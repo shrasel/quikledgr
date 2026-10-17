@@ -1,6 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import pool from '../config/db.js';
 import { hashPassword, comparePassword, generateToken } from '../utils/security.js';
+import { getUserOrganizations } from '../services/organizationService.js';
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -59,7 +60,8 @@ export async function register(req, res, next) {
     };
 
     const token = generateToken(user);
-    res.status(201).json({ user, token });
+    const organizations = await getUserOrganizations(userId);
+    res.status(201).json({ user, token, organizations, activeOrganization: organizations[0] });
   } catch (err) {
     next(err);
   }
@@ -110,7 +112,8 @@ export async function login(req, res, next) {
     };
 
     const token = generateToken(user);
-    res.json({ user, token });
+    const organizations = await getUserOrganizations(user.id);
+    res.json({ user, token, organizations, activeOrganization: organizations[0] });
   } catch (err) {
     next(err);
   }
@@ -210,7 +213,8 @@ export async function googleLogin(req, res, next) {
     }
 
     const token = generateToken(user);
-    res.json({ user, token });
+    const organizations = await getUserOrganizations(user.id);
+    res.json({ user, token, organizations, activeOrganization: organizations[0] });
   } catch (err) {
     next(err);
   }
@@ -241,6 +245,8 @@ export async function getMe(req, res, next) {
     }
 
     const row = users[0];
+    const organizations = await getUserOrganizations(userId);
+
     res.json({
       user: {
         id: row.id,
@@ -251,6 +257,8 @@ export async function getMe(req, res, next) {
         role: row.role,
         avatarUrl: row.avatar_url,
       },
+      organizations,
+      activeOrganization: organizations[0],
       profile: {
         phone: row.phone,
         address: row.address,

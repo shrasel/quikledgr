@@ -3,10 +3,13 @@ import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
 import { InvoiceEditor } from './components/InvoiceEditor';
 import { InvoiceList } from './components/InvoiceList';
+import { Accounting } from './components/Accounting';
 import { ProfileSettings } from './components/ProfileSettings';
 import { InvoiceView } from './components/InvoiceView';
 import { ShareModal } from './components/ShareModal';
 import { AuthScreen } from './components/AuthScreen';
+import { NewOrgModal } from './components/NewOrgModal';
+import { InviteMemberModal } from './components/InviteMemberModal';
 import { Toast } from './components/Toast';
 import { 
   initStorage, 
@@ -19,22 +22,88 @@ import {
 import { getStoredUser, clearUserSession } from './utils/auth';
 import { createBlukersInvoiceTemplate, getCurrentMonthPeriod } from './utils/invoiceSchema';
 import { generateRandomPin } from './utils/cryptoUtils';
-import { invoiceApi } from './api/client';
+import { invoiceApi, organizationApi } from './api/client';
 
 export default function App() {
   const [user, setUser] = useState(() => getStoredUser());
+  const [organizations, setOrganizations] = useState([]);
+  const [activeOrganization, setActiveOrganization] = useState(null);
+
   const [invoices, setInvoices] = useState([]);
   const [currentInvoice, setCurrentInvoice] = useState(null);
-  const [currentTab, setCurrentTab] = useState('dashboard'); // 'dashboard', 'editor', 'list', 'profile'
+  const [currentTab, setCurrentTab] = useState('dashboard'); // 'dashboard', 'editor', 'list', 'accounting', 'profile'
   const [theme, setTheme] = useState(() => localStorage.getItem('quikledgr_theme') || localStorage.getItem('blukers_theme') || 'light');
   const [toasts, setToasts] = useState([]);
   
-  // Share modal state
+  // Modals state
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
+  const [isNewOrgModalOpen, setIsNewOrgModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // Routing detection for recipient link
   const [routeInfo, setRouteInfo] = useState({ isRecipientRoute: false, invoiceId: null, encodedData: null });
+
+  const triggerToast = (message, type = 'success') => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3200);
+  };
+
+  // Sync Organizations & active selection
+  const loadOrganizations = async () => {
+    try {
+      const orgs = await organizationApi.getAll();
+      setOrganizations(orgs);
+      const savedOrgId = organizationApi.getActiveOrgId();
+      const matched = orgs.find(o => o.id === savedOrgId) || orgs[0];
+      if (matched) {
+        setActiveOrganization(matched);
+        organizationApi.setActiveOrgId(matched.id);
+      }
+    } catch (e) {
+      console.warn('[App] Error loading organizations:', e.message);
+    }
+  };
+
+  // Sync Invoices for active organization
+  const syncInvoices = async () => {
+    try {
+      const remoteInvoices = await invoiceApi.getAll();
+      if (remoteInvoices && Array.isArray(remoteInvoices)) {
+        setInvoices(remoteInvoices);
+        if (remoteInvoices.length > 0 && !currentInvoice) {
+          setCurrentInvoice(remoteInvoices[0]);
+        }
+      }
+    } catch (e) {
+      console.log('[App] Using local invoices cache');
+      const stored = getInvoices();
+      setInvoices(stored);
+      if (stored.length > 0 && !currentInvoice) {
+        setCurrentInvoice(stored[0]);
+      }
+    }
+  };
+
+  // Switch Active Workspace
+  const handleSwitchOrganization = (orgId) => {
+    const org = organizations.find(o => o.id === orgId);
+    if (org) {
+      organizationApi.setActiveOrgId(org.id);
+      setActiveOrganization(org);
+      triggerToast(`Switched workspace to "${org.name}"`);
+      syncInvoices();
+    }
+  };
+
+  // On organization created
+  const handleOrgCreated = (newOrg) => {
+    setOrganizations(prev => [...prev, newOrg]);
+    handleSwitchOrganization(newOrg.id);
+  };
 
   // Initialize storage & detect route
   useEffect(() => {
@@ -48,24 +117,11 @@ export default function App() {
       const saved = getIssuerProfile();
       const template = createBlukersInvoiceTemplate(saved);
       setCurrentInvoice(template);
-      // Empty by default for production readiness; do not auto-save into list
-    }
-
-    // Attempt to sync from backend API if authenticated
-    async function syncBackendInvoices() {
-      try {
-        const remoteInvoices = await invoiceApi.getAll();
-        if (remoteInvoices && remoteInvoices.length > 0) {
-          setInvoices(remoteInvoices);
-          setCurrentInvoice(remoteInvoices[0]);
-        }
-      } catch (e) {
-        console.log('[App] Using local invoices cache');
-      }
     }
 
     if (user) {
-      syncBackendInvoices();
+      loadOrganizations();
+      syncInvoices();
     }
 
     const checkHashRoute = () => {
@@ -89,6 +145,14 @@ export default function App() {
     return () => window.removeEventListener('hashchange', checkHashRoute);
   }, []);
 
+  // When user signs in, load organizations
+  useEffect(() => {
+    if (user) {
+      loadOrganizations();
+      syncInvoices();
+    }
+  }, [user]);
+
   // Sync theme
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -100,22 +164,18 @@ export default function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  const triggerToast = (message, type = 'success') => {
-    const id = Date.now() + Math.random();
-    setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 3200);
-  };
-
   const handleLoginSuccess = (authenticatedUser) => {
     setUser(authenticatedUser);
     setCurrentTab('dashboard');
+    loadOrganizations();
+    syncInvoices();
   };
 
   const handleLogout = () => {
     clearUserSession();
     setUser(null);
+    setOrganizations([]);
+    setActiveOrganization(null);
     triggerToast('Signed out successfully.');
   };
 
@@ -237,6 +297,11 @@ export default function App() {
         onNewInvoice={handleNewInvoice}
         invoiceCount={invoices.length}
         user={user}
+        organizations={organizations}
+        activeOrganization={activeOrganization}
+        onSwitchOrganization={handleSwitchOrganization}
+        onOpenNewOrgModal={() => setIsNewOrgModalOpen(true)}
+        onOpenInviteModal={() => setIsInviteModalOpen(true)}
         onLogout={handleLogout}
       />
 
@@ -274,6 +339,14 @@ export default function App() {
           />
         )}
 
+        {currentTab === 'accounting' && (
+          <Accounting 
+            organization={activeOrganization}
+            userRole={activeOrganization?.role || 'owner'}
+            onTriggerToast={triggerToast}
+          />
+        )}
+
         {currentTab === 'profile' && (
           <ProfileSettings onTriggerToast={triggerToast} />
         )}
@@ -288,6 +361,21 @@ export default function App() {
           onTriggerToast={triggerToast}
         />
       )}
+
+      {/* New Entity / LLC Modal */}
+      <NewOrgModal
+        isOpen={isNewOrgModalOpen}
+        onClose={() => setIsNewOrgModalOpen(false)}
+        onCreated={handleOrgCreated}
+        onTriggerToast={triggerToast}
+      />
+
+      {/* Invite Member Modal */}
+      <InviteMemberModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onTriggerToast={triggerToast}
+      />
 
       {/* Toasts */}
       <Toast toasts={toasts} />

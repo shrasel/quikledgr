@@ -1,9 +1,12 @@
 import pool from '../config/db.js';
 import { hashAccessPin } from '../utils/security.js';
+import { recordInvoiceJournal } from '../services/ledgerService.js';
+import { recordAuditLog } from '../services/auditService.js';
 
 export async function getInvoices(req, res, next) {
   try {
     const userId = req.user.id;
+    const orgId = req.organizationId;
 
     const [invoices] = await pool.query(
       `SELECT i.*, 
@@ -12,20 +15,24 @@ export async function getInvoices(req, res, next) {
        FROM invoices i
        LEFT JOIN invoice_security s ON i.id = s.invoice_id
        LEFT JOIN invoice_wire_details w ON i.id = w.invoice_id
-       WHERE i.user_id = ?
+       WHERE (i.organization_id = ? OR (i.organization_id IS NULL AND i.user_id = ?))
        ORDER BY i.created_at DESC`,
-      [userId]
+      [orgId || null, userId]
     );
 
     // Fetch line items and additional charges for all invoices
     const [items] = await pool.query(
-      `SELECT * FROM invoice_items WHERE invoice_id IN (SELECT id FROM invoices WHERE user_id = ?)`,
-      [userId]
+      `SELECT * FROM invoice_items WHERE invoice_id IN (
+        SELECT id FROM invoices WHERE (organization_id = ? OR (organization_id IS NULL AND user_id = ?))
+      )`,
+      [orgId || null, userId]
     );
 
     const [charges] = await pool.query(
-      `SELECT * FROM invoice_additional_charges WHERE invoice_id IN (SELECT id FROM invoices WHERE user_id = ?)`,
-      [userId]
+      `SELECT * FROM invoice_additional_charges WHERE invoice_id IN (
+        SELECT id FROM invoices WHERE (organization_id = ? OR (organization_id IS NULL AND user_id = ?))
+      )`,
+      [orgId || null, userId]
     );
 
     const itemsByInvoice = {};
@@ -53,6 +60,7 @@ export async function getInvoices(req, res, next) {
 
     const formatted = invoices.map(inv => ({
       id: inv.id,
+      organizationId: inv.organization_id,
       invoiceNumber: inv.invoice_number,
       title: 'MONTHLY CONSULTING SERVICES INVOICE',
       status: inv.status,
@@ -103,6 +111,7 @@ export async function createInvoice(req, res, next) {
     await connection.beginTransaction();
 
     const userId = req.user.id;
+    const orgId = req.organizationId;
     const inv = req.body;
 
     const invoiceId = inv.id || 'BLK-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -111,15 +120,16 @@ export async function createInvoice(req, res, next) {
 
     const { hash: pinHash, salt: pinSalt } = await hashAccessPin(pin);
 
-    // 1. Insert invoice header
+    // 1. Insert invoice header with organization_id
     await connection.query(
       `INSERT INTO invoices (
-        id, invoice_number, user_id, client_id, client_name, client_email, client_cc_email, client_address,
+        id, organization_id, invoice_number, user_id, client_id, client_name, client_email, client_cc_email, client_address,
         status, currency, currency_symbol, invoice_date, due_date, service_period, service_start_date, service_end_date,
         payment_terms, subtotal, additional_charges_total, discount_amount, tax_amount, total, notes, agreement_compliance_note
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         invoiceId,
+        orgId || null,
         invoiceNumber,
         userId,
         inv.clientId || null,
@@ -213,6 +223,30 @@ export async function createInvoice(req, res, next) {
     );
 
     await connection.commit();
+
+    // 6. Record audit log
+    await recordAuditLog({
+      organizationId: orgId,
+      userId,
+      entityType: 'invoice',
+      entityId: invoiceId,
+      action: 'create',
+      afterState: { invoiceNumber, total: inv.total, status: inv.status || 'draft' },
+    });
+
+    // 7. Auto-post double-entry journal if invoice is created with 'sent' status
+    if (orgId && (inv.status === 'sent' || inv.status === 'paid')) {
+      try {
+        await recordInvoiceJournal(
+          { ...inv, id: invoiceId, invoiceNumber },
+          inv.status,
+          orgId
+        );
+      } catch (jErr) {
+        console.warn('[Ledger] Auto-journal posting warning on create:', jErr.message);
+      }
+    }
+
     res.status(201).json({ success: true, id: invoiceId, invoiceNumber });
   } catch (err) {
     await connection.rollback();
@@ -222,19 +256,97 @@ export async function createInvoice(req, res, next) {
   }
 }
 
+export async function updateInvoiceStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const orgId = req.organizationId;
+    const userId = req.user.id;
+
+    if (!['draft', 'sent', 'paid', 'void', 'overdue'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid invoice status.' });
+    }
+
+    const [invoices] = await pool.query(
+      'SELECT * FROM invoices WHERE id = ? AND (organization_id = ? OR user_id = ?)',
+      [id, orgId || null, userId]
+    );
+
+    if (invoices.length === 0) {
+      return res.status(404).json({ error: 'Invoice not found or unauthorized.' });
+    }
+
+    const current = invoices[0];
+    const prevStatus = current.status;
+
+    await pool.query(
+      'UPDATE invoices SET status = ? WHERE id = ?',
+      [status, id]
+    );
+
+    const targetOrgId = current.organization_id || orgId;
+
+    // Trigger Double-Entry Auto-Journaling on status changes
+    if (targetOrgId) {
+      if (status === 'sent' && prevStatus !== 'sent') {
+        try {
+          await recordInvoiceJournal(current, 'sent', targetOrgId);
+        } catch (jErr) {
+          console.warn('[Ledger] Invoice sent auto-journal warning:', jErr.message);
+        }
+      } else if (status === 'paid' && prevStatus !== 'paid') {
+        try {
+          await recordInvoiceJournal(current, 'paid', targetOrgId);
+        } catch (jErr) {
+          console.warn('[Ledger] Invoice paid auto-journal warning:', jErr.message);
+        }
+      }
+    }
+
+    // Audit log
+    await recordAuditLog({
+      organizationId: targetOrgId,
+      userId,
+      entityType: 'invoice',
+      entityId: id,
+      action: status === 'void' ? 'void' : 'update',
+      beforeState: { status: prevStatus },
+      afterState: { status },
+    });
+
+    res.json({ success: true, id, status, previousStatus: prevStatus });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function deleteInvoice(req, res, next) {
   try {
     const userId = req.user.id;
+    const orgId = req.organizationId;
     const { id } = req.params;
 
-    const [result] = await pool.query(
-      'DELETE FROM invoices WHERE id = ? AND user_id = ?',
-      [id, userId]
+    const [invoices] = await pool.query(
+      'SELECT * FROM invoices WHERE id = ? AND (organization_id = ? OR user_id = ?)',
+      [id, orgId || null, userId]
     );
 
-    if (result.affectedRows === 0) {
+    if (invoices.length === 0) {
       return res.status(404).json({ error: 'Invoice not found or unauthorized.' });
     }
+
+    const current = invoices[0];
+
+    await pool.query('DELETE FROM invoices WHERE id = ?', [id]);
+
+    await recordAuditLog({
+      organizationId: current.organization_id || orgId,
+      userId,
+      entityType: 'invoice',
+      entityId: id,
+      action: 'delete',
+      beforeState: { invoiceNumber: current.invoice_number, total: current.total },
+    });
 
     res.json({ success: true, message: 'Invoice deleted successfully.' });
   } catch (err) {

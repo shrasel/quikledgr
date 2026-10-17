@@ -8,6 +8,8 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import invoiceRoutes from './routes/invoiceRoutes.js';
 import publicRoutes from './routes/publicRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import organizationRoutes from './routes/organizationRoutes.js';
+import accountingRoutes from './routes/accountingRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -19,7 +21,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: '*', // Allows Nginx, local Vite dev server, and production host
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id'],
 }));
 
 app.use(express.json());
@@ -38,6 +40,8 @@ app.get('/api/health', async (req, res) => {
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/organizations', organizationRoutes);
+app.use('/api/accounting', accountingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/public', publicRoutes);

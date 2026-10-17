@@ -3,8 +3,9 @@ import pool from '../config/db.js';
 export async function getDashboardStats(req, res, next) {
   try {
     const userId = req.user.id;
+    const orgId = req.organizationId;
 
-    // Fetch aggregated metrics for the user's invoices
+    // Fetch aggregated metrics for the organization's invoices
     const [statsRows] = await pool.query(
       `SELECT 
         COUNT(*) as total_count,
@@ -22,8 +23,8 @@ export async function getDashboardStats(req, res, next) {
         COUNT(CASE WHEN status = 'draft' OR status IS NULL THEN 1 END) as not_sent_count,
         COALESCE(SUM(CASE WHEN status = 'draft' OR status IS NULL THEN total ELSE 0 END), 0) as not_sent_amount
       FROM invoices
-      WHERE user_id = ?`,
-      [userId]
+      WHERE (organization_id = ? OR (organization_id IS NULL AND user_id = ?))`,
+      [orgId || null, userId]
     );
 
     const stats = statsRows[0];
@@ -34,10 +35,10 @@ export async function getDashboardStats(req, res, next) {
               i.total, i.currency, i.status, s.passcode_hint
        FROM invoices i
        LEFT JOIN invoice_security s ON i.id = s.invoice_id
-       WHERE i.user_id = ?
+       WHERE (i.organization_id = ? OR (i.organization_id IS NULL AND i.user_id = ?))
        ORDER BY i.created_at DESC
        LIMIT 5`,
-      [userId]
+      [orgId || null, userId]
     );
 
     res.json({

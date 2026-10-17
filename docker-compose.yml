@@ -45,6 +45,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-quikledgr_secure_pass_2026}
       JWT_SECRET: ${JWT_SECRET:-quikledgr_super_secure_jwt_token_key_change_in_production}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     networks:
       - quikledgr_network
 

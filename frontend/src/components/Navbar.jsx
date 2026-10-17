@@ -11,7 +11,10 @@ import {
   LogOut, 
   ChevronDown,
   Info,
-  X
+  X,
+  Scale,
+  Check,
+  UserPlus
 } from 'lucide-react';
 
 export function Navbar({ 
@@ -22,9 +25,15 @@ export function Navbar({
   onNewInvoice, 
   invoiceCount,
   user,
+  organizations = [],
+  activeOrganization = null,
+  onSwitchOrganization,
+  onOpenNewOrgModal,
+  onOpenInviteModal,
   onLogout 
 }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showOrgMenu, setShowOrgMenu] = useState(false);
   const [showComplianceBanner, setShowComplianceBanner] = useState(true);
 
   return (
@@ -47,7 +56,7 @@ export function Navbar({
             </div>
           </div>
 
-          {/* Desktop Navigation Tabs (Hidden on mobile/tablet, replaced by bottom bar) */}
+          {/* Desktop Navigation Tabs */}
           <nav className="nav-tabs hidden lg:flex">
             <button 
               type="button"
@@ -78,6 +87,15 @@ export function Navbar({
 
             <button 
               type="button"
+              className={`nav-tab-btn ${currentTab === 'accounting' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('accounting')}
+            >
+              <Scale size={15} />
+              <span>Accounting</span>
+            </button>
+
+            <button 
+              type="button"
               className={`nav-tab-btn ${currentTab === 'profile' ? 'active' : ''}`}
               onClick={() => setCurrentTab('profile')}
             >
@@ -87,7 +105,90 @@ export function Navbar({
           </nav>
 
           {/* Right Actions */}
-          <div className="navbar-actions">
+          <div className="navbar-actions flex items-center gap-2">
+            {/* Multi-Tenant Organization Switcher */}
+            {activeOrganization && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  className="org-nav-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
+                  onClick={() => {
+                    setShowOrgMenu(!showOrgMenu);
+                    setShowUserMenu(false);
+                  }}
+                  title="Switch business workspace"
+                >
+                  <Building size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="max-w-[120px] truncate hidden sm:inline">{activeOrganization.name}</span>
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    {activeOrganization.role || 'Owner'}
+                  </span>
+                  <ChevronDown size={13} className="text-slate-400" />
+                </button>
+
+                {showOrgMenu && (
+                  <div className="user-dropdown-menu" style={{ width: '260px', right: 0 }}>
+                    <div className="dropdown-user-header">
+                      <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', fontWeight: 700 }}>
+                        Active Workspaces ({organizations.length})
+                      </div>
+                    </div>
+
+                    <div className="max-h-52 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+                      {organizations.map((org) => {
+                        const isSelected = org.id === activeOrganization.id;
+                        return (
+                          <button
+                            key={org.id}
+                            type="button"
+                            className={`dropdown-item w-full flex items-center justify-between text-left ${isSelected ? 'bg-slate-50 dark:bg-slate-800 font-bold' : ''}`}
+                            onClick={() => {
+                              setShowOrgMenu(false);
+                              onSwitchOrganization?.(org.id);
+                            }}
+                          >
+                            <div className="truncate pr-2">
+                              <div className="truncate text-xs text-slate-800 dark:text-slate-200">{org.name}</div>
+                              <div className="text-[10px] text-slate-400 capitalize">{org.role} • {org.currency}</div>
+                            </div>
+                            {isSelected && <Check size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div style={{ borderTop: '1px solid var(--border-color)', margin: '0.35rem 0' }} />
+
+                    <button
+                      type="button"
+                      className="dropdown-item text-xs"
+                      onClick={() => {
+                        setShowOrgMenu(false);
+                        onOpenNewOrgModal?.();
+                      }}
+                    >
+                      <Plus size={14} className="text-emerald-600" />
+                      <span>New Business Entity / LLC</span>
+                    </button>
+
+                    {['owner', 'admin'].includes(activeOrganization.role) && (
+                      <button
+                        type="button"
+                        className="dropdown-item text-xs"
+                        onClick={() => {
+                          setShowOrgMenu(false);
+                          onOpenInviteModal?.();
+                        }}
+                      >
+                        <UserPlus size={14} className="text-blue-600" />
+                        <span>Invite Team Member (RBAC)</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <button 
               type="button"
               className="btn btn-secondary btn-icon-only"
@@ -114,7 +215,10 @@ export function Navbar({
                 <button 
                   type="button" 
                   className="user-nav-btn"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  onClick={() => {
+                    setShowUserMenu(!showUserMenu);
+                    setShowOrgMenu(false);
+                  }}
                   title={user.name}
                 >
                   <img 
@@ -194,7 +298,7 @@ export function Navbar({
         </div>
       )}
 
-      {/* Mobile-First Bottom Navigation Bar (Visible on mobile/tablet under lg:1024px) */}
+      {/* Mobile-First Bottom Navigation Bar */}
       <nav className="mobile-bottom-nav lg:hidden no-print" aria-label="Mobile Navigation">
         <button 
           type="button" 
@@ -230,6 +334,17 @@ export function Navbar({
             )}
           </div>
           <span className="mobile-nav-label">Invoices</span>
+        </button>
+
+        <button 
+          type="button" 
+          className={`mobile-nav-item ${currentTab === 'accounting' ? 'active' : ''}`}
+          onClick={() => setCurrentTab('accounting')}
+        >
+          <div className="mobile-nav-icon-wrap">
+            <Scale size={20} />
+          </div>
+          <span className="mobile-nav-label">Ledger</span>
         </button>
 
         <button 
