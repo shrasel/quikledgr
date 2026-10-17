@@ -5,7 +5,7 @@ import {
   Plus, 
   Sun, 
   Moon, 
-  Building, 
+  Building2, 
   LayoutDashboard, 
   LogOut, 
   ChevronDown, 
@@ -39,7 +39,7 @@ export function Navbar({
     <>
       <header className="navbar no-print">
         <div className="navbar-inner">
-          {/* Brand Logo - Minimalist Apple Style */}
+          {/* Brand Logo - Material Design 3 */}
           <div 
             className="brand-badge" 
             onClick={() => setCurrentTab('dashboard')} 
@@ -47,7 +47,7 @@ export function Navbar({
             tabIndex={0}
           >
             <div className="brand-logo-icon">
-              <FileText size={17} strokeWidth={2.5} />
+              <FileText size={18} strokeWidth={2.2} />
             </div>
             <div className="flex flex-col">
               <div className="brand-title">
@@ -57,14 +57,14 @@ export function Navbar({
             </div>
           </div>
 
-          {/* Desktop Navigation: Apple Segmented Pill Switcher */}
+          {/* Desktop Navigation: Material 3 Horizontal Tabs */}
           <nav className="nav-tabs hidden lg:flex" aria-label="Main Navigation">
             <button 
               type="button"
               className={`nav-tab-btn ${currentTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => setCurrentTab('dashboard')}
             >
-              <LayoutDashboard size={14} />
+              <LayoutDashboard size={15} />
               <span>Dashboard</span>
             </button>
 
@@ -73,10 +73,10 @@ export function Navbar({
               className={`nav-tab-btn ${currentTab === 'list' ? 'active' : ''}`}
               onClick={() => setCurrentTab('list')}
             >
-              <Layers size={14} />
+              <Layers size={15} />
               <span>Invoices</span>
               {invoiceCount > 0 && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/10 dark:bg-white/20 font-bold ml-0.5">
+                <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 font-semibold ml-0.5 text-slate-800 dark:text-slate-200">
                   {invoiceCount}
                 </span>
               )}
@@ -87,7 +87,7 @@ export function Navbar({
               className={`nav-tab-btn ${currentTab === 'editor' ? 'active' : ''}`}
               onClick={() => setCurrentTab('editor')}
             >
-              <FileText size={14} />
+              <FileText size={15} />
               <span>Editor</span>
             </button>
 
@@ -96,7 +96,7 @@ export function Navbar({
               className={`nav-tab-btn ${currentTab === 'accounting' ? 'active' : ''}`}
               onClick={() => setCurrentTab('accounting')}
             >
-              <Scale size={14} />
+              <Scale size={15} />
               <span>Accounting</span>
             </button>
 
@@ -105,7 +105,7 @@ export function Navbar({
               className={`nav-tab-btn ${currentTab === 'profile' ? 'active' : ''}`}
               onClick={() => setCurrentTab('profile')}
             >
-              <Sliders size={14} />
+              <Sliders size={15} />
               <span>Settings</span>
             </button>
           </nav>
@@ -124,9 +124,9 @@ export function Navbar({
                   }}
                   title="Switch workspace entity"
                 >
-                  <Building size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
-                  <span className="max-w-[110px] truncate hidden sm:inline">{activeOrganization.name}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/5 dark:bg-white/10 uppercase font-semibold text-slate-600 dark:text-slate-300">
+                  <Building2 size={14} className="text-slate-500 dark:text-slate-400 shrink-0" />
+                  <span className="max-w-[120px] truncate hidden sm:inline">{activeOrganization.name}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 uppercase font-semibold text-slate-600 dark:text-slate-300">
                     {activeOrganization.role || 'Owner'}
                   </span>
                   <ChevronDown size={12} className="text-slate-400" />
@@ -135,7 +135,7 @@ export function Navbar({
                 {showOrgMenu && (
                   <div className="user-dropdown-menu" style={{ width: '250px' }}>
                     <div className="dropdown-user-header">
-                      <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                      <div className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
                         Workspaces ({organizations.length})
                       </div>
                     </div>
@@ -147,15 +147,15 @@ export function Navbar({
                           <button
                             key={org.id}
                             type="button"
-                            className={`dropdown-item justify-between ${isSelected ? 'font-semibold bg-slate-50 dark:bg-slate-800/60' : ''}`}
+                            className={`dropdown-item justify-between ${isSelected ? 'font-semibold bg-slate-100 dark:bg-slate-800' : ''}`}
                             onClick={() => {
                               setShowOrgMenu(false);
                               onSwitchOrganization?.(org.id);
                             }}
                           >
                             <div className="truncate pr-2">
-                              <div className="truncate text-xs">{org.name}</div>
-                              <div className="text-[10px] text-slate-400 capitalize">{org.role} • {org.currency}</div>
+                              <div className="truncate text-xs text-slate-900 dark:text-white">{org.name}</div>
+                              <div className="text-[11px] text-slate-500 capitalize">{org.role} • {org.currency}</div>
                             </div>
                             {isSelected && <Check size={14} className="text-slate-900 dark:text-white shrink-0" />}
                           </button>
@@ -163,7 +163,7 @@ export function Navbar({
                       })}
                     </div>
 
-                    <div style={{ borderTop: '1px solid var(--apple-divider)', margin: '0.35rem 0' }} />
+                    <div style={{ borderTop: '1px solid var(--md-sys-outline-variant)', margin: '0.35rem 0' }} />
 
                     <button
                       type="button"
@@ -173,7 +173,7 @@ export function Navbar({
                         onOpenNewOrgModal?.();
                       }}
                     >
-                      <Plus size={13} />
+                      <Plus size={14} />
                       <span>New Business Entity / LLC</span>
                     </button>
 
@@ -186,7 +186,7 @@ export function Navbar({
                           onOpenInviteModal?.();
                         }}
                       >
-                        <UserPlus size={13} />
+                        <UserPlus size={14} />
                         <span>Invite Member (RBAC)</span>
                       </button>
                     )}
@@ -195,7 +195,7 @@ export function Navbar({
               </div>
             )}
 
-            {/* Apple Minimalist Theme Toggle */}
+            {/* Theme Toggle Button */}
             <button 
               type="button"
               className="btn btn-secondary btn-icon-only"
@@ -206,7 +206,7 @@ export function Navbar({
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            {/* New Invoice Action */}
+            {/* New Invoice Action Button */}
             <button 
               type="button"
               className="btn btn-primary btn-sm flex items-center gap-1.5"
@@ -241,7 +241,7 @@ export function Navbar({
                   <div className="user-dropdown-menu">
                     <div className="dropdown-user-header">
                       <div className="font-semibold text-slate-900 dark:text-white text-xs">{user.name}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{user.email}</div>
+                      <div className="text-[11px] text-slate-500 truncate">{user.email}</div>
                     </div>
 
                     <button 
@@ -253,7 +253,7 @@ export function Navbar({
                       <span>Banking & Profile Settings</span>
                     </button>
 
-                    <div style={{ borderTop: '1px solid var(--apple-divider)', margin: '0.35rem 0' }} />
+                    <div style={{ borderTop: '1px solid var(--md-sys-outline-variant)', margin: '0.35rem 0' }} />
 
                     <button 
                       type="button" 
@@ -271,7 +271,7 @@ export function Navbar({
         </div>
       </header>
 
-      {/* Protocol Banner: Understated Apple Information Strip */}
+      {/* Protocol Banner: Understated Material Information Strip */}
       {showComplianceBanner && (
         <div className="compliance-banner no-print">
           <div className="compliance-inner">
@@ -294,7 +294,7 @@ export function Navbar({
         </div>
       )}
 
-      {/* Mobile-First Floating Bottom Navigation Bar */}
+      {/* Material Mobile-First Bottom Navigation Bar */}
       <nav className="mobile-bottom-nav lg:hidden no-print" aria-label="Mobile Navigation">
         <button 
           type="button" 

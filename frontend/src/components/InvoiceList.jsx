@@ -2,13 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { 
   FileText, 
   Share2, 
-  Eye, 
   Copy, 
   Trash2, 
   Plus, 
   Search, 
   ChevronRight,
-  ExternalLink
+  Filter,
+  X
 } from 'lucide-react';
 import { formatMoney } from '../utils/invoiceSchema';
 
@@ -38,10 +38,10 @@ export function InvoiceList({
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
             Invoices
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
@@ -59,34 +59,39 @@ export function InvoiceList({
         </button>
       </div>
 
-      {/* Filter & Search Toolbar (Apple Segmented Style) */}
+      {/* Material 3 Toolbar: Outlined Search & Material Filter Chips */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
             type="text" 
-            className="form-input pl-9 text-xs sm:text-sm" 
-            placeholder="Search invoice #, client, period..." 
+            className="form-input pl-9 pr-8 text-xs sm:text-sm" 
+            placeholder="Search by invoice #, client, or period..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              type="button"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              onClick={() => setSearchTerm('')}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
-        {/* Status Pills */}
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700/60 self-start sm:self-auto">
+        {/* Material Filter Chips */}
+        <div className="material-filter-chips">
           {['all', 'draft', 'sent', 'paid'].map((status) => (
             <button
               key={status}
               type="button"
               onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-all ${
-                statusFilter === status
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              }`}
+              className={`material-chip-btn ${statusFilter === status ? 'active' : ''}`}
             >
-              {status === 'all' ? 'All' : status}
+              <span className="capitalize">{status === 'all' ? 'All Invoices' : status}</span>
             </button>
           ))}
         </div>
@@ -94,11 +99,11 @@ export function InvoiceList({
 
       {/* Invoices List Content */}
       {filtered.length === 0 ? (
-        <div className="card p-12 text-center text-slate-400">
+        <div className="card p-10 text-center text-slate-400">
           <FileText size={36} className="mx-auto mb-2 text-slate-300 dark:text-slate-600" />
           <h3 className="text-base font-semibold text-slate-700 dark:text-slate-300">No Invoices Found</h3>
           <p className="text-xs text-slate-400 mt-1 mb-4">
-            {searchTerm ? 'No invoices match your current search criteria.' : 'Create your first monthly invoice to get started.'}
+            {searchTerm ? 'No invoices match your current search query.' : 'Create your first monthly invoice to get started.'}
           </p>
           <button type="button" className="btn btn-primary btn-sm" onClick={onNewInvoice}>
             Create Invoice
@@ -106,9 +111,9 @@ export function InvoiceList({
         </div>
       ) : (
         <>
-          {/* Desktop Table View */}
-          <div className="hidden md:block apple-table-wrap">
-            <table className="apple-table">
+          {/* Desktop Material Data Table */}
+          <div className="hidden md:block md-table-wrap">
+            <table className="md-table">
               <thead>
                 <tr>
                   <th>Invoice #</th>
@@ -116,7 +121,7 @@ export function InvoiceList({
                   <th>Service Period</th>
                   <th>Due Date</th>
                   <th>Status</th>
-                  <th className="text-right">Total</th>
+                  <th className="text-right">Total Amount</th>
                   <th className="text-right">Actions</th>
                 </tr>
               </thead>
@@ -129,11 +134,11 @@ export function InvoiceList({
                       className="cursor-pointer"
                       onClick={() => onSelectInvoice(inv)}
                     >
-                      <td className="font-mono font-bold text-xs">
+                      <td className="font-mono font-semibold text-xs text-slate-900 dark:text-white">
                         {inv.invoiceNumber}
                       </td>
-                      <td className="font-medium">
-                        {inv.client?.companyName || 'Blukers, Inc.'}
+                      <td className="font-medium text-slate-900 dark:text-white">
+                        {inv.client?.companyName || 'Client'}
                       </td>
                       <td className="text-xs text-slate-500 dark:text-slate-400">
                         {inv.servicePeriod || '—'}
@@ -146,14 +151,14 @@ export function InvoiceList({
                           {status}
                         </span>
                       </td>
-                      <td className="text-right font-bold tabular-nums text-sm">
+                      <td className="text-right font-semibold tabular-nums text-sm text-slate-900 dark:text-white">
                         {formatMoney(inv.total)}
                       </td>
                       <td className="text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="p-1.5 rounded-md text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                             onClick={() => onShareInvoice(inv)}
                             title="Share invoice link"
                           >
@@ -161,7 +166,7 @@ export function InvoiceList({
                           </button>
                           <button
                             type="button"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="p-1.5 rounded-md text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                             onClick={() => onDuplicateInvoice(inv)}
                             title="Duplicate invoice"
                           >
@@ -169,7 +174,7 @@ export function InvoiceList({
                           </button>
                           <button
                             type="button"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                             onClick={() => onDeleteInvoice(inv.id)}
                             title="Delete invoice"
                           >
@@ -184,68 +189,70 @@ export function InvoiceList({
             </table>
           </div>
 
-          {/* Mobile Grouped Cards View */}
-          <div className="md:hidden space-y-3">
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-2.5">
             {filtered.map((inv) => {
               const status = inv.status || 'draft';
               return (
-                <div
+                <div 
                   key={inv.id}
-                  className="card p-4 space-y-3"
+                  className="card p-4 space-y-3 cursor-pointer"
                   onClick={() => onSelectInvoice(inv)}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="font-bold text-sm text-slate-900 dark:text-white">
-                        {inv.client?.companyName || 'Client'}
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                          {inv.client?.companyName || 'Client'}
+                        </span>
+                        <span className={`status-chip ${status}`}>
+                          {status}
+                        </span>
                       </div>
-                      <div className="text-xs text-slate-400 font-mono mt-0.5">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                         {inv.invoiceNumber}
                       </div>
                     </div>
 
-                    <span className={`status-chip ${status}`}>
-                      {status}
-                    </span>
+                    <div className="text-right">
+                      <div className="font-bold text-base text-slate-900 dark:text-white tabular-nums">
+                        {formatMoney(inv.total)}
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        Due {inv.dueDate || '15th'}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                    <span className="text-slate-400">
-                      Due: {inv.dueDate || '15th'}
-                    </span>
-                    <span className="font-bold text-base text-slate-900 dark:text-white tabular-nums">
-                      {formatMoney(inv.total)}
-                    </span>
-                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
+                    <span>{inv.servicePeriod || 'Monthly Consulting'}</span>
 
-                  {/* Quick Action Buttons */}
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm flex items-center gap-1 text-xs"
-                      onClick={() => onShareInvoice(inv)}
-                    >
-                      <Share2 size={13} />
-                      <span>Share</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm flex items-center gap-1 text-xs"
-                      onClick={() => onDuplicateInvoice(inv)}
-                    >
-                      <Copy size={13} />
-                      <span>Copy</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn btn-danger btn-sm text-xs p-1.5"
-                      onClick={() => onDeleteInvoice(inv.id)}
-                      title="Delete"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        className="p-1.5 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100"
+                        onClick={() => onShareInvoice(inv)}
+                        title="Share link"
+                      >
+                        <Share2 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        className="p-1.5 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100"
+                        onClick={() => onDuplicateInvoice(inv)}
+                        title="Duplicate"
+                      >
+                        <Copy size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                        onClick={() => onDeleteInvoice(inv.id)}
+                        title="Delete"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

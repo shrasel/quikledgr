@@ -1,127 +1,151 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   QuikLedgr — Apple Human Interface Design System
-   Principles: Radical Simplicity, Muted Neutral Palette, Grouped Insets,
-   Pixel-Perfect Spatial Hierarchy & Mobile-First Tactile Ergonomics
+   QuikLedgr — Clean Material Design 3 (Muted Palette)
+   Principles: High-Utility, Crisp Structure, Muted Slate Tones,
+   Outlined Text Fields, Material Elevation, Mobile-First Responsiveness
    ========================================================================== */
 
 :root {
   /* ------------------------------------------------------------------------
-     Apple Muted Neutral Color Palette (No Loud Clashing Colors)
+     Material 3 Muted Neutral Palette (Slate & Steel)
      ------------------------------------------------------------------------ */
-  --apple-canvas: #fbfbfd;
-  --apple-surface: #ffffff;
-  --apple-surface-elevated: #ffffff;
-  --apple-grouped: #f5f5f7;
-  --apple-grouped-secondary: #e5e5e7;
-  
-  /* Text & Labels */
-  --apple-text-primary: #1d1d1f;
-  --apple-text-secondary: #6e6e73;
-  --apple-text-tertiary: #86868b;
-  --apple-text-quaternary: #aeaeb2;
+  --md-sys-canvas: #f8fafc; /* Slate 50 */
+  --md-sys-surface: #ffffff;
+  --md-sys-surface-container-low: #f8fafc;
+  --md-sys-surface-container: #f1f5f9; /* Slate 100 */
+  --md-sys-surface-container-high: #e2e8f0; /* Slate 200 */
+  --md-sys-surface-elevated: #ffffff;
 
-  /* Hairline Borders & Dividers */
-  --apple-border: rgba(0, 0, 0, 0.08);
-  --apple-border-subtle: rgba(0, 0, 0, 0.04);
-  --apple-divider: rgba(0, 0, 0, 0.06);
+  /* Text & Labels (High contrast, readable, neutral) */
+  --md-sys-on-surface: #0f172a; /* Slate 900 */
+  --md-sys-on-surface-variant: #475569; /* Slate 600 */
+  --md-sys-on-surface-muted: #64748b; /* Slate 500 */
+  --md-sys-outline: #cbd5e1; /* Slate 300 - Clean 1px input outline */
+  --md-sys-outline-variant: #e2e8f0; /* Slate 200 - Dividers & hairline borders */
 
-  /* Primary Interactive - Apple Obsidian */
-  --apple-dark: #1d1d1f;
-  --apple-dark-hover: #333336;
-  --apple-dark-active: #000000;
-  
-  /* Muted Monochromatic Accents */
-  --apple-accent: #0071e3;
-  --apple-accent-soft: rgba(0, 113, 227, 0.08);
-  --apple-accent-hover: #0077ed;
+  /* Primary Interactive - Muted Deep Slate */
+  --md-sys-primary: #0f172a;
+  --md-sys-primary-hover: #1e293b;
+  --md-sys-primary-active: #334155;
+  --md-sys-on-primary: #ffffff;
 
-  /* Status Colors (Apple Muted Tints, Not Loud) */
-  --apple-status-paid-bg: rgba(0, 0, 0, 0.04);
-  --apple-status-paid-text: #1d1d1f;
-  --apple-status-sent-bg: rgba(0, 113, 227, 0.08);
-  --apple-status-sent-text: #0071e3;
-  --apple-status-pending-bg: rgba(142, 142, 147, 0.12);
-  --apple-status-pending-text: #636366;
-  --apple-status-overdue-bg: rgba(255, 59, 48, 0.08);
-  --apple-status-overdue-text: #d70015;
+  /* Accent - Crisp Slate Blue (For active states, focus rings, links) */
+  --md-sys-accent: #2563eb;
+  --md-sys-accent-hover: #1d4ed8;
+  --md-sys-accent-subtle: #eff6ff;
 
-  /* Geometry & Curves (Apple Squircles) */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
-  --radius-pill: 9999px;
+  /* Material Status Tonal Containers (Muted, Not Loud) */
+  --md-status-paid-bg: #ecfdf5;
+  --md-status-paid-text: #065f46;
+  --md-status-paid-border: #a7f3d0;
 
-  /* Shadows (Subtle Ambient Apple Elevations) */
-  --shadow-ambient: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
-  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.02);
-  --shadow-sheet: 0 24px 48px -12px rgba(0, 0, 0, 0.18), 0 0 1px rgba(0, 0, 0, 0.1);
-  --shadow-pill: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.12);
+  --md-status-sent-bg: #eff6ff;
+  --md-status-sent-text: #1d4ed8;
+  --md-status-sent-border: #bfdbfe;
+
+  --md-status-draft-bg: #f1f5f9;
+  --md-status-draft-text: #475569;
+  --md-status-draft-border: #cbd5e1;
+
+  --md-status-overdue-bg: #fff1f2;
+  --md-status-overdue-text: #be123c;
+  --md-status-overdue-border: #fecdd3;
+
+  /* Material 3 Radii */
+  --md-shape-xs: 4px;
+  --md-shape-sm: 6px;
+  --md-shape-md: 8px; /* Standard inputs, buttons, chips */
+  --md-shape-lg: 12px; /* Cards, panels, tables */
+  --md-shape-xl: 16px; /* Modals, large containers */
+  --md-shape-full: 9999px; /* Status badges & avatar circles only */
+
+  /* Material 3 Elevations (Clean, subtle shadows) */
+  --md-elevation-0: none;
+  --md-elevation-1: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --md-elevation-2: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --md-elevation-3: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --md-elevation-dialog: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
 
   /* Typography */
-  --font-sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Inter", -system-ui, sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   --font-mono: "SF Mono", "JetBrains Mono", "Menlo", monospace;
 
-  /* Compatibility Mapping */
-  --bg-app: var(--apple-canvas);
-  --bg-card: var(--apple-surface);
-  --border-color: var(--apple-border);
-  --text-main: var(--apple-text-primary);
-  --text-muted: var(--apple-text-secondary);
+  /* Backward Compatibility Mappings */
+  --apple-canvas: var(--md-sys-canvas);
+  --apple-surface: var(--md-sys-surface);
+  --apple-grouped: var(--md-sys-surface-container);
+  --apple-border: var(--md-sys-outline-variant);
+  --apple-text-primary: var(--md-sys-on-surface);
+  --apple-text-secondary: var(--md-sys-on-surface-variant);
+  --apple-dark: var(--md-sys-primary);
+  --bg-app: var(--md-sys-canvas);
+  --bg-card: var(--md-sys-surface);
+  --border-color: var(--md-sys-outline-variant);
+  --text-main: var(--md-sys-on-surface);
+  --text-muted: var(--md-sys-on-surface-variant);
 }
 
 [data-theme='dark'] {
-  --apple-canvas: #000000;
-  --apple-surface: #161617;
-  --apple-surface-elevated: #1c1c1e;
-  --apple-grouped: #1c1c1e;
-  --apple-grouped-secondary: #2c2c2e;
+  --md-sys-canvas: #090d16;
+  --md-sys-surface: #111827;
+  --md-sys-surface-container-low: #0f172a;
+  --md-sys-surface-container: #1e293b;
+  --md-sys-surface-container-high: #334155;
+  --md-sys-surface-elevated: #1e293b;
 
-  --apple-text-primary: #f5f5f7;
-  --apple-text-secondary: #86868b;
-  --apple-text-tertiary: #6e6e73;
-  --apple-text-quaternary: #48484a;
+  --md-sys-on-surface: #f8fafc;
+  --md-sys-on-surface-variant: #94a3b8;
+  --md-sys-on-surface-muted: #64748b;
+  --md-sys-outline: #334155;
+  --md-sys-outline-variant: #1e293b;
 
-  --apple-border: rgba(255, 255, 255, 0.08);
-  --apple-border-subtle: rgba(255, 255, 255, 0.04);
-  --apple-divider: rgba(255, 255, 255, 0.06);
+  --md-sys-primary: #f8fafc;
+  --md-sys-primary-hover: #e2e8f0;
+  --md-sys-primary-active: #cbd5e1;
+  --md-sys-on-primary: #0f172a;
 
-  --apple-dark: #ffffff;
-  --apple-dark-hover: #e5e5e7;
-  --apple-dark-active: #d1d1d6;
+  --md-sys-accent: #3b82f6;
+  --md-sys-accent-hover: #60a5fa;
+  --md-sys-accent-subtle: rgba(59, 130, 246, 0.15);
 
-  --apple-accent: #2997ff;
-  --apple-accent-soft: rgba(41, 151, 255, 0.12);
-  --apple-accent-hover: #409cff;
+  --md-status-paid-bg: rgba(16, 185, 129, 0.12);
+  --md-status-paid-text: #34d399;
+  --md-status-paid-border: rgba(16, 185, 129, 0.25);
 
-  --apple-status-paid-bg: rgba(255, 255, 255, 0.08);
-  --apple-status-paid-text: #f5f5f7;
-  --apple-status-sent-bg: rgba(41, 151, 255, 0.12);
-  --apple-status-sent-text: #2997ff;
-  --apple-status-pending-bg: rgba(142, 142, 147, 0.16);
-  --apple-status-pending-text: #a1a1a6;
-  --apple-status-overdue-bg: rgba(255, 69, 58, 0.14);
-  --apple-status-overdue-text: #ff453a;
+  --md-status-sent-bg: rgba(59, 130, 246, 0.12);
+  --md-status-sent-text: #60a5fa;
+  --md-status-sent-border: rgba(59, 130, 246, 0.25);
 
-  --shadow-ambient: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.08);
-  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.08);
-  --shadow-hover: 0 14px 32px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.12);
-  --shadow-sheet: 0 32px 64px -16px rgba(0, 0, 0, 0.9), 0 0 1px rgba(255, 255, 255, 0.15);
-  --shadow-pill: 0 1px 4px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.1);
+  --md-status-draft-bg: rgba(148, 163, 184, 0.12);
+  --md-status-draft-text: #cbd5e1;
+  --md-status-draft-border: rgba(148, 163, 184, 0.25);
 
-  --bg-app: var(--apple-canvas);
-  --bg-card: var(--apple-surface);
-  --border-color: var(--apple-border);
-  --text-main: var(--apple-text-primary);
-  --text-muted: var(--apple-text-secondary);
+  --md-status-overdue-bg: rgba(244, 63, 94, 0.12);
+  --md-status-overdue-text: #fb7185;
+  --md-status-overdue-border: rgba(244, 63, 94, 0.25);
+
+  --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  --md-elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --md-elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --md-elevation-dialog: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+
+  --apple-canvas: var(--md-sys-canvas);
+  --apple-surface: var(--md-sys-surface);
+  --apple-grouped: var(--md-sys-surface-container);
+  --apple-border: var(--md-sys-outline-variant);
+  --apple-text-primary: var(--md-sys-on-surface);
+  --apple-text-secondary: var(--md-sys-on-surface-variant);
+  --apple-dark: var(--md-sys-primary);
+  --bg-app: var(--md-sys-canvas);
+  --bg-card: var(--md-sys-surface);
+  --border-color: var(--md-sys-outline-variant);
+  --text-main: var(--md-sys-on-surface);
+  --text-muted: var(--md-sys-on-surface-variant);
 }
 
 /* --------------------------------------------------------------------------
-   Global Reset & Apple Typography Base
+   Global Reset & Material Typography
    -------------------------------------------------------------------------- */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -132,44 +156,44 @@
 }
 
 html, body {
-  background-color: var(--apple-canvas);
-  color: var(--apple-text-primary);
-  font-family: var(--font-sf);
-  font-size: 15px;
-  line-height: 1.47;
-  letter-spacing: -0.015em;
+  background-color: var(--md-sys-canvas);
+  color: var(--md-sys-on-surface);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
   min-height: 100vh;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-/* Tabular numbers for financial metrics */
+/* Tabular figures for financial currency alignment */
 .tabular-nums, .font-mono, td, th {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1, "cv05" 1;
+  font-feature-settings: "tnum" 1;
 }
 
 /* --------------------------------------------------------------------------
-   Layout Containers & Mobile Ergonomics
+   Layout & Container Structure
    -------------------------------------------------------------------------- */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--apple-canvas);
+  background-color: var(--md-sys-canvas);
 }
 
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 6rem; /* Extra bottom padding for mobile tab bar */
+  padding: 1.5rem 1rem 5.5rem; /* Bottom padding keeps space for mobile bottom bar */
 }
 
 @media (min-width: 640px) {
   .main-content {
-    padding: 1.5rem 1.5rem 6rem;
+    padding: 1.75rem 1.5rem 5.5rem;
   }
 }
 
@@ -180,179 +204,157 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   Navigation: Apple Glass Floating Header
+   Material Top App Bar (Navbar)
    -------------------------------------------------------------------------- */
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: rgba(251, 251, 253, 0.82);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--apple-border);
-  padding: 0.65rem 1rem;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
-}
-
-[data-theme='dark'] .navbar {
-  background: rgba(0, 0, 0, 0.75);
+  z-index: 40;
+  background: var(--md-sys-surface);
+  border-bottom: 1px solid var(--md-sys-outline-variant);
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .navbar-inner {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .brand-badge {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.625rem;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.15s ease;
-}
-
-.brand-badge:hover {
-  opacity: 0.85;
 }
 
 .brand-logo-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: var(--apple-dark);
-  color: var(--apple-surface);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--md-shape-md);
+  background: var(--md-sys-primary);
+  color: var(--md-sys-on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
-}
-
-[data-theme='dark'] .brand-logo-icon {
-  background: #ffffff;
-  color: #000000;
+  box-shadow: var(--md-elevation-1);
 }
 
 .brand-title {
   font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: -0.024em;
-  color: var(--apple-text-primary);
+  letter-spacing: -0.02em;
+  color: var(--md-sys-on-surface);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .brand-tag {
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-pill);
-  background: var(--apple-grouped);
-  color: var(--apple-text-secondary);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--md-shape-xs);
+  background: var(--md-sys-surface-container);
+  color: var(--md-sys-on-surface-variant);
+  border: 1px solid var(--md-sys-outline-variant);
 }
 
-/* Apple Segmented Navigation Pills (Desktop) */
+/* Material Top App Bar Navigation Tabs (Desktop) */
 .nav-tabs {
   display: flex;
   align-items: center;
-  background: var(--apple-grouped);
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--apple-border-subtle);
+  gap: 0.25rem;
 }
 
 .nav-tab-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.8rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--apple-text-secondary);
-  border-radius: var(--radius-pill);
-  border: none;
+  color: var(--md-sys-on-surface-variant);
+  border-radius: var(--md-shape-md);
+  border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 
 .nav-tab-btn:hover {
-  color: var(--apple-text-primary);
+  background: var(--md-sys-surface-container);
+  color: var(--md-sys-on-surface);
 }
 
 .nav-tab-btn.active {
-  background: var(--apple-surface);
-  color: var(--apple-text-primary);
+  background: var(--md-sys-surface-container);
+  color: var(--md-sys-on-surface);
   font-weight: 600;
-  box-shadow: var(--shadow-pill);
+  border-color: var(--md-sys-outline-variant);
 }
 
-/* Navbar Right Controls */
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-/* User & Org Trigger Buttons */
 .user-nav-btn, .org-nav-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.35rem 0.65rem;
-  background: var(--apple-grouped);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-pill);
-  color: var(--apple-text-primary);
-  font-size: 0.78rem;
+  padding: 0.375rem 0.625rem;
+  background: var(--md-sys-surface);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-md);
+  color: var(--md-sys-on-surface);
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
-  user-select: none;
 }
 
 .user-nav-btn:hover, .org-nav-btn:hover {
-  background: var(--apple-surface);
-  box-shadow: var(--shadow-ambient);
+  background: var(--md-sys-surface-container);
+  border-color: var(--md-sys-outline);
 }
 
 .user-nav-avatar {
   width: 22px;
   height: 22px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--md-shape-full);
   object-fit: cover;
 }
 
-/* Apple Dropdown Menus */
+/* Material Dropdown Menu (Elevation 2) */
 .user-dropdown-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   right: 0;
-  min-width: 220px;
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sheet);
-  padding: 0.4rem;
+  min-width: 210px;
+  background: var(--md-sys-surface);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-lg);
+  box-shadow: var(--md-elevation-2);
+  padding: 0.375rem;
   z-index: 100;
-  backdrop-filter: blur(25px);
-  animation: appleMenuAppear 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: mdDropdownIn 0.15s ease-out;
 }
 
-@keyframes appleMenuAppear {
+@keyframes mdDropdownIn {
   from {
     opacity: 0;
-    transform: translateY(-6px) scale(0.98);
+    transform: translateY(-4px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -361,22 +363,22 @@ html, body {
 }
 
 .dropdown-user-header {
-  padding: 0.5rem 0.75rem 0.4rem;
-  border-bottom: 1px solid var(--apple-divider);
-  margin-bottom: 0.35rem;
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--md-sys-outline-variant);
+  margin-bottom: 0.25rem;
 }
 
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   width: 100%;
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-xs);
+  padding: 0.45rem 0.625rem;
+  border-radius: var(--md-shape-sm);
   border: none;
   background: transparent;
-  color: var(--apple-text-primary);
-  font-size: 0.8rem;
+  color: var(--md-sys-on-surface);
+  font-size: 0.8125rem;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
@@ -384,24 +386,24 @@ html, body {
 }
 
 .dropdown-item:hover {
-  background: var(--apple-grouped);
+  background: var(--md-sys-surface-container);
 }
 
 .dropdown-item.logout-item {
-  color: var(--apple-status-overdue-text);
+  color: var(--md-status-overdue-text);
 }
 
-/* Compliance Helper Banner */
+/* Top Sub-Bar Banner */
 .compliance-banner {
-  background: var(--apple-grouped);
-  border-bottom: 1px solid var(--apple-border);
-  padding: 0.45rem 1rem;
+  background: var(--md-sys-surface-container-low);
+  border-bottom: 1px solid var(--md-sys-outline-variant);
+  padding: 0.35rem 1rem;
   font-size: 0.75rem;
-  color: var(--apple-text-secondary);
+  color: var(--md-sys-on-surface-variant);
 }
 
 .compliance-inner {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -411,17 +413,17 @@ html, body {
 
 .compliance-badge {
   display: inline-block;
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-pill);
-  background: var(--apple-surface);
-  color: var(--apple-text-primary);
-  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--md-shape-xs);
+  background: var(--md-sys-surface);
+  color: var(--md-sys-on-surface);
+  font-size: 0.6875rem;
   font-weight: 600;
-  border: 1px solid var(--apple-border);
+  border: 1px solid var(--md-sys-outline-variant);
 }
 
 /* --------------------------------------------------------------------------
-   Apple Mobile Bottom Tab Bar (iOS Native Feel)
+   Material Mobile Bottom Navigation Bar
    -------------------------------------------------------------------------- */
 .mobile-bottom-nav {
   position: fixed;
@@ -432,15 +434,10 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background: rgba(251, 251, 253, 0.88);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border-top: 1px solid var(--apple-border);
-  padding: 0.35rem 0.5rem calc(env(safe-area-inset-bottom, 8px) + 0.25rem);
-}
-
-[data-theme='dark'] .mobile-bottom-nav {
-  background: rgba(0, 0, 0, 0.84);
+  background: var(--md-sys-surface);
+  border-top: 1px solid var(--md-sys-outline-variant);
+  padding: 0.35rem 0.5rem calc(env(safe-area-inset-bottom, 6px) + 0.25rem);
+  box-shadow: 0 -1px 3px 0 rgba(15, 23, 42, 0.04);
 }
 
 .mobile-nav-item {
@@ -448,31 +445,23 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
-  padding: 0.3rem 0.6rem;
+  gap: 0.2rem;
+  padding: 0.35rem 0.5rem;
   border: none;
   background: transparent;
-  color: var(--apple-text-tertiary);
-  font-size: 0.68rem;
+  color: var(--md-sys-on-surface-muted);
+  font-size: 0.6875rem;
   font-weight: 500;
   cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: color 0.15s ease, transform 0.1s ease;
+  border-radius: var(--md-shape-md);
+  transition: color 0.15s ease;
   flex: 1;
-  max-width: 72px;
-}
-
-.mobile-nav-item:active {
-  transform: scale(0.92);
+  max-width: 68px;
 }
 
 .mobile-nav-item.active {
-  color: var(--apple-dark);
+  color: var(--md-sys-primary);
   font-weight: 600;
-}
-
-[data-theme='dark'] .mobile-nav-item.active {
-  color: #ffffff;
 }
 
 .mobile-nav-icon-wrap {
@@ -480,18 +469,25 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2px 12px;
+  border-radius: var(--md-shape-full);
+  transition: background-color 0.15s ease;
+}
+
+.mobile-nav-item.active .mobile-nav-icon-wrap {
+  background: var(--md-sys-surface-container);
 }
 
 .mobile-nav-badge {
   position: absolute;
-  top: -4px;
-  right: -8px;
-  min-width: 15px;
-  height: 15px;
+  top: -2px;
+  right: 2px;
+  min-width: 14px;
+  height: 14px;
   padding: 0 3px;
-  border-radius: var(--radius-pill);
-  background: var(--apple-dark);
-  color: var(--apple-surface);
+  border-radius: var(--md-shape-full);
+  background: var(--md-sys-primary);
+  color: var(--md-sys-on-primary);
   font-size: 0.6rem;
   font-weight: 700;
   display: flex;
@@ -499,337 +495,496 @@ html, body {
   justify-content: center;
 }
 
-[data-theme='dark'] .mobile-nav-badge {
-  background: #ffffff;
-  color: #000000;
-}
-
 /* --------------------------------------------------------------------------
-   Apple Inset Grouped Cards & Bento Grid
+   Material Cards & Panels
    -------------------------------------------------------------------------- */
-.card, .apple-card {
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+.card, .md-card {
+  background: var(--md-sys-surface);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-lg);
+  box-shadow: var(--md-elevation-1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   overflow: hidden;
 }
 
-.card:hover, .apple-card:hover {
-  box-shadow: var(--shadow-hover);
+.card:hover, .md-card:hover {
+  border-color: var(--md-sys-outline);
 }
 
-/* Apple Inset Grouped Container */
-.apple-inset-group {
-  background: var(--apple-grouped);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--apple-border-subtle);
-  overflow: hidden;
-}
-
-.apple-inset-row {
+/* Card Header with Icon Badge */
+.card-header-clean {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--md-sys-outline-variant);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--apple-divider);
-  background: var(--apple-surface);
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.apple-inset-row:last-child {
-  border-bottom: none;
+.card-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-header-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--md-shape-md);
+  background: var(--md-sys-surface-container);
+  border: 1px solid var(--md-sys-outline-variant);
+  color: var(--md-sys-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-header-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--md-sys-on-surface);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.card-header-subtext {
+  font-size: 0.8125rem;
+  color: var(--md-sys-on-surface-variant);
+  margin-top: 0.125rem;
+}
+
+.card-body-clean {
+  padding: 1.25rem;
 }
 
 /* --------------------------------------------------------------------------
-   Apple Button System
+   Material Outlined Form Fields (Dense, High-Utility, Clean)
+   -------------------------------------------------------------------------- */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Label: Sentence case, clean, tight binding */
+.form-label {
+  display: block;
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  color: var(--md-sys-on-surface);
+  margin-bottom: 0.35rem; /* 5px - close to input */
+  text-transform: none; /* NO SCREAMING ALL CAPS */
+  letter-spacing: normal;
+}
+
+.form-label-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--md-sys-on-surface-muted);
+  margin-left: 0.35rem;
+}
+
+/* Material Outlined Input: Height 40px, 8px radius, clean 1px border */
+.form-input, 
+.form-select, 
+textarea.form-input {
+  width: 100%;
+  height: 40px;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  color: var(--md-sys-on-surface);
+  background: var(--md-sys-surface);
+  border: 1px solid var(--md-sys-outline);
+  border-radius: var(--md-shape-md);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+textarea.form-input {
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-input:hover, 
+.form-select:hover, 
+textarea.form-input:hover {
+  border-color: var(--md-sys-on-surface-variant);
+}
+
+.form-input:focus, 
+.form-select:focus, 
+textarea.form-input:focus {
+  border-color: var(--md-sys-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  background-color: var(--md-sys-surface);
+}
+
+.form-input::placeholder {
+  color: var(--md-sys-on-surface-muted);
+  font-size: 0.8125rem;
+}
+
+.form-input:disabled, 
+.form-select:disabled {
+  background: var(--md-sys-surface-container-low);
+  color: var(--md-sys-on-surface-muted);
+  cursor: not-allowed;
+  border-color: var(--md-sys-outline-variant);
+}
+
+.form-input-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+/* Material Select with custom dropdown chevron */
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 16px;
+  padding-right: 2.25rem;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Material Buttons (Standard Heights 38px / 32px / 44px)
    -------------------------------------------------------------------------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  font-family: var(--font-sf);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  padding: 0.55rem 1.15rem;
-  border-radius: var(--radius-pill);
+  height: 38px;
+  padding: 0 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  border-radius: var(--md-shape-md);
   border: 1px solid transparent;
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
   text-decoration: none;
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: translateY(1px);
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Primary Button (Apple Obsidian / White in Dark Mode) */
+/* Primary Button (Filled Slate 900) */
 .btn-primary {
-  background: var(--apple-dark);
-  color: var(--apple-surface);
-  border-color: var(--apple-dark);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--md-sys-primary);
+  color: var(--md-sys-on-primary);
+  border-color: var(--md-sys-primary);
+  box-shadow: var(--md-elevation-1);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--apple-dark-hover);
-  border-color: var(--apple-dark-hover);
+  background: var(--md-sys-primary-hover);
+  border-color: var(--md-sys-primary-hover);
 }
 
-[data-theme='dark'] .btn-primary {
-  background: #ffffff;
-  color: #1d1d1f;
-  border-color: #ffffff;
-}
-
-[data-theme='dark'] .btn-primary:hover:not(:disabled) {
-  background: #e5e5e7;
-  border-color: #e5e5e7;
-}
-
-/* Secondary Button (Apple Soft Gray Pill) */
+/* Secondary Button (Outlined Material) */
 .btn-secondary {
-  background: var(--apple-grouped);
-  color: var(--apple-text-primary);
-  border-color: var(--apple-border);
+  background: var(--md-sys-surface);
+  color: var(--md-sys-on-surface);
+  border: 1px solid var(--md-sys-outline);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--apple-grouped-secondary);
+  background: var(--md-sys-surface-container);
+  border-color: var(--md-sys-on-surface-variant);
 }
 
-/* Small Button */
+/* Tonal Button (Filled Container) */
+.btn-tonal {
+  background: var(--md-sys-surface-container);
+  color: var(--md-sys-on-surface);
+  border: 1px solid transparent;
+}
+
+.btn-tonal:hover:not(:disabled) {
+  background: var(--md-sys-surface-container-high);
+}
+
+/* Small Button (Height 32px) */
 .btn-sm {
-  padding: 0.38rem 0.8rem;
-  font-size: 0.78rem;
-  border-radius: var(--radius-pill);
+  height: 32px;
+  padding: 0 0.625rem;
+  font-size: 0.75rem;
+  border-radius: var(--md-shape-sm);
 }
 
-/* Large Button */
+/* Large Button (Height 42px) */
 .btn-lg {
-  padding: 0.75rem 1.6rem;
-  font-size: 0.95rem;
-  border-radius: var(--radius-pill);
-}
-
-/* Icon Only Button */
-.btn-icon-only {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border-radius: var(--radius-pill);
+  height: 42px;
+  padding: 0 1.25rem;
+  font-size: 0.875rem;
 }
 
 /* Danger Button */
 .btn-danger {
-  background: var(--apple-status-overdue-bg);
-  color: var(--apple-status-overdue-text);
-  border-color: transparent;
+  background: var(--md-status-overdue-bg);
+  color: var(--md-status-overdue-text);
+  border: 1px solid var(--md-status-overdue-border);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: rgba(255, 59, 48, 0.16);
+  background: #ffe4e6;
+}
+
+/* Icon-Only Button */
+.btn-icon-only {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--md-shape-md);
 }
 
 /* --------------------------------------------------------------------------
-   Apple Form Controls (Subtle & Inset)
-   -------------------------------------------------------------------------- */
-.form-input, .form-select, textarea.form-input {
-  width: 100%;
-  padding: 0.6rem 0.85rem;
-  font-family: var(--font-sf);
-  font-size: 0.85rem;
-  color: var(--apple-text-primary);
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-sm);
-  outline: none;
-  transition: all 0.15s ease;
-}
-
-.form-input:focus, .form-select:focus, textarea.form-input:focus {
-  border-color: var(--apple-text-secondary);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-}
-
-[data-theme='dark'] .form-input:focus, [data-theme='dark'] .form-select:focus {
-  border-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-}
-
-.form-input::placeholder {
-  color: var(--apple-text-quaternary);
-}
-
-.form-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--apple-text-secondary);
-  margin-bottom: 0.35rem;
-}
-
-/* --------------------------------------------------------------------------
-   Apple Status Chips (Minimalist, Monochromatic, Elegant)
+   Material Status Chips & Filter Chips
    -------------------------------------------------------------------------- */
 .status-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem; /* 12px */
+  font-weight: 500;
+  border-radius: var(--md-shape-sm);
   text-transform: capitalize;
-  letter-spacing: -0.01em;
   border: 1px solid transparent;
+  line-height: 1.2;
 }
 
 .status-chip.paid {
-  background: var(--apple-status-paid-bg);
-  color: var(--apple-status-paid-text);
-  border-color: var(--apple-border);
+  background: var(--md-status-paid-bg);
+  color: var(--md-status-paid-text);
+  border-color: var(--md-status-paid-border);
 }
 
 .status-chip.sent {
-  background: var(--apple-status-sent-bg);
-  color: var(--apple-status-sent-text);
+  background: var(--md-status-sent-bg);
+  color: var(--md-status-sent-text);
+  border-color: var(--md-status-sent-border);
 }
 
 .status-chip.draft {
-  background: var(--apple-status-pending-bg);
-  color: var(--apple-status-pending-text);
+  background: var(--md-status-draft-bg);
+  color: var(--md-status-draft-text);
+  border-color: var(--md-status-draft-border);
 }
 
 .status-chip.overdue {
-  background: var(--apple-status-overdue-bg);
-  color: var(--apple-status-overdue-text);
+  background: var(--md-status-overdue-bg);
+  color: var(--md-status-overdue-text);
+  border-color: var(--md-status-overdue-border);
+}
+
+/* Material Filter Chips Container */
+.material-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.material-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 32px;
+  padding: 0 0.75rem;
+  border-radius: var(--md-shape-md);
+  border: 1px solid var(--md-sys-outline);
+  background: var(--md-sys-surface);
+  color: var(--md-sys-on-surface-variant);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.material-chip-btn:hover {
+  background: var(--md-sys-surface-container);
+  border-color: var(--md-sys-on-surface-variant);
+}
+
+.material-chip-btn.active {
+  background: var(--md-sys-primary);
+  color: var(--md-sys-on-primary);
+  border-color: var(--md-sys-primary);
+  font-weight: 600;
+}
+
+/* Backward compatibility for apple segmented container */
+.apple-segmented-container {
+  display: inline-flex;
+  align-items: center;
+  background: var(--md-sys-surface-container);
+  padding: 3px;
+  border-radius: var(--md-shape-md);
+  border: 1px solid var(--md-sys-outline-variant);
+  gap: 2px;
+}
+
+.apple-segmented-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--md-sys-on-surface-variant);
+  border-radius: var(--md-shape-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.apple-segmented-button:hover {
+  color: var(--md-sys-on-surface);
+}
+
+.apple-segmented-button.active {
+  background: var(--md-sys-surface);
+  color: var(--md-sys-on-surface);
+  font-weight: 600;
+  box-shadow: var(--md-elevation-1);
 }
 
 /* --------------------------------------------------------------------------
-   Apple Tables (Clean, Hairline Rules, High Readability)
+   Material Data Tables (Crisp 1px Grid, High Readability)
    -------------------------------------------------------------------------- */
-.apple-table-wrap {
+.apple-table-wrap, .md-table-wrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-lg);
-  background: var(--apple-surface);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-lg);
+  background: var(--md-sys-surface);
+  box-shadow: var(--md-elevation-1);
 }
 
-.apple-table {
+.apple-table, .md-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.83rem;
+  font-size: 0.8125rem; /* 13px */
 }
 
-.apple-table th {
-  padding: 0.75rem 1rem;
-  font-size: 0.72rem;
+.apple-table th, .md-table th {
+  padding: 0.625rem 1rem;
+  font-size: 0.6875rem; /* 11px */
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--apple-text-secondary);
-  background: var(--apple-grouped);
-  border-bottom: 1px solid var(--apple-divider);
+  color: var(--md-sys-on-surface-variant);
+  background: var(--md-sys-surface-container-low);
+  border-bottom: 1px solid var(--md-sys-outline-variant);
+  white-space: nowrap;
 }
 
-.apple-table td {
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--apple-divider);
-  color: var(--apple-text-primary);
+.apple-table td, .md-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--md-sys-outline-variant);
+  color: var(--md-sys-on-surface);
 }
 
-.apple-table tr:last-child td {
+.apple-table tr:last-child td, .md-table tr:last-child td {
   border-bottom: none;
 }
 
-.apple-table tr:hover td {
-  background: rgba(0, 0, 0, 0.015);
-}
-
-[data-theme='dark'] .apple-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+.apple-table tr:hover td, .md-table tr:hover td {
+  background: var(--md-sys-surface-container-low);
 }
 
 /* --------------------------------------------------------------------------
-   Apple Modal Sheet System
+   Material Dialogs & Modal Overlays (Elevation 3)
    -------------------------------------------------------------------------- */
-.apple-modal-overlay {
+.apple-modal-overlay, .md-dialog-overlay {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  animation: appleFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: mdFadeIn 0.15s ease-out;
 }
 
-.apple-modal-content {
+.apple-modal-content, .md-dialog-card {
   width: 100%;
   max-width: 480px;
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sheet);
+  background: var(--md-sys-surface);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-lg);
+  box-shadow: var(--md-elevation-dialog);
   overflow: hidden;
-  animation: appleSheetSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: mdScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes appleFadeIn {
+@keyframes mdFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes appleSheetSlide {
+@keyframes mdScaleIn {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.97);
+    transform: scale(0.96) translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
 /* --------------------------------------------------------------------------
-   Invoice Paper Styling: Apple Swiss Minimalism
+   Invoice Document Sheet
    -------------------------------------------------------------------------- */
 .invoice-paper {
   background: #ffffff;
-  color: #1d1d1f;
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  padding: 2.5rem;
-  max-width: 800px;
+  color: #0f172a;
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-lg);
+  box-shadow: var(--md-elevation-2);
+  padding: 2.25rem;
+  max-width: 820px;
   margin: 0 auto;
 }
 
 [data-theme='dark'] .invoice-paper {
-  background: #18181a;
-  color: #f5f5f7;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #111827;
+  color: #f8fafc;
+  border-color: #1f2937;
 }
 
 /* --------------------------------------------------------------------------
-   Apple Grid & Layout Utilities
+   Grid Layout Utilities
    -------------------------------------------------------------------------- */
 .grid-2 {
   display: grid;
@@ -867,162 +1022,17 @@ html, body {
   }
 }
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-.form-input-mono {
-  font-family: var(--font-mono);
-  font-feature-settings: "tnum" 1;
-}
-
-/* --------------------------------------------------------------------------
-   Apple Segmented Control System
-   -------------------------------------------------------------------------- */
-.apple-segmented-container {
-  display: inline-flex;
-  align-items: center;
-  background: var(--apple-grouped);
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--apple-border-subtle);
-  gap: 2px;
-}
-
-.apple-segmented-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.95rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--apple-text-secondary);
-  border-radius: var(--radius-pill);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
-}
-
-.apple-segmented-button:hover {
-  color: var(--apple-text-primary);
-}
-
-.apple-segmented-button.active {
-  background: var(--apple-surface);
-  color: var(--apple-text-primary);
-  font-weight: 600;
-  box-shadow: var(--shadow-pill);
-}
-
-/* --------------------------------------------------------------------------
-   Invoice Editor Components
-   -------------------------------------------------------------------------- */
-.editor-layout-wrap {
-  width: 100%;
-}
-
-.editor-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.items-table-wrapper {
-  overflow-x: auto;
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-md);
-  margin-top: 0.75rem;
-  background: var(--apple-surface);
-}
-
-.items-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.items-table th {
-  padding: 0.65rem 0.85rem;
-  text-align: left;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--apple-text-secondary);
-  background: var(--apple-grouped);
-  border-bottom: 1px solid var(--apple-divider);
-}
-
-.items-table td {
-  padding: 0.6rem 0.85rem;
-  border-bottom: 1px solid var(--apple-divider);
-  vertical-align: middle;
-}
-
-.items-table tr:last-child td {
-  border-bottom: none;
-}
-
-.totals-summary-card {
-  margin-top: 1.5rem;
-  padding: 1.25rem;
-  background: var(--apple-grouped);
-  border: 1px solid var(--apple-border-subtle);
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  max-width: 440px;
-  margin-left: auto;
-}
-
-.totals-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  color: var(--apple-text-secondary);
-}
-
-.totals-row.grand-total {
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--apple-divider);
-  color: var(--apple-text-primary);
-  font-weight: 700;
-}
-
-.grand-total-amount {
-  font-family: var(--font-mono);
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--apple-dark);
-}
-
-[data-theme='dark'] .grand-total-amount {
-  color: #ffffff;
-}
-
-/* Wire Transfer Section (Apple Monochromatic Security Box) */
+/* Inset wire transfer / security banner */
 .wire-transfer-section {
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-card);
+  background: var(--md-sys-surface);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-lg);
+  box-shadow: var(--md-elevation-1);
+  padding: 1.25rem;
 }
 
 .wire-header {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -1032,315 +1042,21 @@ html, body {
 .wire-header-title {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--apple-text-primary);
+  gap: 0.625rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--md-sys-on-surface);
 }
 
 .security-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.72rem;
-  font-weight: 600;
-  background: var(--apple-grouped);
-  color: var(--apple-text-secondary);
-  border: 1px solid var(--apple-border);
-}
-
-/* --------------------------------------------------------------------------
-   Apple ID Minimalist Authentication Screen
-   -------------------------------------------------------------------------- */
-.auth-wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1rem;
-  background: radial-gradient(circle at 50% 10%, var(--apple-grouped) 0%, var(--apple-canvas) 100%);
-}
-
-.auth-card {
-  width: 100%;
-  max-width: 440px;
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sheet);
-  padding: 2.25rem 2rem;
-  animation: appleSheetSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@media (max-width: 640px) {
-  .auth-card {
-    padding: 1.75rem 1.25rem;
-    border-radius: var(--radius-lg);
-  }
-}
-
-.auth-header {
-  text-align: center;
-  margin-bottom: 1.75rem;
-}
-
-.auth-logo {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 1rem;
-  border-radius: 14px;
-  background: var(--apple-dark);
-  color: var(--apple-surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-[data-theme='dark'] .auth-logo {
-  background: #ffffff;
-  color: #000000;
-}
-
-.auth-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  color: var(--apple-text-primary);
-  margin-bottom: 0.25rem;
-}
-
-.auth-subtitle {
-  font-size: 0.825rem;
-  color: var(--apple-text-secondary);
-  line-height: 1.4;
-}
-
-.auth-tabs {
-  display: flex;
-  background: var(--apple-grouped);
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--apple-border-subtle);
-  margin-bottom: 1.5rem;
-}
-
-.auth-tab-btn {
-  flex: 1;
-  padding: 0.5rem;
-  text-align: center;
-  font-size: 0.825rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--md-sys-surface-container);
+  border: 1px solid var(--md-sys-outline-variant);
+  border-radius: var(--md-shape-sm);
+  font-size: 0.6875rem;
   font-weight: 500;
-  color: var(--apple-text-secondary);
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: all 0.18s ease;
+  color: var(--md-sys-on-surface-variant);
 }
-
-.auth-tab-btn.active {
-  background: var(--apple-surface);
-  color: var(--apple-text-primary);
-  font-weight: 600;
-  box-shadow: var(--shadow-pill);
-}
-
-.google-button-wrapper {
-  margin-bottom: 1.25rem;
-}
-
-.google-auth-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0.65rem 1rem;
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-pill);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--apple-text-primary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.google-auth-btn:hover {
-  background: var(--apple-grouped);
-  border-color: var(--apple-text-secondary);
-}
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  margin: 1.25rem 0;
-  color: var(--apple-text-tertiary);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--apple-divider);
-}
-
-.auth-divider span {
-  padding: 0 0.75rem;
-}
-
-.input-with-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-icon {
-  position: absolute;
-  left: 0.85rem;
-  color: var(--apple-text-tertiary);
-  pointer-events: none;
-}
-
-.input-with-icon .form-input {
-  padding-left: 2.35rem;
-}
-
-.password-toggle-btn {
-  position: absolute;
-  right: 0.75rem;
-  background: none;
-  border: none;
-  color: var(--apple-text-tertiary);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.password-toggle-btn:hover {
-  color: var(--apple-text-primary);
-}
-
-.auth-error-banner {
-  background: var(--apple-status-overdue-bg);
-  color: var(--apple-status-overdue-text);
-  border: 1px solid rgba(255, 59, 48, 0.2);
-  border-radius: var(--radius-sm);
-  padding: 0.65rem 0.85rem;
-  font-size: 0.8rem;
-  margin-bottom: 1.25rem;
-  line-height: 1.4;
-}
-
-.auth-footer-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--apple-divider);
-  font-size: 0.72rem;
-  color: var(--apple-text-tertiary);
-}
-
-/* --------------------------------------------------------------------------
-   Apple Security Gate (Confidential Passcode Sheet)
-   -------------------------------------------------------------------------- */
-.security-gate-wrapper {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1rem;
-}
-
-.security-gate-card {
-  width: 100%;
-  max-width: 440px;
-  background: var(--apple-surface);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sheet);
-  padding: 2.25rem 2rem;
-  text-align: center;
-  animation: appleSheetSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.security-icon-circle {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 1.25rem;
-  border-radius: 50%;
-  background: var(--apple-grouped);
-  border: 1px solid var(--apple-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--apple-dark);
-}
-
-[data-theme='dark'] .security-icon-circle {
-  color: #ffffff;
-}
-
-.pin-inputs-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1.25rem 0 1.5rem;
-}
-
-.pin-digit-box {
-  width: 44px;
-  height: 54px;
-  text-align: center;
-  font-family: var(--font-sf);
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: var(--apple-grouped);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--radius-sm);
-  color: var(--apple-text-primary);
-  outline: none;
-  transition: all 0.15s ease;
-}
-
-.pin-digit-box:focus {
-  background: var(--apple-surface);
-  border-color: var(--apple-dark);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
-}
-
-[data-theme='dark'] .pin-digit-box:focus {
-  border-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-}
-
-/* --------------------------------------------------------------------------
-   Print Optimizations
-   -------------------------------------------------------------------------- */
-@media print {
-  .no-print, .navbar, .mobile-bottom-nav, .compliance-banner {
-    display: none !important;
-  }
-  body, .app-container {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-  .invoice-paper {
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-  }
-}
-

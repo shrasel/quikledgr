@@ -33,11 +33,11 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
   };
 
   return (
-    <div className="apple-modal-overlay">
-      <div className="apple-modal-content p-6 space-y-4">
+    <div className="md-dialog-overlay">
+      <div className="md-dialog-card p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center">
               <UserPlus size={16} />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -47,14 +47,14 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-md"
           >
             <X size={16} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="form-group mb-0">
             <label className="form-label">
               Email Address *
             </label>
@@ -68,7 +68,7 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
             />
           </div>
 
-          <div>
+          <div className="form-group mb-0">
             <label className="form-label">
               Assigned Role *
             </label>
@@ -84,7 +84,7 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
             </select>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs text-slate-500 flex items-start gap-2">
+          <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex items-start gap-2">
             <Shield size={14} className="text-slate-400 shrink-0 mt-0.5" />
             <span>
               Role-based access is strictly isolated at the database layer.
