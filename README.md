@@ -111,7 +111,15 @@ The initial database migration pre-seeds a demo consultant profile:
 - **Password**: `demoPassword123`
 - *(Alternatively, click **1-Click Sign In** on the authentication screen)*
 
-### 4. Viewing Logs & Stopping Containers
+### 4. Optional: Enable Live Google OAuth 2.0
+
+QuikLedgr supports production Google Identity Services (GIS):
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an **OAuth 2.0 Client ID** (Web application).
+2. Set Authorized JavaScript origins to `http://localhost:8085` (or your production domain).
+3. Set `GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com` in `.env`.
+*(If no Google Client ID is configured, QuikLedgr seamlessly runs in 1-Click Demo Mode for rapid testing).*
+
+### 5. Viewing Logs & Stopping Containers
 
 ```bash
 # View combined live container logs
@@ -153,9 +161,11 @@ npm run dev      # Starts Vite dev server on http://localhost:5173
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/health` | Public | System status, database connectivity, service info |
+| `GET` | `/api/auth/config` | Public | Returns OAuth client configuration (e.g. Google Client ID) |
 | `POST` | `/api/auth/register` | Public | Register new consultant account |
 | `POST` | `/api/auth/login` | Public | Authenticate with email/password, returns JWT |
-| `POST` | `/api/auth/google` | Public | Authenticate via Google OAuth payload |
+| `POST` | `/api/auth/google` | Public | Authenticate and verify Google ID Token (or fallback payload) |
+| `GET` | `/api/auth/me` | Bearer JWT | Retrieve currently authenticated user profile |
 | `GET` | `/api/dashboard/stats` | Bearer JWT | Returns counts & amounts for Total, Paid, Pending, Sent, Not Sent |
 | `GET` | `/api/invoices` | Bearer JWT | List all invoices for authenticated consultant |
 | `POST` | `/api/invoices` | Bearer JWT | Create or update invoice with items and wire details |

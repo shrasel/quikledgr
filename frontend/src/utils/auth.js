@@ -104,15 +104,38 @@ export async function signupWithEmail(name, email, password, businessName) {
   return user;
 }
 
-export async function loginWithGoogle() {
+export async function getGoogleAuthConfig() {
   try {
-    const res = await authApi.googleLogin('alexander.wright.consulting@gmail.com', 'Alexander Wright');
+    const backendConfig = await authApi.getConfig();
+    return {
+      googleClientId: backendConfig?.googleClientId || import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
+      googleAuthEnabled: Boolean(backendConfig?.googleClientId || import.meta.env.VITE_GOOGLE_CLIENT_ID),
+    };
+  } catch (e) {
+    const envClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+    return {
+      googleClientId: envClientId,
+      googleAuthEnabled: Boolean(envClientId),
+    };
+  }
+}
+
+export async function loginWithGoogle(credentialOrPayload) {
+  try {
+    const payload = typeof credentialOrPayload === 'string'
+      ? { credential: credentialOrPayload }
+      : (credentialOrPayload || { email: 'alexander.wright.consulting@gmail.com', name: 'Alexander Wright' });
+
+    const res = await authApi.googleLogin(payload);
     if (res?.user) {
       saveUserSession(res.user);
       return res.user;
     }
   } catch (err) {
-    console.warn('[Auth] Backend Google OAuth offline fallback:', err.message);
+    console.warn('[Auth] Backend Google OAuth notice:', err.message);
+    if (typeof credentialOrPayload === 'string') {
+      throw err;
+    }
   }
 
   const googleUser = {

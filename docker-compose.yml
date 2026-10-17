@@ -44,6 +44,7 @@ services:
       DB_USER: ${DB_USER:-quikledgr_user}
       DB_PASSWORD: ${DB_PASSWORD:-quikledgr_secure_pass_2026}
       JWT_SECRET: ${JWT_SECRET:-quikledgr_super_secure_jwt_token_key_change_in_production}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     networks:
       - quikledgr_network
 

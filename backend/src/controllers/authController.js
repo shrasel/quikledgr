@@ -1,5 +1,8 @@
+import { OAuth2Client } from 'google-auth-library';
 import pool from '../config/db.js';
 import { hashPassword, comparePassword, generateToken } from '../utils/security.js';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function register(req, res, next) {
   try {
@@ -106,30 +109,77 @@ export async function login(req, res, next) {
 
 export async function googleLogin(req, res, next) {
   try {
-    const { email, name, avatarUrl } = req.body;
-    const normalizedEmail = (email || 'alexander.wright.consulting@gmail.com').trim().toLowerCase();
-    const displayName = name || 'Alexander Wright';
-    const avatar = avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80';
+    const { credential, email: bodyEmail, name: bodyName, avatarUrl: bodyAvatarUrl } = req.body;
+    let email, name, avatarUrl, googleId;
 
-    const [existing] = await pool.query('SELECT * FROM users WHERE email = ?', [normalizedEmail]);
+    if (credential) {
+      // Production Google Identity Services (GIS) ID Token Verification
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken: credential,
+          audience: process.env.GOOGLE_CLIENT_ID || undefined,
+        });
+        const payload = ticket.getPayload();
+
+        if (!payload) {
+          return res.status(401).json({ error: 'Failed to extract Google user payload.' });
+        }
+
+        if (payload.email_verified === false) {
+          return res.status(403).json({ error: 'Your Google email address has not been verified.' });
+        }
+
+        googleId = payload.sub;
+        email = payload.email.trim().toLowerCase();
+        name = payload.name || email.split('@')[0];
+        avatarUrl = payload.picture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80';
+      } catch (verifyErr) {
+        console.error('[Google Auth] ID Token verification error:', verifyErr.message);
+        return res.status(401).json({ error: 'Google authentication failed: ' + verifyErr.message });
+      }
+    } else if (bodyEmail) {
+      // Simulated / Demo Mode Fallback (when no Google Cloud Client ID is configured yet)
+      email = bodyEmail.trim().toLowerCase();
+      name = bodyName || 'Alexander Wright';
+      avatarUrl = bodyAvatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80';
+      googleId = 'demo_google_' + Math.random().toString(36).substring(2, 11);
+    } else {
+      return res.status(400).json({ error: 'Google credential token or user details required.' });
+    }
+
+    // Lookup user by email or google_id
+    const [existing] = await pool.query(
+      'SELECT id, name, email, business_name, provider, role, avatar_url, google_id FROM users WHERE email = ? OR (google_id IS NOT NULL AND google_id = ?)',
+      [email, googleId]
+    );
 
     let user;
     if (existing.length > 0) {
+      const existingUser = existing[0];
+      
+      // Update Google metadata if necessary
+      await pool.query(
+        'UPDATE users SET google_id = COALESCE(google_id, ?), avatar_url = COALESCE(?, avatar_url), provider = "google" WHERE id = ?',
+        [googleId, avatarUrl, existingUser.id]
+      );
+
       user = {
-        id: existing[0].id,
-        name: existing[0].name,
-        email: existing[0].email,
-        businessName: existing[0].business_name,
-        avatarUrl: existing[0].avatar_url || avatar,
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        businessName: existingUser.business_name,
+        avatarUrl: avatarUrl || existingUser.avatar_url,
         provider: 'google',
-        role: existing[0].role,
+        role: existingUser.role,
       };
     } else {
       const userId = 'usr_g_' + Math.random().toString(36).substring(2, 11);
+      const defaultBusinessName = name + ' Advisory LLC';
+      
       await pool.query(
-        `INSERT INTO users (id, name, email, password_hash, business_name, provider, role, avatar_url)
-         VALUES (?, ?, ?, NULL, 'Wright Advisory & Solutions LLC', 'google', 'consultant', ?)`,
-        [userId, displayName, normalizedEmail, avatar]
+        `INSERT INTO users (id, name, email, google_id, password_hash, business_name, provider, role, avatar_url)
+         VALUES (?, ?, ?, ?, NULL, ?, 'google', 'consultant', ?)`,
+        [userId, name, email, googleId, defaultBusinessName, avatarUrl]
       );
 
       // Create default profile
@@ -141,10 +191,10 @@ export async function googleLogin(req, res, next) {
 
       user = {
         id: userId,
-        name: displayName,
-        email: normalizedEmail,
-        businessName: 'Wright Advisory & Solutions LLC',
-        avatarUrl: avatar,
+        name,
+        email,
+        businessName: defaultBusinessName,
+        avatarUrl,
         provider: 'google',
         role: 'consultant',
       };
@@ -155,6 +205,14 @@ export async function googleLogin(req, res, next) {
   } catch (err) {
     next(err);
   }
+}
+
+export function getAuthConfig(req, res) {
+  const clientId = process.env.GOOGLE_CLIENT_ID || '';
+  res.json({
+    googleClientId: clientId,
+    googleAuthEnabled: Boolean(clientId),
+  });
 }
 
 export async function getMe(req, res, next) {

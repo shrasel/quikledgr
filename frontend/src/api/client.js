@@ -64,10 +64,18 @@ export const authApi = {
     return data;
   },
 
-  googleLogin: async (email, name, avatarUrl) => {
+  getConfig: async () => {
+    return request('/auth/config');
+  },
+
+  googleLogin: async (payload) => {
+    const body = typeof payload === 'string'
+      ? { credential: payload }
+      : (payload?.credential ? payload : { email: payload?.email, name: payload?.name, avatarUrl: payload?.avatarUrl });
+
     const data = await request('/auth/google', {
       method: 'POST',
-      body: JSON.stringify({ email, name, avatarUrl }),
+      body: JSON.stringify(body),
     });
     if (data.token) {
       localStorage.setItem(TOKEN_KEY, data.token);
