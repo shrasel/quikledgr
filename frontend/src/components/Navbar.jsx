@@ -17,6 +17,7 @@ import {
   FileCheck,
   Repeat,
   Clock,
+  CreditCard,
   MoreHorizontal
 } from 'lucide-react';
 
@@ -112,6 +113,15 @@ export function Navbar({
             >
               <Clock size={15} />
               <span>AR Aging</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`nav-tab-btn ${currentTab === 'payments' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('payments')}
+            >
+              <CreditCard size={15} />
+              <span>Payments</span>
             </button>
 
             <button 
@@ -377,7 +387,7 @@ export function Navbar({
 
         <button 
           type="button" 
-          className={`mobile-nav-item ${['recurring', 'editor', 'accounting', 'profile'].includes(currentTab) || showMobileMore ? 'active' : ''}`}
+          className={`mobile-nav-item ${['payments', 'recurring', 'editor', 'accounting', 'profile'].includes(currentTab) || showMobileMore ? 'active' : ''}`}
           onClick={() => setShowMobileMore(!showMobileMore)}
         >
           <div className="mobile-nav-icon-wrap">
@@ -409,6 +419,20 @@ export function Navbar({
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                className={`p-3 rounded-lg text-left border flex flex-col gap-1.5 transition-colors ${
+                  currentTab === 'payments' 
+                    ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800' 
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => { setCurrentTab('payments'); setShowMobileMore(false); }}
+              >
+                <CreditCard size={18} className="text-slate-700 dark:text-slate-300" />
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">Payments & Portal</span>
+                <span className="text-[10px] text-slate-400">Ledger & checkout</span>
+              </button>
+
               <button
                 type="button"
                 className={`p-3 rounded-lg text-left border flex flex-col gap-1.5 transition-colors ${

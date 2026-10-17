@@ -232,6 +232,64 @@ export async function recordInvoiceJournal(invoice, action, organizationId) {
 }
 
 /**
+ * Automatically record balanced journal entries for Payment events (with surcharge support)
+ */
+export async function postPaymentJournal({
+  organizationId,
+  paymentId,
+  paymentNumber,
+  invoiceId,
+  invoiceNumber,
+  amount,
+  surchargeFee = 0,
+  paymentMethod = 'stripe_card',
+  paymentDate = null,
+  clientName = 'Client',
+}) {
+  const pDate = paymentDate || new Date().toISOString().split('T')[0];
+  const amt = parseFloat(amount || 0);
+  const surcharge = parseFloat(surchargeFee || 0);
+  const totalReceived = Math.round((amt + surcharge) * 100) / 100;
+
+  // Debit Cash / Clearing account
+  // If card/online, route through 1300 Undeposited Funds / Stripe Clearing; else 1010 Operating Checking
+  const debitAccount = ['stripe_card', 'ach_debit'].includes(paymentMethod) ? '1300' : '1010';
+
+  const lines = [
+    {
+      accountNumber: debitAccount,
+      debitAmount: totalReceived,
+      creditAmount: 0,
+      memo: `Funds received via ${paymentMethod} for Invoice #${invoiceNumber}`
+    },
+    {
+      accountNumber: '1200',
+      debitAmount: 0,
+      creditAmount: amt,
+      memo: `Settlement of Accounts Receivable for Invoice #${invoiceNumber} (${clientName})`
+    }
+  ];
+
+  if (surcharge > 0) {
+    lines.push({
+      accountNumber: '4900', // Other Revenue / Merchant Surcharge Collected
+      debitAmount: 0,
+      creditAmount: surcharge,
+      memo: `Customer convenience / merchant surcharge fee passed for Payment #${paymentNumber}`
+    });
+  }
+
+  return postJournalEntry({
+    organizationId,
+    entryDate: pDate,
+    sourceType: 'payment',
+    sourceId: paymentId || invoiceId,
+    description: `Payment #${paymentNumber} ($${totalReceived.toFixed(2)}) applied to Invoice #${invoiceNumber}`,
+    lines,
+  });
+}
+
+/**
  * Get Chart of Accounts with live computed balances
  */
 export async function getAccountsWithBalances(organizationId) {

@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import { verifyAccessPin } from '../utils/security.js';
+import { recordPayment } from '../services/paymentService.js';
 
 export async function getPublicMetadata(req, res, next) {
   try {
@@ -169,6 +170,49 @@ export async function unlockInvoice(req, res, next) {
     };
 
     res.json(unlockedInvoice);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function payPublicInvoice(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { amount, surchargeFee, paymentMethod, referenceNumber, notes, pin } = req.body;
+
+    const [invoices] = await pool.query(
+      `SELECT * FROM invoices WHERE id = ? OR invoice_number = ?`,
+      [id, id]
+    );
+    if (invoices.length === 0) {
+      return res.status(404).json({ error: 'Invoice not found.' });
+    }
+    const inv = invoices[0];
+
+    // Optional pin verification if supplied or required
+    if (pin) {
+      const [sec] = await pool.query(
+        `SELECT access_pin_hash FROM invoice_security WHERE invoice_id = ?`,
+        [inv.id]
+      );
+      if (sec.length > 0 && sec[0].access_pin_hash) {
+        const isValid = await verifyAccessPin(pin, sec[0].access_pin_hash);
+        if (!isValid) {
+          return res.status(403).json({ error: 'Invalid PIN provided for payment authorization.' });
+        }
+      }
+    }
+
+    const result = await recordPayment(inv.organization_id, null, {
+      invoiceId: inv.id,
+      amount: parseFloat(amount) || parseFloat(inv.balance_due || inv.total),
+      surchargeFee: parseFloat(surchargeFee) || 0,
+      paymentMethod: paymentMethod || 'stripe_card',
+      referenceNumber: referenceNumber || ('ONLINE-' + Math.random().toString(36).substring(2, 9).toUpperCase()),
+      notes: notes || `Direct public online payment for ${inv.invoice_number}`,
+    });
+
+    res.status(201).json({ success: true, data: result });
   } catch (err) {
     next(err);
   }

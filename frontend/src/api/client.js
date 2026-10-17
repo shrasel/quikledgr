@@ -260,6 +260,13 @@ export const publicApi = {
       method: 'POST',
       body: JSON.stringify({ pin }),
     });
+  },
+
+  payPublic: async (id, paymentData) => {
+    return request(`/public/invoices/${encodeURIComponent(id)}/pay`, {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    });
   }
 };
 
@@ -412,6 +419,60 @@ export const arApi = {
   sendReminder: async (invoiceId) => {
     return request(`/ar/invoices/${encodeURIComponent(invoiceId)}/send-reminder`, {
       method: 'POST',
+    });
+  }
+};
+
+// 11. Phase 3: Payments & Embedded Checkout Endpoints
+export const paymentsApi = {
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.invoiceId) query.append('invoiceId', params.invoiceId);
+    if (params.paymentMethod) query.append('paymentMethod', params.paymentMethod);
+    if (params.search) query.append('search', params.search);
+    const qs = query.toString();
+    return request(qs ? `/payments?${qs}` : '/payments');
+  },
+
+  recordPayment: async (paymentData) => {
+    return request('/payments', {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    });
+  },
+
+  createIntent: async (intentData) => {
+    return request('/payments/intent', {
+      method: 'POST',
+      body: JSON.stringify(intentData),
+    });
+  },
+
+  generatePortalToken: async (data) => {
+    return request('/payments/portal-token', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+};
+
+// 12. Phase 3: Zero-Login Client Portal Endpoints
+export const portalApi = {
+  getPortalData: async (token) => {
+    return request(`/portal?token=${encodeURIComponent(token)}`);
+  },
+
+  calculateIntent: async (token, data) => {
+    return request('/portal/intent', {
+      method: 'POST',
+      body: JSON.stringify({ token, ...data }),
+    });
+  },
+
+  payInvoice: async (token, paymentData) => {
+    return request('/portal/pay', {
+      method: 'POST',
+      body: JSON.stringify({ token, ...paymentData }),
     });
   }
 };

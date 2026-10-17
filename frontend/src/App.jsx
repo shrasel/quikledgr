@@ -6,6 +6,8 @@ import { InvoiceList } from './components/InvoiceList';
 import { QuotesList } from './components/QuotesList';
 import { RecurringProfiles } from './components/RecurringProfiles';
 import { ArAgingView } from './components/ArAgingView';
+import { PaymentsList } from './components/PaymentsList';
+import { ClientPortalView } from './components/ClientPortalView';
 import { Accounting } from './components/Accounting';
 import { ProfileSettings } from './components/ProfileSettings';
 import { InvoiceView } from './components/InvoiceView';
@@ -34,7 +36,7 @@ export default function App() {
 
   const [invoices, setInvoices] = useState([]);
   const [currentInvoice, setCurrentInvoice] = useState(null);
-  const [currentTab, setCurrentTab] = useState('dashboard'); // 'dashboard', 'editor', 'list', 'accounting', 'profile'
+  const [currentTab, setCurrentTab] = useState('dashboard'); // 'dashboard', 'editor', 'list', 'accounting', 'profile', 'payments'
   const [theme, setTheme] = useState(() => localStorage.getItem('quikledgr_theme') || localStorage.getItem('blukers_theme') || 'light');
   const [toasts, setToasts] = useState([]);
   
@@ -44,8 +46,8 @@ export default function App() {
   const [isNewOrgModalOpen, setIsNewOrgModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  // Routing detection for recipient link
-  const [routeInfo, setRouteInfo] = useState({ isRecipientRoute: false, invoiceId: null, encodedData: null });
+  // Routing detection for recipient link and client portal
+  const [routeInfo, setRouteInfo] = useState({ isRecipientRoute: false, isPortalRoute: false, invoiceId: null, encodedData: null, portalToken: null });
 
   const triggerToast = (message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -136,11 +138,21 @@ export default function App() {
           const params = new URLSearchParams(queryStr);
           const id = params.get('id');
           const data = params.get('data');
-          setRouteInfo({ isRecipientRoute: true, invoiceId: id, encodedData: data });
+          setRouteInfo({ isRecipientRoute: true, isPortalRoute: false, invoiceId: id, encodedData: data, portalToken: null });
           return;
         }
       }
-      setRouteInfo({ isRecipientRoute: false, invoiceId: null, encodedData: null });
+      if (hash.startsWith('#/portal') || hash.startsWith('#portal')) {
+        const queryIdx = hash.indexOf('?');
+        if (queryIdx !== -1) {
+          const queryStr = hash.slice(queryIdx + 1);
+          const params = new URLSearchParams(queryStr);
+          const token = params.get('token');
+          setRouteInfo({ isRecipientRoute: false, isPortalRoute: true, invoiceId: null, encodedData: null, portalToken: token });
+          return;
+        }
+      }
+      setRouteInfo({ isRecipientRoute: false, isPortalRoute: false, invoiceId: null, encodedData: null, portalToken: null });
     };
 
     checkHashRoute();
@@ -292,6 +304,24 @@ export default function App() {
     );
   }
 
+  // 1.5. Zero-Login Client Billing Portal: accessed with 30-day crypto magic token
+  if (routeInfo.isPortalRoute && routeInfo.portalToken) {
+    return (
+      <div className="app-container">
+        <ClientPortalView 
+          portalToken={routeInfo.portalToken}
+          onBackToLogin={() => {
+            window.location.hash = '';
+            setRouteInfo({ isRecipientRoute: false, isPortalRoute: false, invoiceId: null, encodedData: null, portalToken: null });
+            setCurrentTab('dashboard');
+          }}
+          onTriggerToast={triggerToast}
+        />
+        <Toast toasts={toasts} />
+      </div>
+    );
+  }
+
   // 2. Consultant creator side: Requires authentication
   if (!user) {
     return (
@@ -374,6 +404,13 @@ export default function App() {
 
         {currentTab === 'ar' && (
           <ArAgingView 
+            onTriggerToast={triggerToast}
+            onOpenInvoice={handleOpenInvoiceById}
+          />
+        )}
+
+        {currentTab === 'payments' && (
+          <PaymentsList 
             onTriggerToast={triggerToast}
             onOpenInvoice={handleOpenInvoiceById}
           />

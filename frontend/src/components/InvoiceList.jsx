@@ -31,7 +31,16 @@ export function InvoiceList({
         (inv.client?.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (inv.servicePeriod || '').toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus = statusFilter === 'all' || (inv.status || 'draft') === statusFilter;
+      const invStatus = inv.status || 'draft';
+      let matchesStatus = false;
+      if (statusFilter === 'all') {
+        matchesStatus = true;
+      } else if (statusFilter === 'partial') {
+        matchesStatus = invStatus === 'partially_paid' || (parseFloat(inv.amount_paid || 0) > 0 && parseFloat(inv.balance_due || 0) > 0);
+      } else {
+        matchesStatus = invStatus === statusFilter;
+      }
+
       return matchesSearch && matchesStatus;
     });
   }, [invoices, searchTerm, statusFilter]);
@@ -84,14 +93,20 @@ export function InvoiceList({
 
         {/* Material Filter Chips */}
         <div className="material-filter-chips">
-          {['all', 'draft', 'sent', 'paid'].map((status) => (
+          {[
+            { id: 'all', label: 'All Invoices' },
+            { id: 'draft', label: 'Draft' },
+            { id: 'sent', label: 'Sent' },
+            { id: 'partial', label: 'Partially Paid' },
+            { id: 'paid', label: 'Paid' },
+          ].map((item) => (
             <button
-              key={status}
+              key={item.id}
               type="button"
-              onClick={() => setStatusFilter(status)}
-              className={`material-chip-btn ${statusFilter === status ? 'active' : ''}`}
+              onClick={() => setStatusFilter(item.id)}
+              className={`material-chip-btn ${statusFilter === item.id ? 'active' : ''}`}
             >
-              <span className="capitalize">{status === 'all' ? 'All Invoices' : status}</span>
+              <span>{item.label}</span>
             </button>
           ))}
         </div>
@@ -121,13 +136,18 @@ export function InvoiceList({
                   <th>Service Period</th>
                   <th>Due Date</th>
                   <th>Status</th>
-                  <th className="text-right">Total Amount</th>
+                  <th className="text-right">Total</th>
+                  <th className="text-right">Balance Due</th>
                   <th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((inv) => {
                   const status = inv.status || 'draft';
+                  const balanceDue = inv.balance_due !== undefined && inv.balance_due !== null
+                    ? parseFloat(inv.balance_due)
+                    : (parseFloat(inv.total) - parseFloat(inv.amount_paid || 0));
+
                   return (
                     <tr 
                       key={inv.id} 
@@ -147,12 +167,19 @@ export function InvoiceList({
                         {inv.dueDate || '15th'}
                       </td>
                       <td>
-                        <span className={`status-chip ${status}`}>
-                          {status}
+                        <span className={`status-chip ${status === 'partially_paid' ? 'sent' : status}`}>
+                          {status === 'partially_paid' ? 'Partial' : status}
                         </span>
                       </td>
-                      <td className="text-right font-semibold tabular-nums text-sm text-slate-900 dark:text-white">
+                      <td className="text-right font-medium tabular-nums text-xs text-slate-500">
                         {formatMoney(inv.total)}
+                      </td>
+                      <td className="text-right font-semibold tabular-nums text-xs text-slate-900 dark:text-white">
+                        {balanceDue <= 0.005 ? (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-mono">$0.00</span>
+                        ) : (
+                          <span className="font-mono">{formatMoney(balanceDue)}</span>
+                        )}
                       </td>
                       <td className="text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1">

@@ -13,6 +13,8 @@ import accountingRoutes from './routes/accountingRoutes.js';
 import quoteRoutes from './routes/quoteRoutes.js';
 import recurringRoutes from './routes/recurringRoutes.js';
 import arRoutes from './routes/arRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import portalRoutes from './routes/portalRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -48,6 +50,8 @@ app.use('/api/accounting', accountingRoutes);
 app.use('/api/quotes', quoteRoutes);
 app.use('/api/recurring', recurringRoutes);
 app.use('/api/ar', arRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/portal', portalRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/public', publicRoutes);
