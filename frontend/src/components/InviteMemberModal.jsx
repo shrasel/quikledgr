@@ -33,30 +33,30 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+    <div className="apple-modal-overlay">
+      <div className="apple-modal-content p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center">
-              <UserPlus size={18} />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center">
+              <UserPlus size={16} />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              Invite Team Member (Granular RBAC)
+              Invite Team Member
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              User Email Address *
+            <label className="form-label">
+              Email Address *
             </label>
             <input
               type="email"
@@ -64,30 +64,30 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
               placeholder="e.g. accountant@firm.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Assigned Security Role *
+            <label className="form-label">
+              Assigned Role *
             </label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              className="form-select"
             >
-              <option value="admin">Admin (Full settings, user management, invoicing, ledger)</option>
-              <option value="accountant">Accountant / Bookkeeper (Chart of accounts, general ledger, reports)</option>
-              <option value="billing_only">Billing Only (Create and view invoices, no ledger writes)</option>
-              <option value="read_only">Read-Only Auditor (Inspection only)</option>
+              <option value="admin">Admin (Full settings & invoicing)</option>
+              <option value="accountant">Accountant (General ledger & CoA)</option>
+              <option value="billing_only">Billing Only (Issue invoices)</option>
+              <option value="read_only">Read-Only (Auditor)</option>
             </select>
           </div>
 
-          <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 text-xs text-slate-500 dark:text-slate-400 flex items-start gap-2">
-            <Shield size={16} className="text-blue-500 shrink-0 mt-0.5" />
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs text-slate-500 flex items-start gap-2">
+            <Shield size={14} className="text-slate-400 shrink-0 mt-0.5" />
             <span>
-              Role-based access control enforces isolation at the database layer. Accountants cannot access private payout wires, and billing users cannot alter posted ledger journals.
+              Role-based access is strictly isolated at the database layer.
             </span>
           </div>
 
@@ -104,8 +104,8 @@ export function InviteMemberModal({ isOpen, onClose, onTriggerToast }) {
               disabled={submitting}
               className="btn btn-primary btn-sm flex items-center gap-1.5"
             >
-              <UserPlus size={15} />
-              <span>{submitting ? 'Granting Access...' : 'Grant Role Access'}</span>
+              <UserPlus size={14} />
+              <span>{submitting ? 'Granting...' : 'Grant Access'}</span>
             </button>
           </div>
         </form>

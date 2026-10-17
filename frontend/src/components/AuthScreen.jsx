@@ -324,8 +324,8 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
 
         {/* Compliance Security Badge */}
         <div className="auth-footer-badge">
-          <ShieldCheck size={14} color="#059669" />
-          <span>Compliant with Blukers Consulting Agreement security guidelines</span>
+          <ShieldCheck size={14} className="text-slate-500 dark:text-slate-400" />
+          <span>Protected with 256-bit AES client-side encryption</span>
         </div>
       </div>
     </div>

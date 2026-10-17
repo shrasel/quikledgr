@@ -68,7 +68,7 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
               </div>
               <div className="inv-date-item">
                 <span className="inv-date-label">Payment Due</span>
-                <span className="inv-date-val" style={{ color: '#059669', fontWeight: '700' }}>
+                <span className="inv-date-val" style={{ fontWeight: '700' }}>
                   {invoice.dueDate || '—'}
                 </span>
               </div>
@@ -84,7 +84,7 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
               {invoice.servicePeriod || `${invoice.serviceStartDate || ''} to ${invoice.serviceEndDate || ''}`}
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#059669', fontSize: '0.8rem', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--apple-text-secondary)', fontSize: '0.8rem', fontWeight: 600 }}>
             <FileCheck2 size={18} />
             <span>Consulting Agreement Service Verification</span>
           </div>
@@ -111,7 +111,7 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
               <div style={{ marginTop: '0.35rem' }}>
                 <strong>Submission Protocol:</strong> Invoices submitted to <em>accounting@blukers.com</em> with <em>rosa@blukers.com</em> copied.
               </div>
-              <div style={{ marginTop: '0.35rem', color: '#059669', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <div style={{ marginTop: '0.35rem', color: 'var(--apple-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <ShieldCheck size={14} />
                 <span>Verified End-to-End Secure Channel</span>
               </div>
@@ -133,16 +133,16 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
             {(invoice.items || []).map((item, index) => (
               <tr key={item.id || index}>
                 <td>
-                  <div style={{ fontWeight: 600, color: '#0f172a' }}>{item.description}</div>
+                  <div style={{ fontWeight: 600, color: 'inherit' }}>{item.description}</div>
                   {item.category && item.category !== 'consulting' && (
-                    <span style={{ fontSize: '0.725rem', color: '#64748b', textTransform: 'capitalize' }}>
+                    <span style={{ fontSize: '0.725rem', color: 'var(--apple-text-tertiary)', textTransform: 'capitalize' }}>
                       Category: {item.category}
                     </span>
                   )}
                 </td>
                 <td className="col-center font-mono">{item.quantity}</td>
                 <td className="col-center font-mono">{formatMoney(item.rate, currency)}</td>
-                <td className="col-amount">{formatMoney((item.quantity || 0) * (item.rate || 0), currency)}</td>
+                <td className="col-amount font-mono font-bold">{formatMoney((item.quantity || 0) * (item.rate || 0), currency)}</td>
               </tr>
             ))}
           </tbody>
@@ -151,21 +151,21 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
         {/* Pre-Approved Additional Charges (if any) */}
         {invoice.additionalCharges && invoice.additionalCharges.length > 0 && (
           <div style={{ marginTop: '1.25rem' }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: '#475569', marginBottom: '0.4rem' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--apple-text-secondary)', marginBottom: '0.4rem' }}>
               Pre-Approved Additional Charges & Expenses
             </div>
             <table className="inv-table" style={{ marginTop: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ width: '85%', background: '#334155' }}>Approved Expense / Fee Item</th>
-                  <th className="col-amount" style={{ width: '15%', background: '#334155' }}>Amount ({currency})</th>
+                  <th style={{ width: '85%' }}>Approved Expense / Fee Item</th>
+                  <th className="col-amount" style={{ width: '15%' }}>Amount ({currency})</th>
                 </tr>
               </thead>
               <tbody>
                 {invoice.additionalCharges.map((chg, idx) => (
                   <tr key={chg.id || idx}>
                     <td>{chg.description}</td>
-                    <td className="col-amount">{formatMoney(chg.amount, currency)}</td>
+                    <td className="col-amount font-mono font-bold">{formatMoney(chg.amount, currency)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -189,7 +189,7 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
             )}
 
             {invoice.discountAmount > 0 && (
-              <div className="inv-total-line" style={{ color: '#059669' }}>
+              <div className="inv-total-line">
                 <span>Discount:</span>
                 <span className="font-mono">-{formatMoney(invoice.discountAmount, currency)}</span>
               </div>
@@ -204,7 +204,7 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
 
             <div className="inv-total-line final">
               <span>Total Balance Due:</span>
-              <span className="font-mono" style={{ color: '#059669' }}>
+              <span className="font-mono font-bold" style={{ fontSize: '1.25rem' }}>
                 {formatMoney(invoice.total, currency)}
               </span>
             </div>
@@ -214,21 +214,11 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
         {/* Confidential Wire Transfer Details Section (Unlocked via Code) */}
         <div className="inv-wire-card">
           <div className="inv-wire-badge">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: '#1e293b' }}>
-              <CreditCard size={18} color="#0077c5" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}>
+              <CreditCard size={18} />
               <span>Wire Transfer & Direct Deposit Payment Instructions</span>
             </div>
-            <span style={{ 
-              background: '#ecfdf5', 
-              color: '#047857', 
-              fontSize: '0.72rem', 
-              fontWeight: 700, 
-              padding: '0.2rem 0.5rem', 
-              borderRadius: '9999px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem'
-            }}>
+            <span className="security-pill">
               <ShieldCheck size={12} />
               Confidential Banking Data
             </span>
@@ -339,7 +329,7 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
                 <div className="inv-wire-field" style={{ gridColumn: 'span 2' }}>
                   <span className="inv-wire-label">Wire Transfer Reference / Memo</span>
                   <div className="inv-wire-value">
-                    <span style={{ color: '#0077c5' }}>{invoice.wireDetails.wireReference}</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{invoice.wireDetails.wireReference}</span>
                     <button 
                       type="button" 
                       className="copy-mini-btn"
@@ -353,14 +343,14 @@ export function InvoicePaper({ invoice, isUnlocked = true, onTriggerCopyToast })
               )}
 
               {invoice.wireDetails?.paymentInstructions && (
-                <div style={{ gridColumn: 'span 2', marginTop: '0.4rem', fontSize: '0.825rem', color: '#475569', fontStyle: 'italic' }}>
+                <div style={{ gridColumn: 'span 2', marginTop: '0.4rem', fontSize: '0.825rem', color: 'var(--apple-text-secondary)', fontStyle: 'italic' }}>
                   <strong>Note:</strong> {invoice.wireDetails.paymentInstructions}
                 </div>
               )}
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '1.5rem', color: '#64748b' }}>
-              <Lock size={28} style={{ margin: '0 auto 0.5rem auto', color: '#3b82f6' }} />
+            <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--apple-text-secondary)' }}>
+              <Lock size={28} style={{ margin: '0 auto 0.5rem auto' }} />
               <div>Sensitive wire routing information is encrypted behind the access code.</div>
             </div>
           )}

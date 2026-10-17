@@ -180,7 +180,7 @@ export function InvoiceView({ invoiceId, encodedData, onBackToEditor, onTriggerT
   return (
     <div className="main-content">
       {/* Recipient Action Toolbar */}
-      <div className="recipient-toolbar no-print max-w-[860px] mx-auto mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 shadow-sm backdrop-blur-md">
+      <div className="recipient-toolbar no-print max-w-[860px] mx-auto mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 sm:p-4 card">
         <div className="flex items-center justify-between sm:justify-start gap-3">
           {onBackToEditor && (
             <button 
@@ -193,8 +193,8 @@ export function InvoiceView({ invoiceId, encodedData, onBackToEditor, onTriggerT
             </button>
           )}
 
-          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm font-semibold">
-            <ShieldCheck size={16} />
+          <div className="security-pill">
+            <ShieldCheck size={14} />
             <span>Authenticated Secure Invoice</span>
           </div>
         </div>

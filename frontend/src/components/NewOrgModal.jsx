@@ -40,63 +40,63 @@ export function NewOrgModal({ isOpen, onClose, onCreated, onTriggerToast }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+    <div className="apple-modal-overlay">
+      <div className="apple-modal-content p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
-              <Building size={18} />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center">
+              <Building size={16} />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              Create New Business Entity / LLC
+              New Business Entity
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Organization / Company Name *
+            <label className="form-label">
+              Entity / Organization Name *
             </label>
             <input
               type="text"
               required
-              placeholder="e.g. Acme Tech Solutions LLC"
+              placeholder="e.g. Acme Advisory LLC"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="form-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Legal Registered Entity Name
+            <label className="form-label">
+              Legal Registered Name
             </label>
             <input
               type="text"
-              placeholder="e.g. Acme Tech Solutions Incorporated"
+              placeholder="e.g. Acme Advisory Incorporated"
               value={legalName}
               onChange={(e) => setLegalName(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="form-input"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Base Currency
+              <label className="form-label">
+                Currency
               </label>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                className="form-select"
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -106,30 +106,30 @@ export function NewOrgModal({ isOpen, onClose, onCreated, onTriggerToast }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Accounting Method
+              <label className="form-label">
+                Accounting Basis
               </label>
               <select
                 value={accountingMethod}
                 onChange={(e) => setAccountingMethod(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                className="form-select"
               >
-                <option value="accrual">Accrual Basis</option>
-                <option value="cash">Cash Basis</option>
+                <option value="accrual">Accrual</option>
+                <option value="cash">Cash</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              EIN / Federal Tax ID (Optional)
+            <label className="form-label">
+              Tax ID / EIN (Optional)
             </label>
             <input
               type="text"
-              placeholder="e.g. XX-XXXXXXX"
+              placeholder="XX-XXXXXXX"
               value={taxId}
               onChange={(e) => setTaxId(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              className="form-input"
             />
           </div>
 
@@ -146,7 +146,7 @@ export function NewOrgModal({ isOpen, onClose, onCreated, onTriggerToast }) {
               disabled={submitting}
               className="btn btn-primary btn-sm flex items-center gap-1.5"
             >
-              <Plus size={15} />
+              <Plus size={14} />
               <span>{submitting ? 'Creating...' : 'Create Workspace'}</span>
             </button>
           </div>

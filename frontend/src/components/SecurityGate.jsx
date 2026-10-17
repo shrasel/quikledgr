@@ -121,46 +121,47 @@ export function SecurityGate({ invoiceSummary, encryptedWireData, rawAccessPin, 
     <div className="security-gate-wrapper">
       <div className="security-gate-card">
         <div className="security-icon-circle">
-          <Lock size={32} />
+          <Lock size={28} />
         </div>
 
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.025em', marginBottom: '0.4rem', color: 'var(--apple-text-primary)' }}>
           Confidential Invoice Access
         </h2>
         
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+        <p style={{ color: 'var(--apple-text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: 1.45 }}>
           This document contains sensitive consulting fees and wire transfer banking information. 
-          Please enter your access code to view and download the invoice.
+          Enter your 6-digit access code to unlock.
         </p>
 
         {invoiceSummary && (
           <div style={{
-            background: 'var(--slate-100)',
+            background: 'var(--apple-grouped)',
+            border: '1px solid var(--apple-border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '0.75rem 1rem',
+            padding: '0.85rem 1rem',
             marginBottom: '1.5rem',
             textAlign: 'left',
             fontSize: '0.825rem'
           }}>
-            <div style={{ color: 'var(--text-muted)' }}>Document Details:</div>
-            <div style={{ fontWeight: '700', color: 'var(--text-main)', marginTop: '0.2rem' }}>
+            <div style={{ color: 'var(--apple-text-secondary)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Document Details</div>
+            <div style={{ fontWeight: '700', color: 'var(--apple-text-primary)', marginTop: '0.2rem' }}>
               Invoice {invoiceSummary.invoiceNumber || invoiceSummary.id}
             </div>
             {invoiceSummary.issuerName && (
-              <div style={{ color: 'var(--text-muted)' }}>
-                Issued by: <strong>{invoiceSummary.issuerName}</strong>
+              <div style={{ color: 'var(--apple-text-secondary)', marginTop: '0.15rem' }}>
+                Issued by: <strong style={{ color: 'var(--apple-text-primary)' }}>{invoiceSummary.issuerName}</strong>
               </div>
             )}
             {invoiceSummary.clientName && (
-              <div style={{ color: 'var(--text-muted)' }}>
-                Billed to: <strong>{invoiceSummary.clientName}</strong>
+              <div style={{ color: 'var(--apple-text-secondary)', marginTop: '0.15rem' }}>
+                Billed to: <strong style={{ color: 'var(--apple-text-primary)' }}>{invoiceSummary.clientName}</strong>
               </div>
             )}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-label" style={{ textAlign: 'center' }}>
+          <div className="form-label" style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
             ENTER 6-DIGIT ACCESS CODE
           </div>
 
@@ -182,19 +183,7 @@ export function SecurityGate({ invoiceSummary, encryptedWireData, rawAccessPin, 
           </div>
 
           {errorMsg && (
-            <div style={{ 
-              color: 'var(--danger-text)', 
-              background: 'var(--danger-bg)', 
-              border: '1px solid var(--danger-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.5rem 0.75rem',
-              fontSize: '0.825rem',
-              marginBottom: '1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              textAlign: 'left'
-            }}>
+            <div className="auth-error-banner" style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <ShieldAlert size={16} />
               <span>{errorMsg}</span>
             </div>
@@ -215,8 +204,9 @@ export function SecurityGate({ invoiceSummary, encryptedWireData, rawAccessPin, 
           </button>
         </form>
 
-        <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-          🔒 End-to-end protected for Blukers Consulting Agreement security requirements.
+        <div className="auth-footer-badge">
+          <ShieldAlert size={14} className="text-slate-400" />
+          <span>Client-side protected with 256-bit encryption</span>
         </div>
       </div>
     </div>

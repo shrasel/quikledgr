@@ -291,49 +291,49 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
   return (
     <div className="accounting-view max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* Top Banner: Double-Entry Balance Equation & Period Status */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+      <div className="card p-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xl">
-              <Scale size={24} />
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center font-bold text-lg shadow-sm border border-slate-200/60 dark:border-slate-700/60">
+              <Scale size={22} />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                   Accounting & General Ledger
                 </h1>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                <span className="status-chip draft text-[11px]">
                   {organization?.accountingMethod === 'cash' ? 'Cash Basis' : 'Accrual Basis'}
                 </span>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Multi-entity double-entry ledger for <span className="font-semibold text-slate-700 dark:text-slate-200">{organization?.name || 'Workspace'}</span>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Double-entry financial ledger for <span className="font-semibold text-slate-700 dark:text-slate-200">{organization?.name || 'Workspace'}</span>
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             {/* Double-Entry Mathematical Invariant Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
-              <span>Double-Entry Balance: Strict Invariant Verified</span>
+            <div className="security-pill">
+              <ShieldCheck size={14} className="text-slate-600 dark:text-slate-300" />
+              <span>Invariant Verified</span>
             </div>
 
             {/* Period Lock Badge / Action */}
             <button
               type="button"
               onClick={() => setShowLockModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="btn btn-secondary btn-sm flex items-center gap-1.5"
             >
               {organization?.booksLockedUntil ? (
                 <>
-                  <Lock size={13} className="text-amber-600" />
-                  <span>Books Locked Thru: {organization.booksLockedUntil}</span>
+                  <Lock size={13} className="text-amber-500" />
+                  <span>Locked: {organization.booksLockedUntil}</span>
                 </>
               ) : (
                 <>
                   <Unlock size={13} className="text-slate-400" />
-                  <span>Lock Period (Month Close)</span>
+                  <span>Lock Period</span>
                 </>
               )}
             </button>
@@ -341,55 +341,55 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
             <button
               type="button"
               onClick={fetchData}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="btn btn-secondary btn-sm btn-icon-only"
               title="Refresh ledger data"
             >
-              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             </button>
           </div>
         </div>
 
         {/* Executive Summary Metrics Grid */}
         {summary && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-5 pt-5 border-t border-slate-100 dark:border-slate-800/80">
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Assets</span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-5 pt-5 border-t border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Assets</span>
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
                 {formatCurrency(summary.totalAssets)}
               </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Liabilities</span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1">
+            <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Liabilities</span>
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
                 {formatCurrency(summary.totalLiabilities)}
               </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Owner's Equity</span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1">
+            <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Owner's Equity</span>
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
                 {formatCurrency(summary.totalEquity)}
               </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Revenue (YTD)</span>
-              <div className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+            <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Revenue (YTD)</span>
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
                 {formatCurrency(summary.totalRevenue)}
               </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Operating Expenses</span>
-              <div className="text-base sm:text-lg font-bold text-rose-600 dark:text-rose-400 mt-1">
+            <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Expenses</span>
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
                 {formatCurrency(summary.totalExpenses)}
               </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Net Income</span>
-              <div className={`text-base sm:text-lg font-bold mt-1 ${summary.netIncome >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+            <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Net Income</span>
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
                 {formatCurrency(summary.netIncome)}
               </div>
             </div>
@@ -397,64 +397,56 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
         )}
       </div>
 
-      {/* Navigation Sub-Tabs */}
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-        <div className="flex items-center gap-1.5 sm:gap-2">
+      {/* Navigation Sub-Tabs (Apple Segmented Control) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div className="apple-segmented-container overflow-x-auto w-full sm:w-auto p-1 flex">
           <button
             type="button"
             onClick={() => setActiveSubtab('coa')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
-              activeSubtab === 'coa'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`apple-segmented-button flex-1 sm:flex-initial ${
+              activeSubtab === 'coa' ? 'active' : ''
             }`}
           >
-            <BookOpen size={16} />
+            <BookOpen size={15} />
             <span>Chart of Accounts</span>
-            <span className="ml-1 text-xs px-1.5 py-0.5 rounded-full bg-white/20">
-              {accounts.length}
+            <span className="ml-1 text-[11px] opacity-75">
+              ({accounts.length})
             </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveSubtab('ledger')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
-              activeSubtab === 'ledger'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`apple-segmented-button flex-1 sm:flex-initial ${
+              activeSubtab === 'ledger' ? 'active' : ''
             }`}
           >
-            <Scale size={16} />
-            <span>General Ledger Stream</span>
-            <span className="ml-1 text-xs px-1.5 py-0.5 rounded-full bg-white/20">
-              {journalEntries.length}
+            <Scale size={15} />
+            <span>General Ledger</span>
+            <span className="ml-1 text-[11px] opacity-75">
+              ({journalEntries.length})
             </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveSubtab('manual')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
-              activeSubtab === 'manual'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`apple-segmented-button flex-1 sm:flex-initial ${
+              activeSubtab === 'manual' ? 'active' : ''
             }`}
           >
-            <Plus size={16} />
-            <span>Post Journal Entry</span>
+            <Plus size={15} />
+            <span>Post Entry</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveSubtab('audit')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
-              activeSubtab === 'audit'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`apple-segmented-button flex-1 sm:flex-initial ${
+              activeSubtab === 'audit' ? 'active' : ''
             }`}
           >
-            <History size={16} />
+            <History size={15} />
             <span>Audit Trail</span>
           </button>
         </div>
@@ -463,10 +455,10 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
           <button
             type="button"
             onClick={() => setShowNewAccountModal(true)}
-            className="btn btn-primary btn-sm flex items-center gap-1.5"
+            className="btn btn-primary btn-sm flex items-center gap-1.5 self-end sm:self-auto"
           >
             <Plus size={15} />
-            <span className="hidden sm:inline">Add Account</span>
+            <span>Add Account</span>
           </button>
         )}
       </div>
@@ -485,20 +477,18 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                 placeholder="Search account # or name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="form-input text-xs sm:text-sm pl-9"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+            <div className="apple-segmented-container p-1 overflow-x-auto w-full sm:w-auto flex">
               {['all', 'asset', 'liability', 'equity', 'revenue', 'expense'].map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setSelectedTypeFilter(t)}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-lg capitalize transition-colors ${
-                    selectedTypeFilter === t
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  className={`apple-segmented-button text-xs capitalize ${
+                    selectedTypeFilter === t ? 'active' : ''
                   }`}
                 >
                   {t}
@@ -508,10 +498,10 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
           </div>
 
           {/* Accounts Table */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-4">Account #</th>
                     <th className="py-3 px-4">Account Name</th>
@@ -533,26 +523,20 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                     filteredAccounts.map((acct) => {
                       const isNormalDebit = ['asset', 'expense'].includes(acct.type);
                       return (
-                        <tr key={acct.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                        <tr key={acct.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                           <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">
                             {acct.accountNumber}
                           </td>
                           <td className="py-3 px-4 font-medium text-slate-900 dark:text-white">
                             {acct.name}
                             {acct.isSystem && (
-                              <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-normal">
+                              <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 font-normal">
                                 System
                               </span>
                             )}
                           </td>
                           <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold capitalize ${
-                              acct.type === 'asset' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                              acct.type === 'liability' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
-                              acct.type === 'equity' ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
-                              acct.type === 'revenue' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' :
-                              'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'
-                            }`}>
+                            <span className="status-chip draft text-xs capitalize">
                               {acct.type}
                             </span>
                             <span className="text-xs text-slate-400 ml-1.5 capitalize">
@@ -598,20 +582,18 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                 placeholder="Search JE # or description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="form-input text-xs sm:text-sm pl-9"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+            <div className="apple-segmented-container p-1 overflow-x-auto w-full sm:w-auto flex">
               {['all', 'invoice', 'payment', 'manual'].map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => setSelectedSourceFilter(s)}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-lg capitalize transition-colors ${
-                    selectedSourceFilter === s
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  className={`apple-segmented-button text-xs capitalize ${
+                    selectedSourceFilter === s ? 'active' : ''
                   }`}
                 >
                   {s === 'all' ? 'All Sources' : s}
@@ -623,7 +605,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
           {/* Journal Entries List */}
           <div className="space-y-3">
             {filteredEntries.length === 0 ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center text-slate-400">
+              <div className="card p-10 text-center text-slate-400">
                 <BookOpen size={36} className="mx-auto mb-2 text-slate-300 dark:text-slate-600" />
                 <p className="font-semibold text-slate-700 dark:text-slate-300">No Journal Entries Found</p>
                 <p className="text-xs text-slate-500 mt-1">Invoices marked as sent or paid will auto-post here, or you can record a manual journal adjustment.</p>
@@ -640,15 +622,15 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                 return (
                   <div
                     key={entry.id}
-                    className={`bg-white dark:bg-slate-900 border rounded-2xl transition-all shadow-sm ${
+                    className={`card transition-all ${
                       entry.isReversed
-                        ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/20'
-                        : 'border-slate-200 dark:border-slate-800'
+                        ? 'opacity-70 bg-slate-50/50 dark:bg-slate-900/40'
+                        : ''
                     }`}
                   >
                     {/* Header Row */}
                     <div
-                      className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors rounded-2xl"
+                      className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
                       onClick={() => toggleEntryExpand(entry.id)}
                     >
                       <div className="flex items-start md:items-center gap-3">
@@ -665,15 +647,11 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                               {entry.entryNumber}
                             </span>
                             <span className="text-xs text-slate-400">• {entryDateStr}</span>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold capitalize ${
-                              entry.sourceType === 'invoice' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' :
-                              entry.sourceType === 'payment' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' :
-                              'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300'
-                            }`}>
+                            <span className="status-chip draft text-[11px] capitalize">
                               {entry.sourceType}
                             </span>
                             {entry.isReversed && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
+                              <span className="status-chip overdue text-[11px]">
                                 Reversed / Void
                               </span>
                             )}
@@ -686,7 +664,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
 
                       <div className="flex items-center justify-between md:justify-end gap-4 pl-8 md:pl-0">
                         <div className="text-right">
-                          <span className="text-xs text-slate-400 block">Balanced Total</span>
+                          <span className="text-xs text-slate-400 block font-medium">Balanced Total</span>
                           <span className="font-mono font-bold text-sm text-slate-900 dark:text-white">
                             {formatCurrency(entry.totalAmount)}
                           </span>
@@ -700,7 +678,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                               setSelectedEntryToReverse(entry);
                               setShowReverseModal(true);
                             }}
-                            className="px-2.5 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
+                            className="btn btn-danger btn-sm text-xs"
                             title="Reverse this entry (immutable append-only reversal)"
                           >
                             Reverse
@@ -711,7 +689,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
 
                     {/* Expanded Detail: Balanced Debit / Credit Ledger Lines */}
                     {isExpanded && (
-                      <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800">
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs text-left">
                             <thead className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
@@ -719,8 +697,8 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                                 <th className="py-2 px-3">Account Code</th>
                                 <th className="py-2 px-3">Account Name</th>
                                 <th className="py-2 px-3">Memo / Line Notes</th>
-                                <th className="py-2 px-3 text-right">Debit ($)</th>
-                                <th className="py-2 px-3 text-right">Credit ($)</th>
+                                <th className="py-2 px-3 text-right">Debit</th>
+                                <th className="py-2 px-3 text-right">Credit</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40 font-mono">
@@ -735,10 +713,10 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                                   <td className="py-2 px-3 font-sans text-slate-500 dark:text-slate-400 italic">
                                     {line.memo || '—'}
                                   </td>
-                                  <td className="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold">
+                                  <td className="py-2 px-3 text-right text-slate-900 dark:text-white font-bold">
                                     {line.debitAmount > 0 ? formatCurrency(line.debitAmount) : '—'}
                                   </td>
-                                  <td className="py-2 px-3 text-right text-blue-600 dark:text-blue-400 font-bold">
+                                  <td className="py-2 px-3 text-right text-slate-900 dark:text-white font-bold">
                                     {line.creditAmount > 0 ? formatCurrency(line.creditAmount) : '—'}
                                   </td>
                                 </tr>
@@ -746,12 +724,12 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                               {/* Totals Footer Row */}
                               <tr className="font-bold border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
                                 <td colSpan={3} className="py-2 px-3 text-right font-sans text-slate-600 dark:text-slate-400">
-                                  Verification ($\sum Dr = \sum Cr$):
+                                  Verification (Σ Dr = Σ Cr):
                                 </td>
-                                <td className="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400">
+                                <td className="py-2 px-3 text-right text-slate-900 dark:text-white">
                                   {formatCurrency(entry.totalAmount)}
                                 </td>
-                                <td className="py-2 px-3 text-right text-blue-600 dark:text-blue-400">
+                                <td className="py-2 px-3 text-right text-slate-900 dark:text-white">
                                   {formatCurrency(entry.totalAmount)}
                                 </td>
                               </tr>
@@ -772,7 +750,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
       {/* SUBTAB 3: MANUAL JOURNAL ENTRY BUILDER */}
       {/* ========================================================================= */}
       {activeSubtab === 'manual' && (
-        <form onSubmit={handlePostManualJE} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+        <form onSubmit={handlePostManualJE} className="card p-5 sm:p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Record Manual Journal Entry</h2>
@@ -782,20 +760,16 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
             </div>
 
             {/* Live Double-Entry Balancing Pill */}
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold ${
-              isBalanced
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
-                : 'bg-amber-50 text-amber-700 border border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
-            }`}>
+            <div className={isBalanced ? 'status-chip paid text-xs font-semibold' : 'status-chip draft text-xs font-semibold'}>
               {isBalanced ? (
                 <>
-                  <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400" />
-                  <span>Balanced Entry: {formatCurrency(totalDebit)}</span>
+                  <CheckCircle2 size={14} />
+                  <span>Balanced: {formatCurrency(totalDebit)}</span>
                 </>
               ) : (
                 <>
-                  <AlertTriangle size={15} className="text-amber-600 dark:text-amber-400" />
-                  <span>Out of Balance: $\Delta$ {formatCurrency(difference)}</span>
+                  <AlertTriangle size={14} />
+                  <span>Difference: {formatCurrency(difference)}</span>
                 </>
               )}
             </div>
@@ -804,29 +778,29 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
           {/* Top Controls: Entry Date & Description */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Entry Date *
+              <label className="form-label">
+                ENTRY DATE *
               </label>
               <input
                 type="date"
                 required
                 value={manualEntryDate}
                 onChange={(e) => setManualEntryDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="form-input"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Description / Memo *
+              <label className="form-label">
+                DESCRIPTION / MEMO *
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Owner capital injection or computer hardware depreciation"
+                placeholder="e.g. Owner capital injection or equipment depreciation"
                 value={manualDescription}
                 onChange={(e) => setManualDescription(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="form-input"
               />
             </div>
           </div>
@@ -849,11 +823,11 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
 
             <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase">
+                <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase">
                   <tr>
                     <th className="py-2.5 px-3 w-5/12">Account</th>
-                    <th className="py-2.5 px-3 w-2/12">Debit ($)</th>
-                    <th className="py-2.5 px-3 w-2/12">Credit ($)</th>
+                    <th className="py-2.5 px-3 w-2/12">Debit</th>
+                    <th className="py-2.5 px-3 w-2/12">Credit</th>
                     <th className="py-2.5 px-3 w-3/12">Memo</th>
                     <th className="py-2.5 px-2 w-10 text-center"></th>
                   </tr>
@@ -866,7 +840,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                           required
                           value={line.accountId}
                           onChange={(e) => handleUpdateJELine(idx, 'accountId', e.target.value)}
-                          className="w-full p-2 text-xs rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          className="form-select text-xs"
                         >
                           <option value="">Select account...</option>
                           {accounts.map((a) => (
@@ -884,7 +858,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                           placeholder="0.00"
                           value={line.debitAmount}
                           onChange={(e) => handleUpdateJELine(idx, 'debitAmount', e.target.value)}
-                          className="w-full p-2 text-xs font-mono text-right rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          className="form-input form-input-mono text-xs text-right font-bold"
                         />
                       </td>
                       <td className="p-2">
@@ -895,7 +869,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                           placeholder="0.00"
                           value={line.creditAmount}
                           onChange={(e) => handleUpdateJELine(idx, 'creditAmount', e.target.value)}
-                          className="w-full p-2 text-xs font-mono text-right rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          className="form-input form-input-mono text-xs text-right font-bold"
                         />
                       </td>
                       <td className="p-2">
@@ -904,7 +878,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                           placeholder="Optional memo"
                           value={line.memo}
                           onChange={(e) => handleUpdateJELine(idx, 'memo', e.target.value)}
-                          className="w-full p-2 text-xs rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          className="form-input text-xs"
                         />
                       </td>
                       <td className="p-2 text-center">
@@ -922,18 +896,18 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                     </tr>
                   ))}
                   {/* Totals Summary Line */}
-                  <tr className="bg-slate-50/70 dark:bg-slate-800/40 font-mono font-bold text-xs border-t-2 border-slate-200 dark:border-slate-700">
+                  <tr className="bg-slate-50/70 dark:bg-slate-800/40 font-mono font-bold text-xs border-t border-slate-200 dark:border-slate-700">
                     <td className="p-3 text-right font-sans text-slate-600 dark:text-slate-400">Totals:</td>
-                    <td className="p-3 text-right text-emerald-600 dark:text-emerald-400">{formatCurrency(totalDebit)}</td>
-                    <td className="p-3 text-right text-blue-600 dark:text-blue-400">{formatCurrency(totalCredit)}</td>
+                    <td className="p-3 text-right text-slate-900 dark:text-white">{formatCurrency(totalDebit)}</td>
+                    <td className="p-3 text-right text-slate-900 dark:text-white">{formatCurrency(totalCredit)}</td>
                     <td colSpan={2} className="p-3 text-xs font-sans">
                       {isBalanced ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span className="text-slate-900 dark:text-white font-semibold flex items-center gap-1">
                           <CheckCircle2 size={13} /> Balanced
                         </span>
                       ) : (
-                        <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                          <AlertTriangle size={13} /> Difference: {formatCurrency(difference)}
+                        <span className="text-slate-500 font-semibold flex items-center gap-1">
+                          <AlertTriangle size={13} /> Diff: {formatCurrency(difference)}
                         </span>
                       )}
                     </td>
@@ -956,9 +930,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
             <button
               type="submit"
               disabled={!isBalanced || postingJE}
-              className={`btn btn-primary btn-sm flex items-center gap-2 ${
-                !isBalanced ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className="btn btn-primary btn-sm flex items-center gap-2"
             >
               <CheckCircle2 size={16} />
               <span>{postingJE ? 'Posting Transaction...' : 'Post to General Ledger'}</span>
@@ -971,11 +943,11 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
       {/* SUBTAB 4: AUDIT TRAIL & GOVERNANCE */}
       {/* ========================================================================= */}
       {activeSubtab === 'audit' && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
+        <div className="card p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <History size={18} className="text-emerald-600 dark:text-emerald-400" />
+                <History size={18} />
                 <span>Immutable Audit Trail & Governance Log</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -1006,12 +978,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                     className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 text-xs flex flex-col md:flex-row md:items-center justify-between gap-2"
                   >
                     <div className="flex items-start md:items-center gap-3">
-                      <span className={`px-2 py-0.5 rounded font-mono font-bold uppercase text-[10px] ${
-                        log.action === 'create' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' :
-                        log.action === 'void' ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300' :
-                        log.action === 'lock_books' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' :
-                        'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
-                      }`}>
+                      <span className="status-chip draft font-mono text-[10px] uppercase font-bold">
                         {log.action}
                       </span>
 
@@ -1038,19 +1005,19 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL: ADD CUSTOM ACCOUNT */}
+      {/* MODAL: ADD CUSTOM ACCOUNT (Apple Sheet) */}
       {/* ========================================================================= */}
       {showNewAccountModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+        <div className="apple-modal-overlay">
+          <div className="apple-modal-content p-6 space-y-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">
               Add New Account to Chart of Accounts
             </h3>
 
             <form onSubmit={handleCreateAccount} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Account Number (e.g. 1050, 6150) *
+                <label className="form-label">
+                  ACCOUNT NUMBER (E.G. 1050, 6150) *
                 </label>
                 <input
                   type="text"
@@ -1058,13 +1025,13 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                   placeholder="e.g. 6120"
                   value={newAccount.accountNumber}
                   onChange={(e) => setNewAccount({ ...newAccount, accountNumber: e.target.value })}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  className="form-input form-input-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Account Name *
+                <label className="form-label">
+                  ACCOUNT NAME *
                 </label>
                 <input
                   type="text"
@@ -1072,19 +1039,19 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                   placeholder="e.g. Cloud Infrastructure & Hosting"
                   value={newAccount.name}
                   onChange={(e) => setNewAccount({ ...newAccount, name: e.target.value })}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  className="form-input"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Classification *
+                  <label className="form-label">
+                    CLASSIFICATION *
                   </label>
                   <select
                     value={newAccount.type}
                     onChange={(e) => setNewAccount({ ...newAccount, type: e.target.value })}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    className="form-select"
                   >
                     <option value="asset">Asset</option>
                     <option value="liability">Liability</option>
@@ -1095,15 +1062,15 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Subtype
+                  <label className="form-label">
+                    SUBTYPE
                   </label>
                   <input
                     type="text"
                     placeholder="e.g. operating_expense"
                     value={newAccount.subtype}
                     onChange={(e) => setNewAccount({ ...newAccount, subtype: e.target.value })}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    className="form-input"
                   />
                 </div>
               </div>
@@ -1126,23 +1093,23 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL: REVERSE ENTRY */}
+      {/* MODAL: REVERSE ENTRY (Apple Sheet) */}
       {/* ========================================================================= */}
       {showReverseModal && selectedEntryToReverse && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
-            <h3 className="text-lg font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2">
+        <div className="apple-modal-overlay">
+          <div className="apple-modal-content p-6 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <RotateCcw size={18} />
               <span>Reverse Journal Entry {selectedEntryToReverse.entryNumber}</span>
             </h3>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Under immutable GAAP standards, entries cannot be deleted. An equal and opposite reversing entry will be posted to void this transaction.
             </p>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Reason for Reversal *
+              <label className="form-label">
+                REASON FOR REVERSAL *
               </label>
               <input
                 type="text"
@@ -1150,7 +1117,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
                 placeholder="e.g. Duplicate entry, client invoice re-issued, or accounting adjustment"
                 value={reverseReason}
                 onChange={(e) => setReverseReason(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                className="form-input"
               />
             </div>
 
@@ -1168,7 +1135,7 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
               <button
                 type="button"
                 onClick={handleReverseEntry}
-                className="btn bg-rose-600 hover:bg-rose-700 text-white btn-sm"
+                className="btn btn-danger btn-sm"
               >
                 Confirm Reversal
               </button>
@@ -1178,31 +1145,31 @@ export function Accounting({ organization, userRole, onTriggerToast }) {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL: LOCK PERIOD */}
+      {/* MODAL: LOCK PERIOD (Apple Sheet) */}
       {/* ========================================================================= */}
       {showLockModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+        <div className="apple-modal-overlay">
+          <div className="apple-modal-content p-6 space-y-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Lock size={18} className="text-amber-500" />
+              <Lock size={18} />
               <span>Lock Accounting Period (Month-End Close)</span>
             </h3>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Locking an accounting period prevents any new journal entries, invoice issues, or edits on or before the selected date, protecting tax filings and historical audited books.
             </p>
 
             <form onSubmit={handleLockPeriod} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Lock Books Through Date *
+                <label className="form-label">
+                  LOCK BOOKS THROUGH DATE *
                 </label>
                 <input
                   type="date"
                   required
                   value={lockDate}
                   onChange={(e) => setLockDate(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  className="form-input"
                 />
               </div>
 

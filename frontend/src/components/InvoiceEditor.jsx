@@ -232,33 +232,31 @@ export function InvoiceEditor({
   return (
     <div className="editor-layout-wrap">
       {/* Top Toolbar */}
-      <div className="card no-print mb-4 sm:mb-6 p-3 sm:p-5">
+      <div className="card no-print mb-4 sm:mb-6 p-3 sm:p-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           {/* Left: Mode switcher & Presets */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="nav-tabs p-1 w-full sm:w-auto flex">
+            <div className="apple-segmented-container w-full sm:w-auto flex">
               <button 
                 type="button"
-                className={`nav-tab-btn flex-1 sm:flex-initial text-center justify-center ${activeTab === 'edit' ? 'active' : ''}`}
+                className={`apple-segmented-button flex-1 sm:flex-initial text-center justify-center ${activeTab === 'edit' ? 'active' : ''}`}
                 onClick={() => setActiveTab('edit')}
-                style={{ padding: '0.4rem 0.85rem', fontSize: '0.825rem' }}
               >
                 Editor Form
               </button>
               <button 
                 type="button"
-                className={`nav-tab-btn flex-1 sm:flex-initial text-center justify-center ${activeTab === 'preview' ? 'active' : ''}`}
+                className={`apple-segmented-button flex-1 sm:flex-initial text-center justify-center ${activeTab === 'preview' ? 'active' : ''}`}
                 onClick={() => setActiveTab('preview')}
-                style={{ padding: '0.4rem 0.85rem', fontSize: '0.825rem' }}
               >
                 Live Preview
               </button>
             </div>
 
-            <div className="hidden sm:block border-l border-slate-200 dark:border-slate-800 h-6 mx-1" />
+            <div className="hidden sm:block border-l border-slate-200 dark:border-slate-800 h-5 mx-1" />
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
                 Preset:
               </span>
               <button 
@@ -267,7 +265,7 @@ export function InvoiceEditor({
                 onClick={handleApplyBlukersPreset}
                 title="Pre-fills Blukers Accounting emails, consulting agreement rules, and wire checklist"
               >
-                <Sparkles size={13} color="#059669" />
+                <Sparkles size={13} />
                 <span>Blukers Consulting</span>
               </button>
 
@@ -285,7 +283,7 @@ export function InvoiceEditor({
           <div className="flex items-center gap-2 flex-wrap">
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm flex items-center gap-1 flex-1 sm:flex-initial"
+              className="btn btn-secondary btn-sm flex items-center gap-1.5 flex-1 sm:flex-initial"
               onClick={handleSaveInvoice}
             >
               <Save size={14} />
@@ -294,7 +292,7 @@ export function InvoiceEditor({
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm flex items-center gap-1"
+              className="btn btn-secondary btn-sm flex items-center gap-1.5"
               onClick={handleDownloadPdf}
               disabled={isExporting}
             >
@@ -304,7 +302,7 @@ export function InvoiceEditor({
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm hidden sm:flex items-center gap-1"
+              className="btn btn-secondary btn-sm hidden sm:flex items-center gap-1.5"
               onClick={handlePrint}
             >
               <Printer size={14} />
@@ -313,7 +311,7 @@ export function InvoiceEditor({
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm hidden md:flex items-center gap-1"
+              className="btn btn-secondary btn-sm hidden md:flex items-center gap-1.5"
               onClick={onViewRecipientScreen}
               title="Test the lock screen that Rosa and Blukers accounting will see"
             >
@@ -341,10 +339,10 @@ export function InvoiceEditor({
       ) : (
         <div className="editor-layout">
           {/* Header & Metadata Card */}
-          <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <h2 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileCheck2 size={20} color="var(--primary-600)" />
+          <div className="card p-4 sm:p-5">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                <FileCheck2 size={20} className="text-slate-800 dark:text-slate-200" />
                 <span>Invoice Details & Service Period</span>
               </h2>
               
@@ -352,7 +350,7 @@ export function InvoiceEditor({
                 <label className="form-label" style={{ margin: 0 }}>Currency:</label>
                 <select 
                   className="form-select"
-                  style={{ width: 'auto', padding: '0.35rem 0.6rem', fontSize: '0.85rem' }}
+                  style={{ width: 'auto', padding: '0.35rem 0.6rem', fontSize: '0.825rem' }}
                   value={invoice.currency || 'USD'}
                   onChange={(e) => updateInvoice({ currency: e.target.value })}
                 >
@@ -363,7 +361,7 @@ export function InvoiceEditor({
 
                 <select 
                   className="form-select"
-                  style={{ width: 'auto', padding: '0.35rem 0.6rem', fontSize: '0.85rem' }}
+                  style={{ width: 'auto', padding: '0.35rem 0.6rem', fontSize: '0.825rem' }}
                   value={invoice.status || 'draft'}
                   onChange={(e) => updateInvoice({ status: e.target.value })}
                 >
@@ -401,7 +399,7 @@ export function InvoiceEditor({
                   <button 
                     type="button" 
                     onClick={handleSetDue15th} 
-                    style={{ background: 'none', border: 'none', color: '#059669', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                    style={{ background: 'none', border: 'none', color: 'var(--apple-text-secondary)', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
                   >
                     Set 15th
                   </button>
@@ -540,10 +538,10 @@ export function InvoiceEditor({
             </div>
 
             {/* BILL TO: Client (Blukers Protocol) */}
-            <div className="card">
+            <div className="card p-4 sm:p-5">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1rem', color: 'var(--text-main)' }}>Client ("Bill To")</h3>
-                <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600 }}>
+                <h3 style={{ fontSize: '1rem', color: 'var(--apple-text-primary)', fontWeight: 600 }}>Client ("Bill To")</h3>
+                <span className="status-chip paid text-[11px]">
                   Pre-configured for Blukers
                 </span>
               </div>
@@ -611,8 +609,8 @@ export function InvoiceEditor({
             </div>
           </div>
 
-          {/* Line Items Section (QuickBooks Style) */}
-          <div className="card">
+          {/* Line Items Section */}
+          <div className="card p-4 sm:p-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
@@ -678,7 +676,7 @@ export function InvoiceEditor({
                           />
                         </td>
                         <td>
-                          <div className="font-mono" style={{ fontWeight: 600 }}>
+                          <div className="font-mono text-slate-900 dark:text-white" style={{ fontWeight: 600 }}>
                             {formatMoney(rowAmount, invoice.currency)}
                           </div>
                         </td>
@@ -766,7 +764,7 @@ export function InvoiceEditor({
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
                       <span className="text-xs text-slate-500">Row Total:</span>
-                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                      <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
                         {formatMoney(rowAmount, invoice.currency)}
                       </span>
                     </div>
@@ -864,7 +862,7 @@ export function InvoiceEditor({
               </span>
             </div>
 
-            <p style={{ fontSize: '0.825rem', color: '#475569', marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.825rem', color: 'var(--apple-text-secondary)', marginBottom: '1.25rem' }}>
               In accordance with security standards, this sensitive banking data is encrypted when generating the shareable link and will only unlock when the recipient inputs your designated access code.
             </p>
 
@@ -977,14 +975,14 @@ export function InvoiceEditor({
           </div>
 
           {/* Security & Access Code Settings Card */}
-          <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="card p-4 sm:p-5">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
               <div>
-                <h3 style={{ fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <KeyRound size={20} color="#059669" />
+                <h3 style={{ fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                  <KeyRound size={20} />
                   <span>Secure Access Code (PIN Protection)</span>
                 </h3>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--apple-text-secondary)' }}>
                   The recipient must enter this 6-digit passcode to unlock the invoice and view your banking details.
                 </div>
               </div>
@@ -1006,7 +1004,7 @@ export function InvoiceEditor({
                   type="text" 
                   className="form-input form-input-mono"
                   maxLength={6}
-                  style={{ fontSize: '1.2rem', letterSpacing: '0.15em', fontWeight: '700', color: '#059669' }}
+                  style={{ fontSize: '1.25rem', letterSpacing: '0.18em', fontWeight: '700' }}
                   value={invoice.security?.accessPin || '123456'}
                   onChange={(e) => updateInvoice(prev => ({
                     ...prev,

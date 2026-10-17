@@ -104,16 +104,16 @@ export function ProfileSettings({ onTriggerToast }) {
   };
 
   return (
-    <div style={{ maxWidth: '880px', margin: '0 auto' }}>
-      <form onSubmit={handleSave}>
+    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+      <form onSubmit={handleSave} className="space-y-6">
         {/* Consultant / Business Details Card */}
-        <div className="card" style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+        <div className="card p-4 sm:p-6">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <Building size={22} color="var(--primary-600)" />
+              <Building size={22} className="text-slate-800 dark:text-slate-200" />
               <div>
-                <h2 style={{ fontSize: '1.25rem' }}>Consultant / Business Profile</h2>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                <h2 style={{ fontSize: '1.15rem', fontWeight: 700, letterSpacing: '-0.02em' }}>Consultant / Business Profile</h2>
+                <div style={{ fontSize: '0.8rem', color: 'var(--apple-text-secondary)' }}>
                   Your business details appear on all invoices as the issuing party.
                 </div>
               </div>
@@ -240,12 +240,12 @@ export function ProfileSettings({ onTriggerToast }) {
         </div>
 
         {/* Wage & Billing Rate Profile Card */}
-        <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <div className="card p-4 sm:p-6">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
-            <DollarSign size={22} color="var(--primary-600)" />
+            <DollarSign size={22} className="text-slate-800 dark:text-slate-200" />
             <div>
-              <h2 style={{ fontSize: '1.25rem' }}>Wage & Billing Rate Profile</h2>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 700, letterSpacing: '-0.02em' }}>Wage & Billing Rate Profile</h2>
+              <div style={{ fontSize: '0.8rem', color: 'var(--apple-text-secondary)' }}>
                 Set your standard hourly wage/rate and hours to automatically pre-populate new invoices.
               </div>
             </div>
@@ -285,7 +285,7 @@ export function ProfileSettings({ onTriggerToast }) {
             <div className="form-group">
               <label className="form-label">DEFAULT BILLING CURRENCY</label>
               <select
-                className="form-input"
+                className="form-select"
                 value={wageSettings.currency}
                 onChange={(e) => setWageSettings({ ...wageSettings, currency: e.target.value })}
               >
@@ -313,7 +313,7 @@ export function ProfileSettings({ onTriggerToast }) {
         </div>
 
         {/* Wire Transfer Details Card */}
-        <div className="wire-transfer-section" style={{ marginBottom: '1.5rem' }}>
+        <div className="wire-transfer-section">
           <div className="wire-header">
             <div className="wire-header-title">
               <CreditCard size={20} />
@@ -325,7 +325,7 @@ export function ProfileSettings({ onTriggerToast }) {
             </span>
           </div>
 
-          <p style={{ fontSize: '0.825rem', color: '#475569', marginBottom: '1.25rem' }}>
+          <p style={{ fontSize: '0.825rem', color: 'var(--apple-text-secondary)', marginBottom: '1.25rem' }}>
             Store your wire transfer information here so that every monthly invoice can be populated in one click.
           </p>
 

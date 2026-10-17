@@ -1,16 +1,15 @@
 import React from 'react';
 import { 
   FileText, 
-  CheckCircle2, 
+  Check, 
   Clock, 
   Send, 
-  FileEdit, 
   Plus, 
   ArrowRight, 
   ShieldCheck, 
-  TrendingUp, 
-  Calendar,
   Layers,
+  ChevronRight,
+  TrendingUp,
   Share2
 } from 'lucide-react';
 import { formatMoney } from '../utils/invoiceSchema';
@@ -32,7 +31,7 @@ export function Dashboard({
   const paidCount = paidInvoices.length;
   const paidAmount = paidInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
 
-  // Pending (any invoice not yet marked paid, e.g. sent or draft with due date)
+  // Pending
   const pendingInvoices = invoices.filter(inv => inv.status !== 'paid');
   const pendingCount = pendingInvoices.length;
   const pendingAmount = pendingInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
@@ -42,412 +41,256 @@ export function Dashboard({
   const sentCount = sentInvoices.length;
   const sentAmount = sentInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
 
-  // Not Sent / Drafts
-  const notSentInvoices = invoices.filter(inv => !inv.status || inv.status === 'draft');
-  const notSentCount = notSentInvoices.length;
-  const notSentAmount = notSentInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
+  // Drafts
+  const draftInvoices = invoices.filter(inv => !inv.status || inv.status === 'draft');
+  const draftCount = draftInvoices.length;
+  const draftAmount = draftInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
 
-  // Proportional percentages for the visual pipeline bar
+  // Percentages for subtle Apple progress bar
   const paidPercent = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0;
-  const sentPercent = totalAmount > 0 ? (sentAmount / totalAmount) * 100 : 0;
-  const notSentPercent = totalAmount > 0 ? (notSentAmount / totalAmount) * 100 : 0;
+  const pendingPercent = totalAmount > 0 ? (pendingAmount / totalAmount) * 100 : 0;
 
   return (
-    <div className="dashboard-wrapper">
-      {/* Welcome Banner */}
-      <div className="dashboard-hero-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 sm:p-7">
-        <div className="dashboard-hero-left">
-          <div className="dashboard-hero-badge">
-            <ShieldCheck size={14} color="#059669" />
-            <span>Consulting Agreement Invoicing Portal</span>
-          </div>
-          <h1 className="dashboard-hero-title text-xl sm:text-2xl md:text-3xl">
-            Welcome back, {user?.name || 'Consultant'}
+    <div className="space-y-6">
+      {/* Apple Minimalist Hero Greeting */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Overview
           </h1>
-          <p className="dashboard-hero-subtitle text-xs sm:text-sm">
-            Track and manage your monthly consulting invoices, payment statuses, and secure wire transfer links.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Welcome back, {user?.name || 'Consultant'}. Monthly consulting summary.
           </p>
         </div>
 
-        <div className="dashboard-hero-actions w-full sm:w-auto mt-2 sm:mt-0">
+        <div className="flex items-center gap-2">
           <button 
             type="button" 
-            className="btn btn-primary btn-lg w-full sm:w-auto justify-center"
+            className="btn btn-secondary btn-sm"
+            onClick={() => onNavigateToTab('list')}
+          >
+            <Layers size={14} />
+            <span>All Invoices</span>
+          </button>
+
+          <button 
+            type="button" 
+            className="btn btn-primary btn-sm"
             onClick={onNewInvoice}
           >
-            <Plus size={18} />
-            <span>Create New Invoice</span>
+            <Plus size={14} />
+            <span>Create Invoice</span>
           </button>
         </div>
       </div>
 
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-        <div>
-          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-slate-100">
-            Invoice Status Overview
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Live status metrics across all submitted and draft consulting agreements.
-          </p>
-        </div>
-        <button 
-          type="button" 
-          className="btn btn-secondary btn-sm self-start sm:self-auto flex items-center gap-1.5"
-          onClick={() => onNavigateToTab('list')}
-        >
-          <Layers size={14} />
-          <span>View All Invoices</span>
-        </button>
-      </div>
-
-      {/* Main 5 Status Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
-        {/* 1. TOTAL INVOICES */}
-        <div 
-          className="metric-card metric-total col-span-2 sm:col-span-1"
-          onClick={() => onNavigateToTab('list')}
-          title="Click to view all invoices"
-        >
-          <div className="metric-header">
-            <span className="metric-label">TOTAL INVOICES</span>
-            <div className="metric-icon-wrap icon-total">
-              <FileText size={18} />
+      {/* Apple Bento-Grid: 4 Understated Financial Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Card 1: Total Volume */}
+        <div className="card p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider">Total Volume</span>
+            <FileText size={16} />
+          </div>
+          <div className="my-3">
+            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+              {formatMoney(totalAmount)}
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              Across {totalCount} total agreement {totalCount === 1 ? 'record' : 'records'}
             </div>
           </div>
-          <div className="metric-number-row">
-            <span className="metric-count">{totalCount}</span>
-            <span className="metric-count-unit">Invoices</span>
-          </div>
-          <div className="metric-amount font-mono">
-            {formatMoney(totalAmount)}
-          </div>
-          <div className="metric-footer">
-            <span className="truncate">All generated invoices</span>
-            <ArrowRight size={14} className="shrink-0" />
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+            <span>Historical Invoices</span>
+            <span className="font-semibold">{totalCount}</span>
           </div>
         </div>
 
-        {/* 2. PAID INVOICES */}
-        <div 
-          className="metric-card metric-paid"
-          onClick={() => onNavigateToTab('list')}
-          title="Click to view paid invoices"
-        >
-          <div className="metric-header">
-            <span className="metric-label">PAID</span>
-            <div className="metric-icon-wrap icon-paid">
-              <CheckCircle2 size={18} />
+        {/* Card 2: Paid & Cleared */}
+        <div className="card p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider">Settled & Paid</span>
+            <Check size={16} className="text-slate-900 dark:text-white" />
+          </div>
+          <div className="my-3">
+            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+              {formatMoney(paidAmount)}
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {paidCount} {paidCount === 1 ? 'payment' : 'payments'} deposited
             </div>
           </div>
-          <div className="metric-number-row">
-            <span className="metric-count text-emerald-600 dark:text-emerald-400">{paidCount}</span>
-            <span className="metric-count-unit">Invoices</span>
-          </div>
-          <div className="metric-amount font-mono text-emerald-600 dark:text-emerald-400">
-            {formatMoney(paidAmount)}
-          </div>
-          <div className="metric-footer">
-            <span className="status-pill status-paid text-xs">Wire Received</span>
-            <ArrowRight size={14} className="shrink-0" />
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+            <span>Settlement Rate</span>
+            <span className="font-semibold tabular-nums">{paidPercent.toFixed(0)}%</span>
           </div>
         </div>
 
-        {/* 3. PENDING INVOICES */}
-        <div 
-          className="metric-card metric-pending"
-          onClick={() => onNavigateToTab('list')}
-          title="Click to view pending invoices"
-        >
-          <div className="metric-header">
-            <span className="metric-label">PENDING / DUE</span>
-            <div className="metric-icon-wrap icon-pending">
-              <Clock size={18} />
+        {/* Card 3: Pending A/R */}
+        <div className="card p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider">Outstanding A/R</span>
+            <Clock size={16} />
+          </div>
+          <div className="my-3">
+            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+              {formatMoney(pendingAmount)}
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {pendingCount} open {pendingCount === 1 ? 'invoice' : 'invoices'}
             </div>
           </div>
-          <div className="metric-number-row">
-            <span className="metric-count text-amber-600 dark:text-amber-400">{pendingCount}</span>
-            <span className="metric-count-unit">Invoices</span>
-          </div>
-          <div className="metric-amount font-mono text-amber-600 dark:text-amber-400">
-            {formatMoney(pendingAmount)}
-          </div>
-          <div className="metric-footer">
-            <span className="status-pill status-pending text-xs">Awaiting Payment</span>
-            <ArrowRight size={14} className="shrink-0" />
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+            <span>Sent to Client</span>
+            <span className="font-semibold">{sentCount}</span>
           </div>
         </div>
 
-        {/* 4. SENT INVOICES */}
-        <div 
-          className="metric-card metric-sent"
-          onClick={() => onNavigateToTab('list')}
-          title="Click to view sent invoices"
-        >
-          <div className="metric-header">
-            <span className="metric-label">SENT</span>
-            <div className="metric-icon-wrap icon-sent">
-              <Send size={18} />
+        {/* Card 4: Drafts & In-Progress */}
+        <div className="card p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider">Unissued Drafts</span>
+            <Send size={16} />
+          </div>
+          <div className="my-3">
+            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+              {formatMoney(draftAmount)}
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {draftCount} ready to issue
             </div>
           </div>
-          <div className="metric-number-row">
-            <span className="metric-count text-blue-600 dark:text-blue-400">{sentCount}</span>
-            <span className="metric-count-unit">Invoices</span>
-          </div>
-          <div className="metric-amount font-mono text-blue-600 dark:text-blue-400">
-            {formatMoney(sentAmount)}
-          </div>
-          <div className="metric-footer">
-            <span className="status-pill status-sent text-xs">Delivered via Link</span>
-            <ArrowRight size={14} className="shrink-0" />
-          </div>
-        </div>
-
-        {/* 5. NOT SENT / DRAFT INVOICES */}
-        <div 
-          className="metric-card metric-draft"
-          onClick={() => onNavigateToTab('list')}
-          title="Click to view drafts"
-        >
-          <div className="metric-header">
-            <span className="metric-label">DRAFTS</span>
-            <div className="metric-icon-wrap icon-draft">
-              <FileEdit size={18} />
-            </div>
-          </div>
-          <div className="metric-number-row">
-            <span className="metric-count text-slate-500 dark:text-slate-400">{notSentCount}</span>
-            <span className="metric-count-unit">Invoices</span>
-          </div>
-          <div className="metric-amount font-mono text-slate-500 dark:text-slate-400">
-            {formatMoney(notSentAmount)}
-          </div>
-          <div className="metric-footer">
-            <span className="status-pill status-draft text-xs">Ready to Send</span>
-            <ArrowRight size={14} className="shrink-0" />
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+            <span>Quick Action</span>
+            <button 
+              type="button"
+              onClick={() => onNavigateToTab('editor')}
+              className="text-xs font-semibold text-slate-900 dark:text-white hover:underline flex items-center gap-0.5"
+            >
+              <span>Edit Draft</span>
+              <ChevronRight size={12} />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Visual Revenue Pipeline Progress Bar */}
-      <div className="card mt-4 p-4 sm:p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
-          <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
-            Invoice Value Distribution
-          </div>
-          <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Total Pipeline: <strong className="font-mono text-slate-800 dark:text-slate-200">{formatMoney(totalAmount)}</strong>
-          </div>
+      {/* Subtle Apple Progress Pipeline */}
+      <div className="card p-4 sm:p-5">
+        <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+          <span>Settlement Allocation</span>
+          <span className="tabular-nums font-semibold text-slate-700 dark:text-slate-300">
+            {paidPercent.toFixed(0)}% Collected
+          </span>
         </div>
-
-        <div className="pipeline-bar-track">
+        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
           <div 
-            className="pipeline-segment segment-paid" 
             style={{ width: `${paidPercent}%` }} 
-            title={`Paid: ${formatMoney(paidAmount)} (${paidPercent.toFixed(1)}%)`}
+            className="h-full bg-slate-900 dark:bg-white transition-all duration-500" 
+            title={`Paid: ${paidPercent.toFixed(1)}%`}
           />
           <div 
-            className="pipeline-segment segment-sent" 
-            style={{ width: `${sentPercent}%` }} 
-            title={`Sent: ${formatMoney(sentAmount)} (${sentPercent.toFixed(1)}%)`}
-          />
-          <div 
-            className="pipeline-segment segment-draft" 
-            style={{ width: `${notSentPercent}%` }} 
-            title={`Drafts (Not Sent): ${formatMoney(notSentAmount)} (${notSentPercent.toFixed(1)}%)`}
+            style={{ width: `${pendingPercent}%` }} 
+            className="h-full bg-slate-300 dark:bg-slate-600 transition-all duration-500" 
+            title={`Pending: ${pendingPercent.toFixed(1)}%`}
           />
         </div>
-
-        <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
           <div className="flex items-center gap-1.5">
-            <span className="legend-dot dot-paid shrink-0" />
-            <span>Paid ({paidCount}) • {formatMoney(paidAmount)}</span>
+            <span className="w-2 h-2 rounded-full bg-slate-900 dark:bg-white" />
+            <span>Paid ({formatMoney(paidAmount)})</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="legend-dot dot-sent shrink-0" />
-            <span>Sent ({sentCount}) • {formatMoney(sentAmount)}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="legend-dot dot-draft shrink-0" />
-            <span>Not Sent ({notSentCount}) • {formatMoney(notSentAmount)}</span>
+            <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
+            <span>Pending ({formatMoney(pendingAmount)})</span>
           </div>
         </div>
       </div>
 
-      {/* Recent Invoices Quick-Access Section */}
-      <div className="card mt-4 p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-3.5">
-          <div>
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">Recent Invoices</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Quickly preview, edit, or copy secure links for your latest invoices.
-            </p>
-          </div>
+      {/* Recent Invoices: Apple Grouped Inset Stream */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+            Recent Invoices
+          </h2>
           <button 
             type="button" 
-            className="btn btn-secondary btn-sm flex items-center gap-1"
+            className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1"
             onClick={() => onNavigateToTab('list')}
           >
-            <span>View All ({totalCount})</span>
-            <ArrowRight size={13} />
+            <span>View All</span>
+            <ChevronRight size={13} />
           </button>
         </div>
 
         {invoices.length === 0 ? (
-          <div className="text-center py-10 px-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 my-2">
-            <FileText size={38} className="mx-auto mb-2 text-slate-400" />
-            <h4 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">No Invoices Created Yet</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">
-              Your invoice ledger is clean and ready. Click below to draft your first compliant monthly consulting invoice.
-            </p>
-            <button 
-              type="button" 
-              className="btn btn-primary btn-sm inline-flex items-center gap-1.5"
-              onClick={onNewInvoice}
-            >
-              <Plus size={14} />
-              <span>Create First Monthly Invoice</span>
+          <div className="card p-8 text-center text-slate-400">
+            <FileText size={32} className="mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No Invoices Yet</p>
+            <p className="text-xs text-slate-400 mt-1 mb-4">Create your first monthly consulting agreement invoice to begin tracking.</p>
+            <button type="button" className="btn btn-primary btn-sm" onClick={onNewInvoice}>
+              Create Invoice
             </button>
           </div>
         ) : (
-          <>
-            {/* Desktop View: Table (Visible on md:768px and up) */}
-            <div className="hidden md:block items-table-wrapper" style={{ margin: 0 }}>
-              <table className="items-table">
-                <thead>
-                  <tr>
-                    <th>Invoice #</th>
-                    <th>Client</th>
-                    <th>Service Period</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Access PIN</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoices.slice(0, 4).map(inv => (
-                    <tr key={inv.id}>
-                      <td>
-                        <span 
-                          style={{ fontWeight: 700, color: 'var(--qb-blue)', cursor: 'pointer' }}
-                          onClick={() => onSelectInvoice(inv)}
-                        >
-                          {inv.invoiceNumber || inv.id}
-                        </span>
-                      </td>
-                      <td>{inv.client?.companyName || 'Blukers, Inc.'}</td>
-                      <td>{inv.servicePeriod || '—'}</td>
-                      <td className="font-mono" style={{ fontWeight: 700 }}>
-                        {formatMoney(inv.total, inv.currency)}
-                      </td>
-                      <td>
-                        <span className={`status-pill status-${inv.status || 'draft'}`}>
-                          {inv.status === 'paid' ? 'Paid' : inv.status === 'sent' ? 'Sent' : 'Draft / Not Sent'}
-                        </span>
-                      </td>
-                      <td>
-                        <span style={{
-                          fontFamily: 'var(--font-mono)',
-                          background: 'var(--primary-100)',
-                          color: 'var(--primary-800)',
-                          padding: '0.15rem 0.45rem',
-                          borderRadius: '4px',
-                          fontWeight: 700,
-                          fontSize: '0.8rem'
-                        }}>
-                          {inv.security?.accessPin || '—'}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
-                          <button 
-                            type="button" 
-                            className="btn btn-secondary btn-sm"
-                            onClick={() => onSelectInvoice(inv)}
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            type="button" 
-                            className="btn btn-primary btn-sm"
-                            onClick={() => onShareInvoice(inv)}
-                          >
-                            <Share2 size={13} />
-                            <span>Share</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile View: Interactive Cards (Visible on mobile screens < 768px) */}
-            <div className="md:hidden space-y-3">
-              {invoices.slice(0, 4).map(inv => (
+          <div className="card divide-y divide-slate-100 dark:divide-slate-800/80 overflow-hidden">
+            {invoices.slice(0, 6).map((inv) => {
+              const status = inv.status || 'draft';
+              return (
                 <div 
                   key={inv.id}
-                  className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:border-emerald-500/50 transition-all"
+                  className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
+                  onClick={() => onSelectInvoice(inv)}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span 
-                      className="font-bold text-sm text-blue-600 dark:text-blue-400 cursor-pointer"
-                      onClick={() => onSelectInvoice(inv)}
-                    >
-                      {inv.invoiceNumber || inv.id}
-                    </span>
-                    <span className={`status-pill status-${inv.status || 'draft'} text-xs`}>
-                      {inv.status === 'paid' ? 'Paid' : inv.status === 'sent' ? 'Sent' : 'Draft'}
-                    </span>
-                  </div>
-
-                  <div className="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1">
-                    {inv.client?.companyName || 'Blukers, Inc.'}
-                  </div>
-
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-2.5">
-                    Period: {inv.servicePeriod || '—'}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100">
-                        {formatMoney(inv.total, inv.currency)}
-                      </span>
-                      {inv.security?.accessPin && (
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold" title="Access PIN">
-                          PIN: {inv.security.accessPin}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-slate-300 shrink-0">
+                      {(inv.client?.companyName || 'B')[0]}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                          {inv.client?.companyName || 'Client'}
                         </span>
-                      )}
+                        <span className={`status-chip ${status}`}>
+                          {status}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5 truncate">
+                        <span className="font-mono">{inv.invoiceNumber}</span>
+                        {inv.servicePeriod && <span>• {inv.servicePeriod}</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="text-right">
+                      <div className="font-bold text-sm text-slate-900 dark:text-white tabular-nums">
+                        {formatMoney(inv.total)}
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        Due {inv.dueDate || '15th'}
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <button 
-                        type="button" 
-                        className="btn btn-secondary btn-sm py-1 px-2.5 text-xs"
-                        onClick={() => onSelectInvoice(inv)}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        type="button" 
-                        className="btn btn-primary btn-sm py-1 px-2.5 text-xs flex items-center gap-1"
-                        onClick={() => onShareInvoice(inv)}
-                      >
-                        <Share2 size={12} />
-                        <span>Share</span>
-                      </button>
-                    </div>
+                    <button 
+                      type="button"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onShareInvoice(inv);
+                      }}
+                      title="Share link"
+                    >
+                      <Share2 size={15} />
+                    </button>
+
+                    <ChevronRight size={16} className="text-slate-300 dark:text-slate-600 hidden sm:block" />
                   </div>
                 </div>
-              ))}
-            </div>
-          </>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
   );
 }
-
