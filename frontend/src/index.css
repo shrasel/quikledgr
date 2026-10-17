@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+@theme {
+  --color-boxdark: #24303f;
+  --color-boxdark-2: #1a222c;
+  --color-strokedark: #2e3a47;
+  --color-stroke: #e2e8f0;
+  --color-graydark: #333a48;
+  --color-meta-1: #dc3545;
+  --color-meta-2: #eff2f7;
+  --color-meta-3: #10b981;
+  --color-meta-4: #313d4a;
+  --color-meta-5: #259ae6;
+  --color-meta-6: #ffba00;
+  --color-meta-7: #ff6766;
+  --color-meta-8: #f0950c;
+  --color-meta-9: #e5e7eb;
+  --color-meta-10: #0fb7ff;
+  --color-primary: #3c50e0;
+}
+
 /* ==========================================================================
    QuikLedgr — Clean Material Design 3 (Muted Palette)
    Principles: High-Utility, Crisp Structure, Muted Slate Tones,

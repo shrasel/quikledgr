@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Sidebar } from './components/layout/Sidebar';
+import { Header } from './components/layout/Header';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
 import { InvoiceEditor } from './components/InvoiceEditor';
@@ -41,6 +43,7 @@ export default function App() {
   const [toasts, setToasts] = useState([]);
   
   // Modals state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [isNewOrgModalOpen, setIsNewOrgModalOpen] = useState(false);
@@ -171,6 +174,11 @@ export default function App() {
   // Sync theme
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('quikledgr_theme', theme);
     localStorage.setItem('blukers_theme', theme);
   }, [theme]);
@@ -335,99 +343,120 @@ export default function App() {
     );
   }
 
-  // 3. Authenticated App Portal
+  // 3. Authenticated App Portal - TailAdmin Layout Shell
   return (
-    <div className="app-container">
-      <Navbar 
-        currentTab={currentTab} 
-        setCurrentTab={setCurrentTab} 
-        theme={theme} 
-        toggleTheme={toggleTheme}
-        onNewInvoice={handleNewInvoice}
+    <div className="flex h-screen overflow-hidden bg-[#F1F5F9] dark:bg-[#1A222C] text-body dark:text-bodydark antialiased">
+      {/* TailAdmin Sidebar */}
+      <Sidebar 
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
         invoiceCount={invoices.length}
-        user={user}
-        organizations={organizations}
         activeOrganization={activeOrganization}
+        organizations={organizations}
         onSwitchOrganization={handleSwitchOrganization}
         onOpenNewOrgModal={() => setIsNewOrgModalOpen(true)}
-        onOpenInviteModal={() => setIsInviteModalOpen(true)}
-        onLogout={handleLogout}
       />
 
-      <main className="main-content">
-        {currentTab === 'dashboard' && (
-          <Dashboard 
-            user={user}
-            invoices={invoices}
-            onNavigateToTab={setCurrentTab}
-            onSelectInvoice={handleSelectInvoice}
-            onNewInvoice={handleNewInvoice}
-            onShareInvoice={handleOpenShareModal}
-          />
-        )}
+      {/* Content Area */}
+      <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        {/* TailAdmin Header */}
+        <Header 
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          user={user}
+          activeOrganization={activeOrganization}
+          organizations={organizations}
+          onSwitchOrganization={handleSwitchOrganization}
+          onOpenNewOrgModal={() => setIsNewOrgModalOpen(true)}
+          onOpenInviteModal={() => setIsInviteModalOpen(true)}
+          onLogout={handleLogout}
+          onNewInvoice={handleNewInvoice}
+        />
 
-        {currentTab === 'editor' && currentInvoice && (
-          <InvoiceEditor 
-            invoice={currentInvoice}
-            setInvoice={setCurrentInvoice}
-            onOpenShareModal={() => handleOpenShareModal(currentInvoice)}
-            onViewRecipientScreen={handleViewRecipientScreen}
-            onTriggerToast={triggerToast}
-          />
-        )}
+        {/* Main Content Area */}
+        <main className="flex-1 p-4 md:p-6 2xl:p-10">
+          <div className="mx-auto max-w-screen-2xl">
+            {currentTab === 'dashboard' && (
+              <Dashboard 
+                user={user}
+                invoices={invoices}
+                onNavigateToTab={setCurrentTab}
+                onSelectInvoice={handleSelectInvoice}
+                onNewInvoice={handleNewInvoice}
+                onShareInvoice={handleOpenShareModal}
+              />
+            )}
 
-        {currentTab === 'list' && (
-          <InvoiceList 
-            invoices={invoices}
-            onSelectInvoice={handleSelectInvoice}
-            onShareInvoice={handleOpenShareModal}
-            onDeleteInvoice={handleDeleteInvoice}
-            onDuplicateInvoice={handleDuplicateInvoice}
-            onNewInvoice={handleNewInvoice}
-            onTriggerToast={triggerToast}
-          />
-        )}
+            {currentTab === 'editor' && currentInvoice && (
+              <InvoiceEditor 
+                invoice={currentInvoice}
+                setInvoice={setCurrentInvoice}
+                onOpenShareModal={() => handleOpenShareModal(currentInvoice)}
+                onViewRecipientScreen={handleViewRecipientScreen}
+                onTriggerToast={triggerToast}
+              />
+            )}
 
-        {currentTab === 'quotes' && (
-          <QuotesList 
-            onTriggerToast={triggerToast}
-            onOpenInvoice={handleOpenInvoiceById}
-          />
-        )}
+            {currentTab === 'list' && (
+              <InvoiceList 
+                invoices={invoices}
+                onSelectInvoice={handleSelectInvoice}
+                onShareInvoice={handleOpenShareModal}
+                onDeleteInvoice={handleDeleteInvoice}
+                onDuplicateInvoice={handleDuplicateInvoice}
+                onNewInvoice={handleNewInvoice}
+                onTriggerToast={triggerToast}
+              />
+            )}
 
-        {currentTab === 'recurring' && (
-          <RecurringProfiles 
-            onTriggerToast={triggerToast}
-            onOpenInvoice={handleOpenInvoiceById}
-          />
-        )}
+            {currentTab === 'quotes' && (
+              <QuotesList 
+                onTriggerToast={triggerToast}
+                onOpenInvoice={handleOpenInvoiceById}
+              />
+            )}
 
-        {currentTab === 'ar' && (
-          <ArAgingView 
-            onTriggerToast={triggerToast}
-            onOpenInvoice={handleOpenInvoiceById}
-          />
-        )}
+            {currentTab === 'recurring' && (
+              <RecurringProfiles 
+                onTriggerToast={triggerToast}
+                onOpenInvoice={handleOpenInvoiceById}
+              />
+            )}
 
-        {currentTab === 'payments' && (
-          <PaymentsList 
-            onTriggerToast={triggerToast}
-            onOpenInvoice={handleOpenInvoiceById}
-          />
-        )}
+            {currentTab === 'ar' && (
+              <ArAgingView 
+                onTriggerToast={triggerToast}
+                onOpenInvoice={handleOpenInvoiceById}
+              />
+            )}
 
-        {currentTab === 'accounting' && (
-          <Accounting 
-            organization={activeOrganization}
-            userRole={activeOrganization?.role || 'owner'}
-            onTriggerToast={triggerToast}
-          />
-        )}
+            {currentTab === 'payments' && (
+              <PaymentsList 
+                onTriggerToast={triggerToast}
+                onOpenInvoice={handleOpenInvoiceById}
+              />
+            )}
 
-        {currentTab === 'profile' && (
-          <ProfileSettings onTriggerToast={triggerToast} />
-        )}
-      </main>
+            {currentTab === 'accounting' && (
+              <Accounting 
+                organization={activeOrganization}
+                userRole={activeOrganization?.role || 'owner'}
+                onTriggerToast={triggerToast}
+              />
+            )}
+
+            {currentTab === 'profile' && (
+              <ProfileSettings onTriggerToast={triggerToast} />
+            )}
+          </div>
+        </main>
+      </div>
 
       {/* Share Modal */}
       {isShareModalOpen && currentInvoice && (
