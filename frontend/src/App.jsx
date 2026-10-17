@@ -380,8 +380,8 @@ export default function App() {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 p-4 md:p-6 2xl:p-10">
-          <div className="mx-auto max-w-screen-2xl">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl">
             {currentTab === 'dashboard' && (
               <Dashboard 
                 user={user}
