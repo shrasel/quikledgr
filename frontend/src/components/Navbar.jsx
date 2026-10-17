@@ -13,7 +13,11 @@ import {
   Check, 
   UserPlus,
   Sliders,
-  X
+  X,
+  FileCheck,
+  Repeat,
+  Clock,
+  MoreHorizontal
 } from 'lucide-react';
 
 export function Navbar({ 
@@ -33,6 +37,7 @@ export function Navbar({
 }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showOrgMenu, setShowOrgMenu] = useState(false);
+  const [showMobileMore, setShowMobileMore] = useState(false);
   const [showComplianceBanner, setShowComplianceBanner] = useState(true);
 
   return (
@@ -80,6 +85,33 @@ export function Navbar({
                   {invoiceCount}
                 </span>
               )}
+            </button>
+
+            <button 
+              type="button"
+              className={`nav-tab-btn ${currentTab === 'quotes' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('quotes')}
+            >
+              <FileCheck size={15} />
+              <span>Quotes</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`nav-tab-btn ${currentTab === 'recurring' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('recurring')}
+            >
+              <Repeat size={15} />
+              <span>Recurring</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`nav-tab-btn ${currentTab === 'ar' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('ar')}
+            >
+              <Clock size={15} />
+              <span>AR Aging</span>
             </button>
 
             <button 
@@ -299,7 +331,7 @@ export function Navbar({
         <button 
           type="button" 
           className={`mobile-nav-item ${currentTab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('dashboard')}
+          onClick={() => { setCurrentTab('dashboard'); setShowMobileMore(false); }}
         >
           <div className="mobile-nav-icon-wrap">
             <LayoutDashboard size={18} />
@@ -310,7 +342,7 @@ export function Navbar({
         <button 
           type="button" 
           className={`mobile-nav-item ${currentTab === 'list' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('list')}
+          onClick={() => { setCurrentTab('list'); setShowMobileMore(false); }}
         >
           <div className="mobile-nav-icon-wrap">
             <Layers size={18} />
@@ -323,37 +355,119 @@ export function Navbar({
 
         <button 
           type="button" 
-          className={`mobile-nav-item ${currentTab === 'editor' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('editor')}
+          className={`mobile-nav-item ${currentTab === 'quotes' ? 'active' : ''}`}
+          onClick={() => { setCurrentTab('quotes'); setShowMobileMore(false); }}
         >
           <div className="mobile-nav-icon-wrap">
-            <FileText size={18} />
+            <FileCheck size={18} />
           </div>
-          <span className="mobile-nav-label">Editor</span>
+          <span className="mobile-nav-label">Quotes</span>
         </button>
 
         <button 
           type="button" 
-          className={`mobile-nav-item ${currentTab === 'accounting' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('accounting')}
+          className={`mobile-nav-item ${currentTab === 'ar' ? 'active' : ''}`}
+          onClick={() => { setCurrentTab('ar'); setShowMobileMore(false); }}
         >
           <div className="mobile-nav-icon-wrap">
-            <Scale size={18} />
+            <Clock size={18} />
           </div>
-          <span className="mobile-nav-label">Ledger</span>
+          <span className="mobile-nav-label">AR Aging</span>
         </button>
 
         <button 
           type="button" 
-          className={`mobile-nav-item ${currentTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('profile')}
+          className={`mobile-nav-item ${['recurring', 'editor', 'accounting', 'profile'].includes(currentTab) || showMobileMore ? 'active' : ''}`}
+          onClick={() => setShowMobileMore(!showMobileMore)}
         >
           <div className="mobile-nav-icon-wrap">
-            <Sliders size={18} />
+            <MoreHorizontal size={18} />
           </div>
-          <span className="mobile-nav-label">Settings</span>
+          <span className="mobile-nav-label">More</span>
         </button>
       </nav>
+
+      {/* Mobile More Drawer Overlay */}
+      {showMobileMore && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex flex-col justify-end lg:hidden no-print"
+          onClick={() => setShowMobileMore(false)}
+        >
+          <div 
+            className="bg-white dark:bg-slate-900 rounded-t-2xl p-4 shadow-xl border-t border-slate-200 dark:border-slate-800 space-y-2 mb-16 animate-in slide-in-from-bottom"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">More QuikLedgr Tools</span>
+              <button 
+                type="button" 
+                onClick={() => setShowMobileMore(false)}
+                className="text-slate-400 p-1"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                className={`p-3 rounded-lg text-left border flex flex-col gap-1.5 transition-colors ${
+                  currentTab === 'recurring' 
+                    ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800' 
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => { setCurrentTab('recurring'); setShowMobileMore(false); }}
+              >
+                <Repeat size={18} className="text-slate-700 dark:text-slate-300" />
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">Recurring Retainers</span>
+                <span className="text-[10px] text-slate-400">Automated billing</span>
+              </button>
+
+              <button
+                type="button"
+                className={`p-3 rounded-lg text-left border flex flex-col gap-1.5 transition-colors ${
+                  currentTab === 'accounting' 
+                    ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800' 
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => { setCurrentTab('accounting'); setShowMobileMore(false); }}
+              >
+                <Scale size={18} className="text-slate-700 dark:text-slate-300" />
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">Ledger & COA</span>
+                <span className="text-[10px] text-slate-400">Double-entry books</span>
+              </button>
+
+              <button
+                type="button"
+                className={`p-3 rounded-lg text-left border flex flex-col gap-1.5 transition-colors ${
+                  currentTab === 'editor' 
+                    ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800' 
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => { setCurrentTab('editor'); setShowMobileMore(false); }}
+              >
+                <FileText size={18} className="text-slate-700 dark:text-slate-300" />
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">Invoice Editor</span>
+                <span className="text-[10px] text-slate-400">Live customization</span>
+              </button>
+
+              <button
+                type="button"
+                className={`p-3 rounded-lg text-left border flex flex-col gap-1.5 transition-colors ${
+                  currentTab === 'profile' 
+                    ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800' 
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => { setCurrentTab('profile'); setShowMobileMore(false); }}
+              >
+                <Sliders size={18} className="text-slate-700 dark:text-slate-300" />
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">Settings & Wire</span>
+                <span className="text-[10px] text-slate-400">Payment details</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

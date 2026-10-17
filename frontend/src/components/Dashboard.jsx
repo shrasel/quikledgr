@@ -213,6 +213,69 @@ export function Dashboard({
         </div>
       </div>
 
+      {/* Phase 2: Operations & Sales Quick Hub */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button
+          type="button"
+          className="card p-3.5 text-left hover:border-slate-400 dark:hover:border-slate-600 transition-colors group flex flex-col justify-between"
+          onClick={() => onNavigateToTab('quotes')}
+        >
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Proposals</span>
+            <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-slate-900 dark:text-white">Quotes & e-Sign</div>
+            <div className="text-[11px] text-slate-500 mt-0.5">1-click convert to invoice</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          className="card p-3.5 text-left hover:border-slate-400 dark:hover:border-slate-600 transition-colors group flex flex-col justify-between"
+          onClick={() => onNavigateToTab('recurring')}
+        >
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Subscriptions</span>
+            <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-slate-900 dark:text-white">Recurring Retainers</div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Scheduled auto-invoicing</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          className="card p-3.5 text-left hover:border-slate-400 dark:hover:border-slate-600 transition-colors group flex flex-col justify-between"
+          onClick={() => onNavigateToTab('ar')}
+        >
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Collections</span>
+            <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-slate-900 dark:text-white">AR Aging & Dunning</div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Debtor risk & late fees</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          className="card p-3.5 text-left hover:border-slate-400 dark:hover:border-slate-600 transition-colors group flex flex-col justify-between"
+          onClick={() => onNavigateToTab('accounting')}
+        >
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Accounting</span>
+            <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-slate-900 dark:text-white">Double-Entry Ledger</div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Trial Balance & Journals</div>
+          </div>
+        </button>
+      </div>
+
       {/* Recent Invoices List */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">

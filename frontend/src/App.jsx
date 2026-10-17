@@ -3,6 +3,9 @@ import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
 import { InvoiceEditor } from './components/InvoiceEditor';
 import { InvoiceList } from './components/InvoiceList';
+import { QuotesList } from './components/QuotesList';
+import { RecurringProfiles } from './components/RecurringProfiles';
+import { ArAgingView } from './components/ArAgingView';
 import { Accounting } from './components/Accounting';
 import { ProfileSettings } from './components/ProfileSettings';
 import { InvoiceView } from './components/InvoiceView';
@@ -234,6 +237,22 @@ export default function App() {
     setCurrentTab('editor');
   };
 
+  const handleOpenInvoiceById = async (invoiceId) => {
+    try {
+      await syncInvoices();
+      const remoteInvoices = await invoiceApi.getAll();
+      const matched = remoteInvoices?.find(i => i.id === invoiceId);
+      if (matched) {
+        setCurrentInvoice(matched);
+        setCurrentTab('editor');
+        return;
+      }
+    } catch (e) {
+      console.warn('Failed to load invoice by id:', e);
+    }
+    setCurrentTab('list');
+  };
+
   // Open share modal
   const handleOpenShareModal = async (invToShare = currentInvoice) => {
     if (!invToShare) return;
@@ -336,6 +355,27 @@ export default function App() {
             onDuplicateInvoice={handleDuplicateInvoice}
             onNewInvoice={handleNewInvoice}
             onTriggerToast={triggerToast}
+          />
+        )}
+
+        {currentTab === 'quotes' && (
+          <QuotesList 
+            onTriggerToast={triggerToast}
+            onOpenInvoice={handleOpenInvoiceById}
+          />
+        )}
+
+        {currentTab === 'recurring' && (
+          <RecurringProfiles 
+            onTriggerToast={triggerToast}
+            onOpenInvoice={handleOpenInvoiceById}
+          />
+        )}
+
+        {currentTab === 'ar' && (
+          <ArAgingView 
+            onTriggerToast={triggerToast}
+            onOpenInvoice={handleOpenInvoiceById}
           />
         )}
 

@@ -276,3 +276,143 @@ export const profileApi = {
     });
   }
 };
+
+// 8. Phase 2: Quotes & Proposals Endpoints
+export const quotesApi = {
+  getAll: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.search) params.append('search', filters.search);
+    const qs = params.toString();
+    return request(`/quotes${qs ? '?' + qs : ''}`);
+  },
+
+  getById: async (id) => {
+    return request(`/quotes/${encodeURIComponent(id)}`);
+  },
+
+  create: async (data) => {
+    return request('/quotes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateStatus: async (id, status) => {
+    return request(`/quotes/${encodeURIComponent(id)}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  convertToInvoice: async (id) => {
+    return request(`/quotes/${encodeURIComponent(id)}/convert`, {
+      method: 'POST',
+    });
+  },
+
+  sign: async (id, signatureDataUrl, signedByName) => {
+    return request(`/quotes/${encodeURIComponent(id)}/sign`, {
+      method: 'POST',
+      body: JSON.stringify({ signatureDataUrl, signedByName }),
+    });
+  },
+
+  delete: async (id) => {
+    return request(`/quotes/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+};
+
+// 9. Phase 2: Recurring Profiles Endpoints
+export const recurringApi = {
+  getAll: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.search) params.append('search', filters.search);
+    const qs = params.toString();
+    return request(`/recurring${qs ? '?' + qs : ''}`);
+  },
+
+  getById: async (id) => {
+    return request(`/recurring/${encodeURIComponent(id)}`);
+  },
+
+  create: async (data) => {
+    return request('/recurring', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: async (id, data) => {
+    return request(`/recurring/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateStatus: async (id, status) => {
+    return request(`/recurring/${encodeURIComponent(id)}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  processDue: async () => {
+    return request('/recurring/process-due', {
+      method: 'POST',
+    });
+  },
+
+  generateNow: async (id) => {
+    return request(`/recurring/${encodeURIComponent(id)}/generate-now`, {
+      method: 'POST',
+    });
+  },
+
+  delete: async (id) => {
+    return request(`/recurring/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+};
+
+// 10. Phase 2: Accounts Receivable (AR) & Dunning Endpoints
+export const arApi = {
+  getAgingSummary: async () => {
+    return request('/ar/aging-summary');
+  },
+
+  getDunningRules: async () => {
+    return request('/ar/dunning-rules');
+  },
+
+  saveDunningRule: async (ruleData) => {
+    return request('/ar/dunning-rules', {
+      method: 'POST',
+      body: JSON.stringify(ruleData),
+    });
+  },
+
+  deleteDunningRule: async (id) => {
+    return request(`/ar/dunning-rules/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  },
+
+  applyLateFee: async (invoiceId, feeData) => {
+    return request(`/ar/invoices/${encodeURIComponent(invoiceId)}/late-fee`, {
+      method: 'POST',
+      body: JSON.stringify(feeData),
+    });
+  },
+
+  sendReminder: async (invoiceId) => {
+    return request(`/ar/invoices/${encodeURIComponent(invoiceId)}/send-reminder`, {
+      method: 'POST',
+    });
+  }
+};
+
