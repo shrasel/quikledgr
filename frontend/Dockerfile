@@ -1,31 +1,20 @@
-# ==============================================================================
-# QuikLedgr — Frontend Dockerfile (Multi-stage Build)
-# Stage 1: Build React 18 + Vite Production Bundle
-# Stage 2: Serve via Nginx Alpine Web Server & Reverse Proxy
-# ==============================================================================
-
-# Stage 1: Build Application Bundle
+# Stage 1: Build Angular 19 Production Application
 FROM node:20-slim AS builder
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install --legacy-peer-deps
-
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve with High-Performance Nginx Alpine
+# Stage 2: Production Nginx Server
 FROM nginx:1.27-alpine AS production
 
-# Remove default nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy compiled assets from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copy custom Nginx reverse proxy configuration
+COPY --from=builder /app/dist/quikledgr-frontend/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
