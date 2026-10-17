@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ==========================================================================
    QuikLedgr — Design System & Global Styles
    QuickBooks-inspired modern enterprise aesthetic with banking-grade security
@@ -1632,6 +1634,183 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1.5rem;
   font-size: 0.725rem;
   color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Mobile-First & Pixel-Perfect Responsive Enhancements
+   ========================================================================== */
+
+/* Mobile Bottom Tab Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 0.5rem;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 45;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme='dark'] .mobile-bottom-nav {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0.35rem 0;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+  color: var(--primary-600);
+}
+
+[data-theme='dark'] .mobile-nav-item:hover,
+[data-theme='dark'] .mobile-nav-item.active {
+  color: var(--primary-400);
+}
+
+.mobile-nav-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: var(--primary-600);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 9999px;
+  line-height: 1;
+}
+
+.mobile-nav-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Base Body Safe Viewport */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Touch Targets & Mobile Padding */
+@media (max-width: 1023px) {
+  .main-content {
+    padding: 1rem;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.6rem 1rem;
+  }
+
+  .compliance-banner {
+    padding: 0.5rem 1rem;
+    font-size: 0.775rem;
+  }
+
+  .card {
+    padding: 1.15rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .form-input, .form-select {
+    min-height: 42px;
+    font-size: 0.875rem;
+  }
+
+  /* Invoice Paper Mobile Fit */
+  .invoice-paper-wrapper {
+    padding: 0.5rem 0;
+  }
+
+  .invoice-paper {
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .inv-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .inv-meta-right {
+    text-align: left;
+    width: 100%;
+  }
+
+  .inv-date-row {
+    justify-content: flex-start;
+    gap: 1.25rem;
+  }
+
+  .service-period-callout {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .inv-parties {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1.25rem 0;
+  }
+
+  .modal-card {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .security-gate-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .pin-inputs-row {
+    gap: 0.35rem;
+  }
+
+  .pin-digit-box {
+    width: 38px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
 }
 
 /* ==========================================================================

@@ -180,67 +180,55 @@ export function InvoiceView({ invoiceId, encodedData, onBackToEditor, onTriggerT
   return (
     <div className="main-content">
       {/* Recipient Action Toolbar */}
-      <div className="recipient-toolbar no-print" style={{
-        maxWidth: '860px',
-        margin: '0 auto 1.5rem auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '0.75rem',
-        background: 'var(--bg-card)',
-        padding: '0.85rem 1.25rem',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow-sm)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div className="recipient-toolbar no-print max-w-[860px] mx-auto mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between sm:justify-start gap-3">
           {onBackToEditor && (
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm flex items-center gap-1.5"
               onClick={onBackToEditor}
             >
-              <ArrowLeft size={16} />
-              <span>Back to Editor</span>
+              <ArrowLeft size={15} />
+              <span>Editor</span>
             </button>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#059669', fontSize: '0.825rem', fontWeight: 600 }}>
-            <ShieldCheck size={18} />
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm font-semibold">
+            <ShieldCheck size={16} />
             <span>Authenticated Secure Invoice</span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="flex items-center gap-2 flex-wrap">
           <button 
             type="button" 
-            className="btn btn-primary btn-sm"
+            className="btn btn-primary btn-sm flex-1 sm:flex-initial justify-center flex items-center gap-1.5"
             onClick={handleDownloadPdf}
             disabled={isDownloading}
           >
-            <Download size={16} />
-            <span>{isDownloading ? 'Generating PDF...' : 'Download PDF'}</span>
+            <Download size={15} />
+            <span>{isDownloading ? 'Generating...' : 'PDF'}</span>
           </button>
 
           <button 
             type="button" 
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm flex-1 sm:flex-initial justify-center flex items-center gap-1.5"
             onClick={handlePrint}
           >
-            <Printer size={16} />
-            <span>Print Invoice</span>
+            <Printer size={15} />
+            <span>Print</span>
           </button>
 
           {invoice.issuer?.email && (
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm flex-1 sm:flex-initial justify-center flex items-center gap-1.5"
               onClick={handleSendConfirmation}
               title="Send automated email confirmation to consultant"
             >
-              <Mail size={16} />
-              <span>Confirm Receipt</span>
+              <Mail size={15} />
+              <span className="hidden sm:inline">Confirm Receipt</span>
+              <span className="sm:hidden">Confirm</span>
             </button>
           )}
         </div>

@@ -7,10 +7,11 @@ import {
   Sun, 
   Moon, 
   Building, 
-  LayoutDashboard,
-  LogOut,
-  User,
-  ChevronDown
+  LayoutDashboard, 
+  LogOut, 
+  ChevronDown,
+  Info,
+  X
 } from 'lucide-react';
 
 export function Navbar({ 
@@ -24,58 +25,63 @@ export function Navbar({
   onLogout 
 }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showComplianceBanner, setShowComplianceBanner] = useState(true);
 
   return (
     <>
       <header className="navbar no-print">
         <div className="navbar-inner">
           {/* Brand Logo */}
-          <div className="brand-badge" onClick={() => setCurrentTab('dashboard')}>
+          <div className="brand-badge" onClick={() => setCurrentTab('dashboard')} role="button" tabIndex={0}>
             <div className="brand-logo-icon">
-              <FileText size={20} strokeWidth={2.5} />
+              <FileText size={18} strokeWidth={2.5} />
             </div>
             <div className="brand-text-wrap">
               <div className="brand-title">
                 QuikLedgr
                 <span className="brand-tag">QuickBooks Model</span>
               </div>
-              <div className="brand-subtitle">
+              <div className="brand-subtitle hidden sm:block">
                 Secure Link Invoicing for Monthly Consulting Agreements
               </div>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="nav-tabs">
+          {/* Desktop Navigation Tabs (Hidden on mobile/tablet, replaced by bottom bar) */}
+          <nav className="nav-tabs hidden lg:flex">
             <button 
+              type="button"
               className={`nav-tab-btn ${currentTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => setCurrentTab('dashboard')}
             >
-              <LayoutDashboard size={16} />
+              <LayoutDashboard size={15} />
               <span>Dashboard</span>
             </button>
 
             <button 
+              type="button"
               className={`nav-tab-btn ${currentTab === 'editor' ? 'active' : ''}`}
               onClick={() => setCurrentTab('editor')}
             >
-              <FileText size={16} />
+              <FileText size={15} />
               <span>Invoice Editor</span>
             </button>
 
             <button 
+              type="button"
               className={`nav-tab-btn ${currentTab === 'list' ? 'active' : ''}`}
               onClick={() => setCurrentTab('list')}
             >
-              <Layers size={16} />
+              <Layers size={15} />
               <span>Invoices ({invoiceCount})</span>
             </button>
 
             <button 
+              type="button"
               className={`nav-tab-btn ${currentTab === 'profile' ? 'active' : ''}`}
               onClick={() => setCurrentTab('profile')}
             >
-              <Building size={16} />
+              <Building size={15} />
               <span>Banking & Profile</span>
             </button>
           </nav>
@@ -83,20 +89,23 @@ export function Navbar({
           {/* Right Actions */}
           <div className="navbar-actions">
             <button 
+              type="button"
               className="btn btn-secondary btn-icon-only"
               onClick={toggleTheme}
               title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
             </button>
 
             <button 
-              className="btn btn-primary btn-sm"
+              type="button"
+              className="btn btn-primary btn-sm flex items-center gap-1.5"
               onClick={onNewInvoice}
+              title="Create new monthly invoice"
             >
               <Plus size={16} />
-              <span>New Invoice</span>
+              <span className="hidden sm:inline">New Invoice</span>
             </button>
 
             {/* User Profile Badge & Menu */}
@@ -113,7 +122,7 @@ export function Navbar({
                     alt={user.name} 
                     className="user-nav-avatar"
                   />
-                  <div className="user-nav-text">
+                  <div className="user-nav-text hidden md:flex flex-col text-left">
                     <span className="user-nav-name">{user.name}</span>
                     <span className="user-nav-provider">
                       {user.provider === 'google' ? 'Google Account' : 'Consultant'}
@@ -126,7 +135,9 @@ export function Navbar({
                   <div className="user-dropdown-menu">
                     <div className="dropdown-user-header">
                       <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{user.name}</div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{user.email}</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {user.email}
+                      </div>
                     </div>
 
                     <button 
@@ -157,20 +168,81 @@ export function Navbar({
       </header>
 
       {/* Compliance Helper Bar */}
-      <div className="compliance-banner no-print">
-        <div className="compliance-inner">
-          <div className="compliance-info">
-            <span className="compliance-badge">Consulting Agreement Protocol</span>
-            <span>
-              Submit no later than the <strong>15th day</strong> of following month to <strong>accounting@blukers.com</strong> (cc: <strong>rosa@blukers.com</strong>).
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem' }}>
-            <ShieldCheck size={15} color="#059669" />
-            <span>Sensitive wire details encrypted with access code</span>
+      {showComplianceBanner && (
+        <div className="compliance-banner no-print">
+          <div className="compliance-inner">
+            <div className="compliance-info flex items-center flex-wrap gap-1.5">
+              <span className="compliance-badge">Consulting Agreement Protocol</span>
+              <span className="text-xs sm:text-sm">
+                Submit no later than the <strong>15th day</strong> of following month to <strong>accounting@blukers.com</strong> (cc: <strong>rosa@blukers.com</strong>).
+              </span>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400">
+              <ShieldCheck size={14} color="#059669" />
+              <span>Sensitive wire details encrypted with access code</span>
+            </div>
+            <button 
+              type="button" 
+              onClick={() => setShowComplianceBanner(false)}
+              className="text-emerald-800 dark:text-emerald-300 hover:opacity-75 p-0.5 ml-auto sm:ml-0"
+              title="Dismiss protocol banner"
+              aria-label="Dismiss banner"
+            >
+              <X size={14} />
+            </button>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Mobile-First Bottom Navigation Bar (Visible on mobile/tablet under lg:1024px) */}
+      <nav className="mobile-bottom-nav lg:hidden no-print" aria-label="Mobile Navigation">
+        <button 
+          type="button" 
+          className={`mobile-nav-item ${currentTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setCurrentTab('dashboard')}
+        >
+          <div className="mobile-nav-icon-wrap">
+            <LayoutDashboard size={20} />
+          </div>
+          <span className="mobile-nav-label">Dashboard</span>
+        </button>
+
+        <button 
+          type="button" 
+          className={`mobile-nav-item ${currentTab === 'editor' ? 'active' : ''}`}
+          onClick={() => setCurrentTab('editor')}
+        >
+          <div className="mobile-nav-icon-wrap">
+            <FileText size={20} />
+          </div>
+          <span className="mobile-nav-label">Editor</span>
+        </button>
+
+        <button 
+          type="button" 
+          className={`mobile-nav-item ${currentTab === 'list' ? 'active' : ''}`}
+          onClick={() => setCurrentTab('list')}
+        >
+          <div className="mobile-nav-icon-wrap relative">
+            <Layers size={20} />
+            {invoiceCount > 0 && (
+              <span className="mobile-nav-badge">{invoiceCount}</span>
+            )}
+          </div>
+          <span className="mobile-nav-label">Invoices</span>
+        </button>
+
+        <button 
+          type="button" 
+          className={`mobile-nav-item ${currentTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setCurrentTab('profile')}
+        >
+          <div className="mobile-nav-icon-wrap">
+            <Building size={20} />
+          </div>
+          <span className="mobile-nav-label">Profile</span>
+        </button>
+      </nav>
     </>
   );
 }

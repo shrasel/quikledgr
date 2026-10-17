@@ -222,98 +222,102 @@ export function InvoiceEditor({
   return (
     <div className="editor-layout-wrap">
       {/* Top Toolbar */}
-      <div className="card no-print" style={{ marginBottom: '1.5rem', padding: '1rem 1.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)' }}>
-              PRESET TEMPLATE:
-            </span>
-            <button 
-              type="button" 
-              className="btn btn-secondary btn-sm"
-              onClick={handleApplyBlukersPreset}
-              title="Pre-fills Blukers Accounting emails, consulting agreement rules, and wire checklist"
-            >
-              <Sparkles size={14} color="#059669" />
-              <span>Blukers Monthly Consulting</span>
-            </button>
-
-            <button 
-              type="button" 
-              className="btn btn-secondary btn-sm"
-              onClick={handleApplyBlankPreset}
-            >
-              <span>Blank Template</span>
-            </button>
-
-            <div style={{ borderLeft: '1px solid var(--border-color)', height: '24px', margin: '0 0.25rem' }} />
-
-            <div className="nav-tabs" style={{ padding: '0.2rem' }}>
+      <div className="card no-print mb-4 sm:mb-6 p-3 sm:p-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+          {/* Left: Mode switcher & Presets */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="nav-tabs p-1 w-full sm:w-auto flex">
               <button 
                 type="button"
-                className={`nav-tab-btn ${activeTab === 'edit' ? 'active' : ''}`}
+                className={`nav-tab-btn flex-1 sm:flex-initial text-center justify-center ${activeTab === 'edit' ? 'active' : ''}`}
                 onClick={() => setActiveTab('edit')}
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.825rem' }}
               >
                 Editor Form
               </button>
               <button 
                 type="button"
-                className={`nav-tab-btn ${activeTab === 'preview' ? 'active' : ''}`}
+                className={`nav-tab-btn flex-1 sm:flex-initial text-center justify-center ${activeTab === 'preview' ? 'active' : ''}`}
                 onClick={() => setActiveTab('preview')}
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.825rem' }}
               >
                 Live Preview
               </button>
             </div>
+
+            <div className="hidden sm:block border-l border-slate-200 dark:border-slate-800 h-6 mx-1" />
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                Preset:
+              </span>
+              <button 
+                type="button" 
+                className="btn btn-secondary btn-sm text-xs flex items-center gap-1.5 flex-1 sm:flex-initial"
+                onClick={handleApplyBlukersPreset}
+                title="Pre-fills Blukers Accounting emails, consulting agreement rules, and wire checklist"
+              >
+                <Sparkles size={13} color="#059669" />
+                <span>Blukers Consulting</span>
+              </button>
+
+              <button 
+                type="button" 
+                className="btn btn-secondary btn-sm text-xs"
+                onClick={handleApplyBlankPreset}
+              >
+                <span>Blank</span>
+              </button>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {/* Right: Quick actions */}
+          <div className="flex items-center gap-2 flex-wrap">
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm flex items-center gap-1 flex-1 sm:flex-initial"
               onClick={handleSaveInvoice}
             >
-              <Save size={15} />
+              <Save size={14} />
               <span>Save</span>
             </button>
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm flex items-center gap-1"
               onClick={handleDownloadPdf}
               disabled={isExporting}
             >
-              <Download size={15} />
+              <Download size={14} />
               <span>{isExporting ? 'Exporting...' : 'PDF'}</span>
             </button>
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm hidden sm:flex items-center gap-1"
               onClick={handlePrint}
             >
-              <Printer size={15} />
+              <Printer size={14} />
               <span>Print</span>
             </button>
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm hidden md:flex items-center gap-1"
               onClick={onViewRecipientScreen}
               title="Test the lock screen that Rosa and Blukers accounting will see"
             >
-              <Eye size={15} />
-              <span>Test Recipient Lock</span>
+              <Eye size={14} />
+              <span>Recipient View</span>
             </button>
 
             <button 
               type="button" 
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-sm flex items-center gap-1.5 flex-1 sm:flex-initial justify-center"
               onClick={onOpenShareModal}
             >
-              <Share2 size={15} />
-              <span>Share Secure Link</span>
+              <Share2 size={14} />
+              <span>Share Link</span>
             </button>
           </div>
         </div>
@@ -597,19 +601,21 @@ export function InvoiceEditor({
             </div>
           </div>
 
-          {/* Line Items Table (QuickBooks Style) */}
+          {/* Line Items Section (QuickBooks Style) */}
           <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div>
-                <h3 style={{ fontSize: '1.1rem' }}>Description of Services Provided</h3>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                  Description of Services Provided
+                </h3>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
                   Enter itemized consulting hours, strategic milestones, or monthly retainer fees.
                 </div>
               </div>
 
               <button 
                 type="button" 
-                className="btn btn-secondary btn-sm"
+                className="btn btn-secondary btn-sm flex items-center gap-1.5 self-start sm:self-auto"
                 onClick={() => handleAddItem('consulting')}
               >
                 <Plus size={14} />
@@ -617,7 +623,8 @@ export function InvoiceEditor({
               </button>
             </div>
 
-            <div className="items-table-wrapper">
+            {/* Desktop Table View (Hidden on mobile < 768px) */}
+            <div className="hidden md:block items-table-wrapper">
               <table className="items-table">
                 <thead>
                   <tr>
@@ -683,21 +690,96 @@ export function InvoiceEditor({
               </table>
             </div>
 
+            {/* Mobile Cards View (Visible on mobile < 768px) */}
+            <div className="md:hidden space-y-3.5 mt-2">
+              {(invoice.items || []).map((item, index) => {
+                const rowAmount = (parseFloat(item.quantity) || 0) * (parseFloat(item.rate) || 0);
+                return (
+                  <div 
+                    key={item.id || index}
+                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Service Item #{index + 1}
+                      </span>
+                      <button 
+                        type="button" 
+                        className="text-red-500 hover:text-red-700 p-1 rounded-md"
+                        onClick={() => handleDeleteItem(index)}
+                        title="Delete item"
+                        disabled={(invoice.items || []).length <= 1}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+                        Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        className="form-input mt-1 text-xs"
+                        placeholder="e.g. Technical Consulting Services — Architecture, integrations, support"
+                        value={item.description || ''}
+                        onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+                          Hours / Qty
+                        </label>
+                        <input 
+                          type="number" 
+                          className="form-input form-input-mono mt-1 text-xs"
+                          step="any"
+                          value={item.quantity ?? 1}
+                          onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+                          Rate ({invoice.currencySymbol || '$'})
+                        </label>
+                        <input 
+                          type="number" 
+                          className="form-input form-input-mono mt-1 text-xs"
+                          step="any"
+                          value={item.rate ?? 0}
+                          onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+                      <span className="text-xs text-slate-500">Row Total:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                        {formatMoney(rowAmount, invoice.currency)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
             {/* Pre-Approved Additional Charges Section */}
-            <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div className="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div>
-                  <h4 style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>
+                  <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
                     Pre-Approved Additional Charges (Optional)
                   </h4>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
                     Reimbursable project expenses, software licenses, or cloud infrastructure pre-approved by Blukers.
                   </div>
                 </div>
 
                 <button 
                   type="button" 
-                  className="btn btn-secondary btn-sm"
+                  className="btn btn-secondary btn-sm flex items-center gap-1 self-start sm:self-auto"
                   onClick={handleAddCharge}
                 >
                   <Plus size={14} />
@@ -706,33 +788,32 @@ export function InvoiceEditor({
               </div>
 
               {(invoice.additionalCharges || []).map((chg, idx) => (
-                <div key={chg.id || idx} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <div key={chg.id || idx} className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center mb-3">
                   <input 
                     type="text" 
-                    className="form-input"
+                    className="form-input flex-1 text-xs sm:text-sm"
                     placeholder="Description of pre-approved charge"
                     value={chg.description || ''}
                     onChange={(e) => handleChargeChange(idx, 'description', e.target.value)}
-                    style={{ flex: 1 }}
                   />
-                  <div style={{ width: '180px' }}>
+                  <div className="flex items-center gap-2">
                     <input 
                       type="number" 
-                      className="form-input form-input-mono"
+                      className="form-input form-input-mono w-full sm:w-44 text-xs sm:text-sm"
                       placeholder="Amount ($)"
                       step="any"
                       value={chg.amount ?? 0}
                       onChange={(e) => handleChargeChange(idx, 'amount', e.target.value)}
                     />
+                    <button 
+                      type="button" 
+                      className="btn btn-danger btn-sm btn-icon-only shrink-0"
+                      onClick={() => handleDeleteCharge(idx)}
+                      title="Remove charge"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
-                  <button 
-                    type="button" 
-                    className="btn btn-danger btn-sm btn-icon-only"
-                    onClick={() => handleDeleteCharge(idx)}
-                    title="Remove charge"
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
               ))}
             </div>
@@ -940,10 +1021,10 @@ export function InvoiceEditor({
           </div>
 
           {/* Final Action Bar */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-4 mt-4">
             <button 
               type="button" 
-              className="btn btn-secondary"
+              className="btn btn-secondary w-full sm:w-auto justify-center flex items-center gap-2"
               onClick={handleSaveInvoice}
             >
               <Save size={16} />
@@ -952,7 +1033,7 @@ export function InvoiceEditor({
 
             <button 
               type="button" 
-              className="btn btn-primary btn-lg"
+              className="btn btn-primary btn-lg w-full sm:w-auto justify-center flex items-center gap-2"
               onClick={onOpenShareModal}
             >
               <Share2 size={18} />

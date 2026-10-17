@@ -276,8 +276,8 @@ export function ProfileSettings({ onTriggerToast }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button type="submit" className="btn btn-primary btn-lg">
+        <div className="flex flex-col sm:flex-row justify-end mt-4">
+          <button type="submit" className="btn btn-primary btn-lg w-full sm:w-auto justify-center flex items-center gap-2">
             <Save size={18} />
             <span>Save Profile & Banking Details</span>
           </button>

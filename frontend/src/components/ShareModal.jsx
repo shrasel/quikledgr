@@ -183,12 +183,11 @@ ${consultantName}`;
             {emailBody}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+          <div className="flex flex-col sm:flex-row gap-2 mt-3">
             <button 
               type="button" 
-              className="btn btn-qb btn-sm"
+              className="btn btn-qb btn-sm flex-1 justify-center flex items-center gap-1.5"
               onClick={handleOpenMailto}
-              style={{ flex: 1 }}
             >
               <Send size={14} />
               <span>Send via Email Client</span>
@@ -196,9 +195,8 @@ ${consultantName}`;
 
             <button 
               type="button" 
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm flex-1 justify-center flex items-center gap-1.5"
               onClick={handleCopyEmailDraft}
-              style={{ flex: 1 }}
             >
               {copiedEmailDraft ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
               <span>{copiedEmailDraft ? 'Copied' : 'Copy Email Text'}</span>
@@ -207,10 +205,10 @@ ${consultantName}`;
         </div>
 
         {/* Test Recipient View Button */}
-        <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+        <div className="flex flex-col sm:flex-row justify-end gap-2.5 mt-5">
           <button 
             type="button" 
-            className="btn btn-secondary"
+            className="btn btn-secondary w-full sm:w-auto justify-center flex items-center gap-2"
             onClick={handleOpenRecipientView}
           >
             <ExternalLink size={16} />
@@ -219,7 +217,7 @@ ${consultantName}`;
           
           <button 
             type="button" 
-            className="btn btn-primary"
+            className="btn btn-primary w-full sm:w-auto justify-center"
             onClick={onClose}
           >
             Done
