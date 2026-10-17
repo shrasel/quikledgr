@@ -1,0 +1,25 @@
+{
+  "name": "quikledgr-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QuikLedgr — Modern Full-Stack Invoicing Monorepo",
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "start:backend": "npm run start --prefix backend",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "keywords": [
+    "quikledgr",
+    "invoice",
+    "quickbooks",
+    "monorepo",
+    "docker",
+    "mariadb"
+  ],
+  "author": "",
+  "license": "MIT"
+}
