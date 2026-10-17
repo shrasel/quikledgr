@@ -10,10 +10,8 @@ import {
   Scale, 
   Sliders, 
   Building2, 
-  ChevronRight, 
   X,
-  Plus,
-  ShieldCheck
+  Plus
 } from 'lucide-react';
 
 export function Sidebar({ 
@@ -23,8 +21,6 @@ export function Sidebar({
   setCurrentTab, 
   invoiceCount = 0,
   activeOrganization,
-  organizations = [],
-  onSwitchOrganization,
   onOpenNewOrgModal
 }) {
   const sidebar = useRef(null);
@@ -38,7 +34,7 @@ export function Sidebar({
     };
     document.addEventListener('click', clickHandler);
     return () => document.removeEventListener('click', clickHandler);
-  });
+  }, [sidebarOpen, setSidebarOpen]);
 
   // Close on ESC
   useEffect(() => {
@@ -48,7 +44,7 @@ export function Sidebar({
     };
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
-  });
+  }, [sidebarOpen, setSidebarOpen]);
 
   const menuGroups = [
     {
@@ -71,6 +67,11 @@ export function Sidebar({
           badge: invoiceCount > 0 ? invoiceCount : null,
         },
         {
+          id: 'editor',
+          label: 'Invoice Editor',
+          icon: <FileText size={18} />,
+        },
+        {
           id: 'quotes',
           label: 'Quotes & Proposals',
           icon: <FileCheck size={18} />,
@@ -84,11 +85,6 @@ export function Sidebar({
           id: 'ar',
           label: 'AR Aging & Dunning',
           icon: <Clock size={18} />,
-        },
-        {
-          id: 'editor',
-          label: 'Invoice Editor',
-          icon: <FileText size={18} />,
         },
       ],
     },
@@ -134,7 +130,7 @@ export function Sidebar({
 
   return (
     <>
-      {/* Mobile Drawer Backdrop */}
+      {/* Mobile Backdrop */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -142,14 +138,15 @@ export function Sidebar({
         />
       )}
 
+      {/* TailAdmin Sidebar */}
       <aside
         ref={sidebar}
-        className={`fixed left-0 top-0 z-50 flex h-screen w-72 min-w-[288px] max-w-[288px] shrink-0 flex-shrink-0 flex-col overflow-y-hidden bg-[#1C2434] duration-200 ease-in-out border-r border-[#2E3A47] lg:static lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-72 min-w-[288px] max-w-[288px] shrink-0 flex-col overflow-y-hidden bg-[#1C2434] duration-200 ease-in-out border-r border-[#2E3A47] lg:static lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
-        {/* SIDEBAR HEADER: Logo & Mobile Close */}
-        <div className="flex h-16 shrink-0 items-center justify-between gap-2 px-6 border-b border-[#2E3A47]">
+        {/* Sidebar Header / Logo */}
+        <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-[#2E3A47]">
           <div 
             className="flex items-center gap-3 cursor-pointer select-none"
             onClick={() => handleSelectTab('dashboard')}
@@ -164,7 +161,7 @@ export function Sidebar({
                   PRO
                 </span>
               </div>
-              <p className="text-[10px] text-[#8A99AD] font-medium tracking-wide mt-0.5">
+              <p className="text-[10px] text-[#8A99AD] font-medium tracking-wide mt-1">
                 Enterprise Ledger & AR
               </p>
             </div>
@@ -180,12 +177,12 @@ export function Sidebar({
           </button>
         </div>
 
-        {/* SIDEBAR NAVIGATION ITEMS */}
-        <div className="no-scrollbar flex flex-col overflow-y-auto duration-200 ease-linear py-5 px-4 flex-1 space-y-6">
+        {/* Sidebar Nav Items */}
+        <div className="no-scrollbar flex flex-col overflow-y-auto duration-200 ease-linear py-6 px-4 flex-1">
           <nav className="space-y-6">
             {menuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
-                <h3 className="mb-2 ml-3 text-[10px] font-bold uppercase tracking-wider text-[#8A99AD]">
+                <h3 className="mb-2.5 ml-3 text-[10px] font-bold uppercase tracking-wider text-[#8A99AD]">
                   {group.name}
                 </h3>
 
@@ -197,7 +194,7 @@ export function Sidebar({
                         <button
                           type="button"
                           onClick={() => handleSelectTab(item.id)}
-                          className={`group relative flex w-full items-center gap-3 rounded-lg py-2.5 px-3 text-xs font-medium duration-150 transition-all ${
+                          className={`group relative flex w-full items-center gap-3 rounded-lg py-2.5 px-3.5 text-xs font-medium duration-150 transition-all ${
                             isActive
                               ? 'bg-[#333A48] text-white shadow-xs font-semibold'
                               : 'text-[#DEE4EE] hover:bg-[#333A48]/50 hover:text-white'
@@ -230,7 +227,7 @@ export function Sidebar({
           </nav>
         </div>
 
-        {/* SIDEBAR FOOTER: Workspace Quick Status */}
+        {/* Sidebar Footer: Active Workspace Badge */}
         {activeOrganization && (
           <div className="border-t border-[#2E3A47] p-3.5 bg-[#1A222C]/80 shrink-0">
             <div className="flex items-center justify-between gap-2">

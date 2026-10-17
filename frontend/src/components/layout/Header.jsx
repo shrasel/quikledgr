@@ -7,13 +7,11 @@ import {
   Bell, 
   Building2, 
   ChevronDown, 
-  User, 
   LogOut, 
   Plus, 
   Check, 
   UserPlus, 
   Sliders, 
-  X,
   CreditCard,
   FileText,
   Clock
@@ -63,10 +61,9 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 w-full items-center bg-white dark:bg-[#1C2434] border-b border-[#E2E8F0] dark:border-[#2E3A47] shadow-xs">
-      <div className="flex h-full w-full items-center justify-between px-4 md:px-6 2xl:px-8">
-        {/* LEFT: Hamburger Toggle & Global Search Bar */}
+      <div className="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* LEFT: Hamburger Toggle & Search */}
         <div className="flex items-center gap-3 sm:gap-4 flex-1 max-w-xl">
-          {/* Hamburger Toggle Button (TailAdmin style) */}
           <button
             type="button"
             aria-controls="sidebar"
@@ -98,7 +95,7 @@ export function Header({
           </div>
         </div>
 
-        {/* RIGHT: Actions, Switcher, Theme, Notifications & User Avatar */}
+        {/* RIGHT: Switcher, New Invoice, Theme, Notifications & User */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Active Workspace / Organization Dropdown Switcher */}
           {activeOrganization && (
@@ -277,7 +274,7 @@ export function Header({
             )}
           </div>
 
-          {/* User Profile Dropdown (TailAdmin style) */}
+          {/* User Profile Dropdown */}
           <div className="relative pl-2 sm:pl-3 border-l border-[#E2E8F0] dark:border-[#2E3A47]" ref={dropdownRef}>
             <button
               type="button"
@@ -306,7 +303,7 @@ export function Header({
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-60 rounded-lg border border-[#E2E8F0] bg-white p-2 shadow-lg dark:border-[#2E3A47] dark:bg-[#1C2434] animate-in fade-in zoom-in-95 z-50">
+              <div className="absolute right-0 mt-2 w-60 rounded-xl border border-[#E2E8F0] bg-white p-2 shadow-xl dark:border-[#2E3A47] dark:bg-[#1C2434] animate-in fade-in zoom-in-95 z-50">
                 <div className="border-b border-[#E2E8F0] px-3 py-2.5 dark:border-[#2E3A47]">
                   <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{user?.name || 'User'}</p>
                   <p className="text-[11px] text-[#64748B] dark:text-[#8A99AD] truncate">{user?.email}</p>
@@ -319,7 +316,7 @@ export function Header({
                       setDropdownOpen(false);
                       setCurrentTab('profile');
                     }}
-                    className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-slate-700 hover:bg-[#F1F5F9] dark:text-[#DEE4EE] dark:hover:bg-[#24303F] transition-colors"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#F1F5F9] dark:text-[#DEE4EE] dark:hover:bg-[#24303F] transition-colors"
                   >
                     <Sliders size={14} className="text-[#64748B] dark:text-[#8A99AD]" />
                     <span>Profile & Wire Settings</span>
@@ -331,7 +328,7 @@ export function Header({
                       setDropdownOpen(false);
                       setCurrentTab('accounting');
                     }}
-                    className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-slate-700 hover:bg-[#F1F5F9] dark:text-[#DEE4EE] dark:hover:bg-[#24303F] transition-colors"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#F1F5F9] dark:text-[#DEE4EE] dark:hover:bg-[#24303F] transition-colors"
                   >
                     <Building2 size={14} className="text-[#64748B] dark:text-[#8A99AD]" />
                     <span>General Ledger & COA</span>
@@ -345,7 +342,7 @@ export function Header({
                       setDropdownOpen(false);
                       onLogout?.();
                     }}
-                    className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                   >
                     <LogOut size={14} />
                     <span>Sign Out</span>
