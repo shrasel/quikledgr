@@ -138,21 +138,15 @@ export function InvoiceEditor({
 
   // Presets
   const handleApplyBlukersPreset = () => {
-    const template = createBlukersInvoiceTemplate();
-    // Keep user's saved profile if available
     const saved = getIssuerProfile();
-    if (saved?.profile) {
-      template.issuer = { ...template.issuer, ...saved.profile };
-    }
-    if (saved?.wireDetails) {
-      template.wireDetails = { ...template.wireDetails, ...saved.wireDetails };
-    }
+    const template = createBlukersInvoiceTemplate(saved);
     setInvoice(template);
     onTriggerToast('Applied Blukers Monthly Consulting template!');
   };
 
   const handleApplyBlankPreset = () => {
-    const blank = createBlankInvoice();
+    const saved = getIssuerProfile();
+    const blank = createBlankInvoice(saved);
     setInvoice(blank);
     onTriggerToast('Reset to blank invoice.');
   };
@@ -176,13 +170,29 @@ export function InvoiceEditor({
   // Load default profile
   const handleLoadDefaultProfile = () => {
     const saved = getIssuerProfile();
-    if (saved?.profile || saved?.wireDetails) {
-      updateInvoice(prev => ({
-        ...prev,
-        issuer: saved.profile ? { ...prev.issuer, ...saved.profile } : prev.issuer,
-        wireDetails: saved.wireDetails ? { ...prev.wireDetails, ...saved.wireDetails } : prev.wireDetails,
-      }));
-      onTriggerToast('Loaded saved consultant profile & wire instructions!');
+    if (saved?.profile || saved?.wireDetails || saved?.wageSettings) {
+      updateInvoice(prev => {
+        const wage = saved.wageSettings || {};
+        const items = [...(prev.items || [])];
+        if (wage.defaultHourlyRate && items.length > 0 && items[0].rate === 0) {
+          const qty = parseFloat(wage.defaultMonthlyHours) || items[0].quantity || 0;
+          const rate = parseFloat(wage.defaultHourlyRate) || 0;
+          items[0] = {
+            ...items[0],
+            rate,
+            quantity: qty,
+            amount: qty * rate,
+          };
+        }
+        return {
+          ...prev,
+          issuer: saved.profile ? { ...prev.issuer, ...saved.profile } : prev.issuer,
+          wireDetails: saved.wireDetails ? { ...prev.wireDetails, ...saved.wireDetails } : prev.wireDetails,
+          currency: wage.currency || prev.currency,
+          items,
+        };
+      });
+      onTriggerToast('Loaded saved consultant profile, wage & wire instructions!');
     } else {
       onTriggerToast('No saved profile found yet. Fill in your details and click Save as Default.');
     }

@@ -45,9 +45,10 @@ export default function App() {
     if (stored.length > 0) {
       setCurrentInvoice(stored[0]);
     } else {
-      const template = createBlukersInvoiceTemplate();
+      const saved = getIssuerProfile();
+      const template = createBlukersInvoiceTemplate(saved);
       setCurrentInvoice(template);
-      saveInvoice(template);
+      // Empty by default for production readiness; do not auto-save into list
     }
 
     // Attempt to sync from backend API if authenticated
@@ -120,14 +121,8 @@ export default function App() {
 
   // Create new invoice
   const handleNewInvoice = () => {
-    const newInv = createBlukersInvoiceTemplate();
     const saved = getIssuerProfile();
-    if (saved?.profile) {
-      newInv.issuer = { ...newInv.issuer, ...saved.profile };
-    }
-    if (saved?.wireDetails) {
-      newInv.wireDetails = { ...newInv.wireDetails, ...saved.wireDetails };
-    }
+    const newInv = createBlukersInvoiceTemplate(saved);
     setCurrentInvoice(newInv);
     saveInvoice(newInv);
     setInvoices(getInvoices());

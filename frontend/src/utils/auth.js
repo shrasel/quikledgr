@@ -8,18 +8,6 @@ import { authApi } from '../api/client';
 const AUTH_STORAGE_KEY = 'quikledgr_auth_user_v1';
 const LEGACY_STORAGE_KEY = 'blukers_auth_user_v1';
 
-// Default demo user credentials
-export const DEMO_USER = {
-  id: 'usr_blukers_alex',
-  name: 'Alexander Wright',
-  email: 'alex@wrightsolutions.io',
-  businessName: 'Wright Advisory & Solutions LLC',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
-  provider: 'email',
-  role: 'Principal Technology Consultant',
-  createdAt: '2026-01-01T00:00:00.000Z',
-};
-
 export function getStoredUser() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
@@ -61,17 +49,9 @@ export async function loginWithEmail(email, password) {
       return res.user;
     }
   } catch (err) {
-    // If backend returned a clear rejection (e.g. 401 or 400), throw to display message
     if (err.message && !err.message.includes('Failed to fetch')) {
       throw err;
     }
-
-    // Offline demo fallback only for the preset demo consultant
-    if (normalizedEmail === 'alex@wrightsolutions.io' && password === 'demoPassword123') {
-      saveUserSession(DEMO_USER);
-      return DEMO_USER;
-    }
-
     throw new Error(err.message || 'Unable to connect to authentication server. Please try again.');
   }
 
@@ -118,7 +98,7 @@ export async function loginWithGoogle(credentialOrPayload) {
   try {
     const payload = typeof credentialOrPayload === 'string'
       ? { credential: credentialOrPayload }
-      : (credentialOrPayload || { email: 'alexander.wright.consulting@gmail.com', name: 'Alexander Wright' });
+      : credentialOrPayload;
 
     const res = await authApi.googleLogin(payload);
     if (res?.user) {
@@ -126,22 +106,9 @@ export async function loginWithGoogle(credentialOrPayload) {
       return res.user;
     }
   } catch (err) {
-    console.warn('[Auth] Backend Google OAuth notice:', err.message);
-    if (typeof credentialOrPayload === 'string') {
-      throw err;
-    }
+    console.warn('[Auth] Google OAuth error:', err.message);
+    throw err;
   }
 
-  const googleUser = {
-    id: 'usr_google_alex',
-    name: 'Alexander Wright',
-    email: 'alexander.wright.consulting@gmail.com',
-    businessName: 'Wright Advisory & Solutions LLC',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80',
-    provider: 'google',
-    createdAt: new Date().toISOString(),
-  };
-
-  saveUserSession(googleUser);
-  return googleUser;
+  throw new Error('Google sign-in could not be completed. Please try again.');
 }

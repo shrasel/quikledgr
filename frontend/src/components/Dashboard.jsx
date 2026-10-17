@@ -293,139 +293,159 @@ export function Dashboard({
           </button>
         </div>
 
-        {/* Desktop View: Table (Visible on md:768px and up) */}
-        <div className="hidden md:block items-table-wrapper" style={{ margin: 0 }}>
-          <table className="items-table">
-            <thead>
-              <tr>
-                <th>Invoice #</th>
-                <th>Client</th>
-                <th>Service Period</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Access PIN</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+        {invoices.length === 0 ? (
+          <div className="text-center py-10 px-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 my-2">
+            <FileText size={38} className="mx-auto mb-2 text-slate-400" />
+            <h4 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">No Invoices Created Yet</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">
+              Your invoice ledger is clean and ready. Click below to draft your first compliant monthly consulting invoice.
+            </p>
+            <button 
+              type="button" 
+              className="btn btn-primary btn-sm inline-flex items-center gap-1.5"
+              onClick={onNewInvoice}
+            >
+              <Plus size={14} />
+              <span>Create First Monthly Invoice</span>
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Desktop View: Table (Visible on md:768px and up) */}
+            <div className="hidden md:block items-table-wrapper" style={{ margin: 0 }}>
+              <table className="items-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Client</th>
+                    <th>Service Period</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Access PIN</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.slice(0, 4).map(inv => (
+                    <tr key={inv.id}>
+                      <td>
+                        <span 
+                          style={{ fontWeight: 700, color: 'var(--qb-blue)', cursor: 'pointer' }}
+                          onClick={() => onSelectInvoice(inv)}
+                        >
+                          {inv.invoiceNumber || inv.id}
+                        </span>
+                      </td>
+                      <td>{inv.client?.companyName || 'Blukers, Inc.'}</td>
+                      <td>{inv.servicePeriod || '—'}</td>
+                      <td className="font-mono" style={{ fontWeight: 700 }}>
+                        {formatMoney(inv.total, inv.currency)}
+                      </td>
+                      <td>
+                        <span className={`status-pill status-${inv.status || 'draft'}`}>
+                          {inv.status === 'paid' ? 'Paid' : inv.status === 'sent' ? 'Sent' : 'Draft / Not Sent'}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          background: 'var(--primary-100)',
+                          color: 'var(--primary-800)',
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px',
+                          fontWeight: 700,
+                          fontSize: '0.8rem'
+                        }}>
+                          {inv.security?.accessPin || '—'}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                          <button 
+                            type="button" 
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => onSelectInvoice(inv)}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            type="button" 
+                            className="btn btn-primary btn-sm"
+                            onClick={() => onShareInvoice(inv)}
+                          >
+                            <Share2 size={13} />
+                            <span>Share</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View: Interactive Cards (Visible on mobile screens < 768px) */}
+            <div className="md:hidden space-y-3">
               {invoices.slice(0, 4).map(inv => (
-                <tr key={inv.id}>
-                  <td>
+                <div 
+                  key={inv.id}
+                  className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:border-emerald-500/50 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-2">
                     <span 
-                      style={{ fontWeight: 700, color: 'var(--qb-blue)', cursor: 'pointer' }}
+                      className="font-bold text-sm text-blue-600 dark:text-blue-400 cursor-pointer"
                       onClick={() => onSelectInvoice(inv)}
                     >
                       {inv.invoiceNumber || inv.id}
                     </span>
-                  </td>
-                  <td>{inv.client?.companyName || 'Blukers, Inc.'}</td>
-                  <td>{inv.servicePeriod || '—'}</td>
-                  <td className="font-mono" style={{ fontWeight: 700 }}>
-                    {formatMoney(inv.total, inv.currency)}
-                  </td>
-                  <td>
-                    <span className={`status-pill status-${inv.status || 'draft'}`}>
-                      {inv.status === 'paid' ? 'Paid' : inv.status === 'sent' ? 'Sent' : 'Draft / Not Sent'}
+                    <span className={`status-pill status-${inv.status || 'draft'} text-xs`}>
+                      {inv.status === 'paid' ? 'Paid' : inv.status === 'sent' ? 'Sent' : 'Draft'}
                     </span>
-                  </td>
-                  <td>
-                    <span style={{
-                      fontFamily: 'var(--font-mono)',
-                      background: 'var(--primary-100)',
-                      color: 'var(--primary-800)',
-                      padding: '0.15rem 0.45rem',
-                      borderRadius: '4px',
-                      fontWeight: 700,
-                      fontSize: '0.8rem'
-                    }}>
-                      {inv.security?.accessPin || '—'}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                  </div>
+
+                  <div className="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1">
+                    {inv.client?.companyName || 'Blukers, Inc.'}
+                  </div>
+
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-2.5">
+                    Period: {inv.servicePeriod || '—'}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100">
+                        {formatMoney(inv.total, inv.currency)}
+                      </span>
+                      {inv.security?.accessPin && (
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold" title="Access PIN">
+                          PIN: {inv.security.accessPin}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
                       <button 
                         type="button" 
-                        className="btn btn-secondary btn-sm"
+                        className="btn btn-secondary btn-sm py-1 px-2.5 text-xs"
                         onClick={() => onSelectInvoice(inv)}
                       >
                         Edit
                       </button>
                       <button 
                         type="button" 
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm py-1 px-2.5 text-xs flex items-center gap-1"
                         onClick={() => onShareInvoice(inv)}
                       >
-                        <Share2 size={13} />
+                        <Share2 size={12} />
                         <span>Share</span>
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile View: Interactive Cards (Visible on mobile screens < 768px) */}
-        <div className="md:hidden space-y-3">
-          {invoices.slice(0, 4).map(inv => (
-            <div 
-              key={inv.id}
-              className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:border-emerald-500/50 transition-all"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span 
-                  className="font-bold text-sm text-blue-600 dark:text-blue-400 cursor-pointer"
-                  onClick={() => onSelectInvoice(inv)}
-                >
-                  {inv.invoiceNumber || inv.id}
-                </span>
-                <span className={`status-pill status-${inv.status || 'draft'} text-xs`}>
-                  {inv.status === 'paid' ? 'Paid' : inv.status === 'sent' ? 'Sent' : 'Draft'}
-                </span>
-              </div>
-
-              <div className="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1">
-                {inv.client?.companyName || 'Blukers, Inc.'}
-              </div>
-
-              <div className="text-xs text-slate-500 dark:text-slate-400 mb-2.5">
-                Period: {inv.servicePeriod || '—'}
-              </div>
-
-              <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100">
-                    {formatMoney(inv.total, inv.currency)}
-                  </span>
-                  {inv.security?.accessPin && (
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold" title="Access PIN">
-                      PIN: {inv.security.accessPin}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary btn-sm py-1 px-2.5 text-xs"
-                    onClick={() => onSelectInvoice(inv)}
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn btn-primary btn-sm py-1 px-2.5 text-xs flex items-center gap-1"
-                    onClick={() => onShareInvoice(inv)}
-                  >
-                    <Share2 size={12} />
-                    <span>Share</span>
-                  </button>
-                </div>
-              </div>
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

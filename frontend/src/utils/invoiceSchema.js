@@ -69,17 +69,25 @@ export function getCurrentMonthPeriod() {
   };
 }
 
-export function createBlankInvoice() {
+export function createBlankInvoice(savedProfile = null) {
   const dates = getCurrentMonthPeriod();
   const invoiceId = 'INV-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
   const securityPin = generateRandomPin();
+
+  const profile = savedProfile?.profile || {};
+  const wire = savedProfile?.wireDetails || {};
+  const wage = savedProfile?.wageSettings || {};
+
+  const qty = parseFloat(wage.defaultMonthlyHours) || 0;
+  const rate = parseFloat(wage.defaultHourlyRate) || 0;
+  const amount = Math.round(qty * rate * 100) / 100;
 
   return {
     id: invoiceId,
     invoiceNumber: invoiceId,
     title: 'CONSULTING SERVICES INVOICE',
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: wage.currency || 'USD',
+    currencySymbol: wage.currency === 'EUR' ? '€' : wage.currency === 'GBP' ? '£' : '$',
     status: 'draft', // draft, sent, paid, overdue
     createdAt: new Date().toISOString(),
     
@@ -91,18 +99,18 @@ export function createBlankInvoice() {
     servicePeriod: dates.servicePeriodLabel,
     paymentTerms: 'Payment due on or before the 15th of the month',
 
-    // Sender / Issuer (Your Info)
+    // Sender / Issuer (Your Info - Populated from saved profile or blank)
     issuer: {
-      name: '',
-      businessName: '',
-      titleOrRole: 'Senior Consultant',
-      email: '',
-      phone: '',
-      address: '',
-      cityStateZip: '',
-      country: 'United States',
-      taxId: '', // SSN / EIN / VAT
-      logoUrl: '',
+      name: profile.name || '',
+      businessName: profile.businessName || '',
+      titleOrRole: profile.titleOrRole || '',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      address: profile.address || '',
+      cityStateZip: profile.cityStateZip || '',
+      country: profile.country || 'United States',
+      taxId: profile.taxId || '',
+      logoUrl: profile.logoUrl || '',
     },
 
     // Client ("Bill To")
@@ -117,48 +125,42 @@ export function createBlankInvoice() {
       notes: '',
     },
 
-    // Line items
+    // Line items (Clean starting item)
     items: [
       {
         id: 'item_1',
         description: 'Professional Consulting Services',
-        category: 'consulting', // consulting or additional_charge
-        quantity: 160,
-        rate: 85,
-        amount: 13600,
+        category: 'consulting',
+        quantity: qty,
+        rate: rate,
+        amount: amount,
       }
     ],
 
     // Additional pre-approved charges
-    additionalCharges: [
-      {
-        id: 'charge_1',
-        description: 'Pre-approved Cloud Hosting & Tooling Reimbursable',
-        amount: 150,
-      }
-    ],
+    additionalCharges: [],
 
     // Financial calculations
     discountRate: 0,
     discountAmount: 0,
-    taxRate: 0,
+    taxRate: parseFloat(wage.taxRate) || 0,
     taxAmount: 0,
-    subtotal: 13600,
-    additionalChargesTotal: 150,
-    total: 13750,
+    subtotal: amount,
+    additionalChargesTotal: 0,
+    total: amount,
 
-    // Sensitive Wire Transfer Details (Protected by Security Code)
+    // Sensitive Wire Transfer Details
     wireDetails: {
-      accountHolderName: '',
-      bankName: '',
-      bankAddress: '',
-      accountNumberOrIban: '',
-      swiftBicCode: '',
-      routingAba: '',
-      achRouting: '',
-      intermediaryBank: '',
+      accountHolderName: wire.accountHolderName || '',
+      bankName: wire.bankName || '',
+      bankAddress: wire.bankAddress || '',
+      accountNumberOrIban: wire.accountNumberOrIban || '',
+      swiftBicCode: wire.swiftBicCode || '',
+      routingAba: wire.routingAba || '',
+      achRouting: wire.achRouting || '',
+      intermediaryBank: wire.intermediaryBank || '',
       wireReference: '',
-      paymentInstructions: 'Please include the invoice number in the wire transfer reference/memo field.',
+      paymentInstructions: wire.paymentInstructions || 'Please include the invoice number in the wire transfer reference/memo field.',
     },
 
     // Security
@@ -174,22 +176,29 @@ export function createBlankInvoice() {
   };
 }
 
-export function createBlukersInvoiceTemplate() {
+export function createBlukersInvoiceTemplate(savedProfile = null) {
   const dates = getPreviousMonthPeriod();
   const invoiceId = 'BLK-' + new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + Math.floor(100 + Math.random() * 900);
   const securityPin = generateRandomPin();
+
+  const profile = savedProfile?.profile || {};
+  const wire = savedProfile?.wireDetails || {};
+  const wage = savedProfile?.wageSettings || {};
+
+  const qty = parseFloat(wage.defaultMonthlyHours) || 0;
+  const rate = parseFloat(wage.defaultHourlyRate) || 0;
+  const amount = Math.round(qty * rate * 100) / 100;
 
   return {
     id: invoiceId,
     invoiceNumber: invoiceId,
     title: 'MONTHLY CONSULTING SERVICES INVOICE',
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: wage.currency || 'USD',
+    currencySymbol: wage.currency === 'EUR' ? '€' : wage.currency === 'GBP' ? '£' : '$',
     status: 'draft',
     createdAt: new Date().toISOString(),
 
     // Dates matching Blukers requirements:
-    // Submitted no later than 15th of the following month
     invoiceDate: dates.invoiceDate,
     dueDate: dates.dueDate,
     serviceStartDate: dates.serviceStartDate,
@@ -197,18 +206,18 @@ export function createBlukersInvoiceTemplate() {
     servicePeriod: dates.servicePeriodLabel,
     paymentTerms: 'Payment due on or before the 15th of following month (Consulting Agreement)',
 
-    // Issuer (pre-filled with realistic placeholder ready to personalize)
+    // Issuer (Clean: populated from saved profile or blank)
     issuer: {
-      name: 'Alexander Wright',
-      businessName: 'Wright Advisory & Solutions LLC',
-      titleOrRole: 'Principal Technology Consultant',
-      email: 'alex@wrightsolutions.io',
-      phone: '+1 (555) 234-5678',
-      address: '100 Innovation Way, Suite 400',
-      cityStateZip: 'San Francisco, CA 94105',
-      country: 'United States',
-      taxId: 'XX-XXX4920',
-      logoUrl: '',
+      name: profile.name || '',
+      businessName: profile.businessName || '',
+      titleOrRole: profile.titleOrRole || '',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      address: profile.address || '',
+      cityStateZip: profile.cityStateZip || '',
+      country: profile.country || 'United States',
+      taxId: profile.taxId || '',
+      logoUrl: profile.logoUrl || '',
     },
 
     // Client (Blukers specific guidelines)
@@ -223,47 +232,41 @@ export function createBlukersInvoiceTemplate() {
       notes: 'Monthly Consulting Invoice for Blukers, Inc.',
     },
 
-    // Line items per agreement
+    // Line items (Clean starting consulting line item)
     items: [
       {
         id: 'item_1',
-        description: 'Strategic Advisory & Technical Execution (Month of ' + dates.servicePeriodLabel.split('–')[0].trim() + ') - System architecture, integrations & support',
+        description: 'Strategic Advisory & Technical Execution (' + dates.servicePeriodLabel + ')',
         category: 'consulting',
-        quantity: 160,
-        rate: 95.00,
-        amount: 15200.00,
+        quantity: qty,
+        rate: rate,
+        amount: amount,
       }
     ],
 
     // Pre-approved additional charges
-    additionalCharges: [
-      {
-        id: 'charge_1',
-        description: 'Pre-Approved Project Infrastructure & API License Charges',
-        amount: 320.00,
-      }
-    ],
+    additionalCharges: [],
 
     discountRate: 0,
     discountAmount: 0,
-    taxRate: 0,
+    taxRate: parseFloat(wage.taxRate) || 0,
     taxAmount: 0,
-    subtotal: 15200.00,
-    additionalChargesTotal: 320.00,
-    total: 15520.00,
+    subtotal: amount,
+    additionalChargesTotal: 0,
+    total: amount,
 
-    // Sensitive Banking details (Blukers requirement)
+    // Sensitive Banking details
     wireDetails: {
-      accountHolderName: 'Wright Advisory & Solutions LLC',
-      bankName: 'JPMorgan Chase Bank, N.A.',
-      bankAddress: '270 Park Avenue, New York, NY 10017, USA',
-      accountNumberOrIban: '984729104829',
-      swiftBicCode: 'CHASUS33XXX',
-      routingAba: '021000021 (Wire / Fedwire)',
-      achRouting: '121000248 (ACH Direct Deposit)',
-      intermediaryBank: '',
-      wireReference: 'INV-BLK-' + new Date().getFullYear() + ' - Alexander Wright',
-      paymentInstructions: 'Please route wire transfer to JPMorgan Chase Bank. Ensure the Wire Reference code is included in the transfer description for proper ledger crediting.',
+      accountHolderName: wire.accountHolderName || '',
+      bankName: wire.bankName || '',
+      bankAddress: wire.bankAddress || '',
+      accountNumberOrIban: wire.accountNumberOrIban || '',
+      swiftBicCode: wire.swiftBicCode || '',
+      routingAba: wire.routingAba || '',
+      achRouting: wire.achRouting || '',
+      intermediaryBank: wire.intermediaryBank || '',
+      wireReference: '',
+      paymentInstructions: wire.paymentInstructions || 'Please route wire transfer to designated account. Ensure invoice number is noted in description.',
     },
 
     security: {
@@ -272,7 +275,7 @@ export function createBlukersInvoiceTemplate() {
       passcodeHint: 'Enter your 6-digit access code to unlock confidential wire routing details.',
     },
 
-    notes: 'Thank you for the opportunity to partner with Blukers. Services delivered in full compliance with our Consulting Agreement. All deliverable milestones were reviewed and accepted.',
+    notes: 'Thank you for the opportunity to partner with Blukers. Services delivered in full compliance with our Consulting Agreement.',
     agreementComplianceNote: 'Submitted in accordance with the Blukers Consulting Agreement. Submitted before the 15th day of the following month to accounting@blukers.com (cc: rosa@blukers.com).',
   };
 }

@@ -104,12 +104,12 @@ Access the application in your browser:
 - 🩺 **API Health Check**: [http://localhost:8085/api/health](http://localhost:8085/api/health)
 - 🗄️ **MariaDB Database**: `localhost:3306` (`user: quikledgr_user`, `db: quikledgr_db`)
 
-### 3. Demo Login Credentials
+### 3. Authentication & Production Readiness
 
-The initial database migration pre-seeds a demo consultant profile:
-- **Email**: `alex@wrightsolutions.io`
-- **Password**: `demoPassword123`
-- *(Alternatively, click **1-Click Sign In** on the authentication screen)*
+QuikLedgr comes clean and production-ready:
+- **Create Account**: Register your business consultant account using your work email and password.
+- **Google Sign-In**: Click **Continue with Google** for 1-click single sign-on.
+- **Default Profile & Wage Settings**: Set your business name, hourly rate, standard monthly hours, and wire instructions under **Profile Settings** to automatically populate subsequent monthly invoices.
 
 ### 4. Optional: Enable Live Google OAuth 2.0
 

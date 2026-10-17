@@ -93,10 +93,7 @@ export async function login(req, res, next) {
       });
     }
 
-    let isValid = await comparePassword(password, userRecord.password_hash);
-    if (!isValid && normalizedEmail === 'alex@wrightsolutions.io' && password === 'demoPassword123') {
-      isValid = true;
-    }
+    const isValid = await comparePassword(password, userRecord.password_hash);
 
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid email or password.' });
@@ -152,7 +149,7 @@ export async function googleLogin(req, res, next) {
     } else if (bodyEmail) {
       // Simulated / Demo Mode Fallback (when no Google Cloud Client ID is configured yet)
       email = bodyEmail.trim().toLowerCase();
-      name = bodyName || 'Alexander Wright';
+      name = bodyName || email.split('@')[0];
       avatarUrl = bodyAvatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80';
       googleId = 'demo_google_' + Math.random().toString(36).substring(2, 11);
     } else {

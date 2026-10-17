@@ -18,9 +18,20 @@ export async function getProfile(req, res, next) {
     }
 
     const row = rows[0];
-    const wire = row.default_wire_details
+    const rawData = row.default_wire_details
       ? (typeof row.default_wire_details === 'string' ? JSON.parse(row.default_wire_details) : row.default_wire_details)
       : null;
+
+    let wage = null;
+    let cleanWire = rawData;
+
+    if (rawData && typeof rawData === 'object') {
+      if (rawData._wageSettings) {
+        wage = rawData._wageSettings;
+        cleanWire = { ...rawData };
+        delete cleanWire._wageSettings;
+      }
+    }
 
     res.json({
       profile: {
@@ -33,7 +44,8 @@ export async function getProfile(req, res, next) {
         country: row.country,
         taxId: row.tax_id,
       },
-      wireDetails: wire,
+      wireDetails: cleanWire,
+      wageSettings: wage,
     });
   } catch (err) {
     next(err);
@@ -43,7 +55,7 @@ export async function getProfile(req, res, next) {
 export async function updateProfile(req, res, next) {
   try {
     const userId = req.user.id;
-    const { profile, wireDetails } = req.body;
+    const { profile, wireDetails, wageSettings } = req.body;
 
     // Update user table
     if (profile) {
@@ -52,8 +64,13 @@ export async function updateProfile(req, res, next) {
         [profile.name, profile.businessName, userId]
       );
 
-      // Update user_profiles table
-      const wireJson = wireDetails ? JSON.stringify(wireDetails) : null;
+      // Package wire details and wage settings into JSON
+      const combinedPayload = {
+        ...(wireDetails || {}),
+        ...(wageSettings ? { _wageSettings: wageSettings } : {}),
+      };
+      const wireJson = JSON.stringify(combinedPayload);
+
       await pool.query(
         `INSERT INTO user_profiles (id, user_id, phone, address, city_state_zip, country, tax_id, default_wire_details)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)

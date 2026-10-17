@@ -8,15 +8,13 @@ import {
   Building, 
   ArrowRight, 
   Eye, 
-  EyeOff, 
-  Sparkles
+  EyeOff
 } from 'lucide-react';
 import { 
   loginWithEmail, 
   signupWithEmail, 
   loginWithGoogle, 
-  getGoogleAuthConfig, 
-  DEMO_USER 
+  getGoogleAuthConfig 
 } from '../utils/auth';
 
 export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
@@ -159,20 +157,6 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    setErrorMessage('');
-    try {
-      const user = await loginWithEmail(DEMO_USER.email, 'demoPassword123');
-      onTriggerToast(`Signed in as demo consultant: ${user.name}`);
-      onLoginSuccess(user);
-    } catch (err) {
-      setErrorMessage(err.message || 'Demo login failed.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
@@ -251,7 +235,7 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
                   <input 
                     type="text" 
                     className="form-input" 
-                    placeholder="e.g. Alexander Wright"
+                    placeholder="e.g. Sarah Jenkins"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -267,7 +251,7 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
                   <input 
                     type="text" 
                     className="form-input" 
-                    placeholder="e.g. Wright Advisory LLC"
+                    placeholder="e.g. Jenkins Advisory & Consulting LLC"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                     autoComplete="organization"
@@ -337,27 +321,6 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
             <ArrowRight size={18} />
           </button>
         </form>
-
-        {/* 1-Click Demo Login Pill */}
-        <div className="auth-demo-box">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.825rem', fontWeight: 600, color: 'var(--text-main)' }}>
-              <Sparkles size={16} color="#059669" />
-              <span>Instant Demo Access</span>
-            </div>
-            <button 
-              type="button" 
-              className="btn btn-secondary btn-sm"
-              onClick={handleDemoLogin}
-              disabled={isLoading}
-            >
-              1-Click Sign In
-            </button>
-          </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            Test the complete system pre-loaded with consultant profile and Blukers invoices.
-          </div>
-        </div>
 
         {/* Compliance Security Badge */}
         <div className="auth-footer-badge">

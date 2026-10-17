@@ -10,53 +10,48 @@ const LEGACY_STORAGE_KEY_PROFILE = 'blukers_issuer_profile_v1';
 const STORAGE_KEY_CLIENTS = 'quikledgr_saved_clients_v1';
 const LEGACY_STORAGE_KEY_CLIENTS = 'blukers_saved_clients_v1';
 
-// Initialize default sample data if empty
+// Initialize storage and purge any legacy sample data
 export function initStorage() {
   const existing = localStorage.getItem(STORAGE_KEY_INVOICES) || localStorage.getItem(LEGACY_STORAGE_KEY_INVOICES);
-  if (!existing) {
-    const inv1 = createBlukersInvoiceTemplate();
-    inv1.id = 'BLK-2026-10-001';
-    inv1.invoiceNumber = 'BLK-2026-10-001';
-    inv1.status = 'sent';
-    inv1.servicePeriod = 'September 1 – September 30, 2026';
-    inv1.invoiceDate = '2026-10-01';
-    inv1.dueDate = '2026-10-15';
+  if (existing) {
+    try {
+      const parsed = JSON.parse(existing);
+      if (Array.isArray(parsed)) {
+        // Purge hardcoded legacy sample invoices if found in browser storage
+        const cleaned = parsed.filter(inv => {
+          const id = inv.id || '';
+          const isSampleId = id === 'BLK-2026-10-001' || id === 'BLK-2026-09-002' || id === 'BLK-2026-08-003' || id === 'BLK-2026-11-004';
+          const isAlexIssuer = inv.issuer?.email === 'alex@wrightsolutions.io' || inv.issuer?.name === 'Alexander Wright';
+          return !isSampleId && !isAlexIssuer;
+        });
 
-    const inv2 = createBlukersInvoiceTemplate();
-    inv2.id = 'BLK-2026-09-002';
-    inv2.invoiceNumber = 'BLK-2026-09-002';
-    inv2.status = 'paid';
-    inv2.servicePeriod = 'August 1 – August 31, 2026';
-    inv2.invoiceDate = '2026-09-01';
-    inv2.dueDate = '2026-09-15';
-    inv2.total = 15200;
-    inv2.subtotal = 15200;
-    inv2.additionalChargesTotal = 0;
-    inv2.additionalCharges = [];
+        if (cleaned.length !== parsed.length) {
+          const serialized = JSON.stringify(cleaned);
+          localStorage.setItem(STORAGE_KEY_INVOICES, serialized);
+          localStorage.setItem(LEGACY_STORAGE_KEY_INVOICES, serialized);
+        }
+      }
+    } catch (e) {
+      localStorage.setItem(STORAGE_KEY_INVOICES, JSON.stringify([]));
+      localStorage.setItem(LEGACY_STORAGE_KEY_INVOICES, JSON.stringify([]));
+    }
+  } else {
+    localStorage.setItem(STORAGE_KEY_INVOICES, JSON.stringify([]));
+    localStorage.setItem(LEGACY_STORAGE_KEY_INVOICES, JSON.stringify([]));
+  }
 
-    const inv3 = createBlukersInvoiceTemplate();
-    inv3.id = 'BLK-2026-08-003';
-    inv3.invoiceNumber = 'BLK-2026-08-003';
-    inv3.status = 'paid';
-    inv3.servicePeriod = 'July 1 – July 31, 2026';
-    inv3.invoiceDate = '2026-08-01';
-    inv3.dueDate = '2026-08-15';
-    inv3.total = 14800;
-    inv3.subtotal = 14800;
-    inv3.additionalChargesTotal = 0;
-    inv3.additionalCharges = [];
-
-    const inv4 = createBlukersInvoiceTemplate();
-    inv4.id = 'BLK-2026-11-004';
-    inv4.invoiceNumber = 'BLK-2026-11-004';
-    inv4.status = 'draft';
-    inv4.servicePeriod = 'October 1 – October 31, 2026';
-    inv4.invoiceDate = '2026-10-16';
-    inv4.dueDate = '2026-11-15';
-
-    const initialData = JSON.stringify([inv4, inv1, inv2, inv3]);
-    localStorage.setItem(STORAGE_KEY_INVOICES, initialData);
-    localStorage.setItem(LEGACY_STORAGE_KEY_INVOICES, initialData);
+  // Purge legacy sample consultant profile if found in localStorage
+  const savedProfile = localStorage.getItem(STORAGE_KEY_PROFILE) || localStorage.getItem(LEGACY_STORAGE_KEY_PROFILE);
+  if (savedProfile) {
+    try {
+      const parsed = JSON.parse(savedProfile);
+      if (parsed?.profile?.email === 'alex@wrightsolutions.io' || parsed?.profile?.name === 'Alexander Wright') {
+        localStorage.removeItem(STORAGE_KEY_PROFILE);
+        localStorage.removeItem(LEGACY_STORAGE_KEY_PROFILE);
+      }
+    } catch (e) {
+      localStorage.removeItem(STORAGE_KEY_PROFILE);
+    }
   }
 }
 
@@ -105,9 +100,15 @@ export function deleteInvoice(id) {
   return updated;
 }
 
-export function saveIssuerProfile(profile, wireDetails) {
+export function saveIssuerProfile(profile, wireDetails, wageSettings = null) {
   try {
-    const serialized = JSON.stringify({ profile, wireDetails });
+    const existing = getIssuerProfile() || {};
+    const payload = {
+      profile: profile || existing.profile || null,
+      wireDetails: wireDetails || existing.wireDetails || null,
+      wageSettings: wageSettings !== null ? wageSettings : (existing.wageSettings || null),
+    };
+    const serialized = JSON.stringify(payload);
     localStorage.setItem(STORAGE_KEY_PROFILE, serialized);
     localStorage.setItem(LEGACY_STORAGE_KEY_PROFILE, serialized);
   } catch (e) {

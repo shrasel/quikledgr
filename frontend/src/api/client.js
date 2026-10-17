@@ -141,10 +141,10 @@ export const profileApi = {
     return request('/profile');
   },
 
-  update: async (profile, wireDetails) => {
+  update: async (profile, wireDetails, wageSettings = null) => {
     return request('/profile', {
       method: 'PUT',
-      body: JSON.stringify({ profile, wireDetails }),
+      body: JSON.stringify({ profile, wireDetails, wageSettings }),
     });
   }
 };
