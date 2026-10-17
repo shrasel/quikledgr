@@ -9,26 +9,35 @@ export async function register(req, res, next) {
     const { name, email, password, businessName } = req.body;
 
     if (!email || !password || !name) {
-      return res.status(400).json({ error: 'Name, email, and password are required.' });
+      return res.status(400).json({ error: 'Full name, email, and password are required.' });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+    }
 
     // Check if user exists
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [normalizedEmail]);
     if (existing.length > 0) {
-      return res.status(400).json({ error: 'An account with this email already exists.' });
+      return res.status(400).json({ error: 'An account with this email already exists. Please sign in instead.' });
     }
 
     const userId = 'usr_' + Math.random().toString(36).substring(2, 11);
     const passwordHash = await hashPassword(password);
     const defaultAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80';
+    const cleanBusinessName = businessName?.trim() || `${name.trim()} Advisory LLC`;
 
     // Insert user
     await pool.query(
       `INSERT INTO users (id, name, email, password_hash, business_name, provider, role, avatar_url)
        VALUES (?, ?, ?, ?, ?, 'email', 'consultant', ?)`,
-      [userId, name.trim(), normalizedEmail, passwordHash, businessName?.trim() || null, defaultAvatar]
+      [userId, name.trim(), normalizedEmail, passwordHash, cleanBusinessName, defaultAvatar]
     );
 
     // Initialize default profile
@@ -43,7 +52,7 @@ export async function register(req, res, next) {
       id: userId,
       name: name.trim(),
       email: normalizedEmail,
-      businessName: businessName?.trim() || null,
+      businessName: cleanBusinessName,
       avatarUrl: defaultAvatar,
       provider: 'email',
       role: 'consultant',
@@ -77,17 +86,20 @@ export async function login(req, res, next) {
 
     const userRecord = users[0];
 
-    // Check password
-    if (userRecord.password_hash) {
-      // Demo fallback check
-      let isValid = await comparePassword(password, userRecord.password_hash);
-      if (!isValid && normalizedEmail === 'alex@wrightsolutions.io' && password === 'demoPassword123') {
-        isValid = true;
-      }
+    // Check if password exists (e.g. account created through Google)
+    if (!userRecord.password_hash) {
+      return res.status(401).json({ 
+        error: 'This account was created with Google Sign-In. Please sign in with Google.' 
+      });
+    }
 
-      if (!isValid) {
-        return res.status(401).json({ error: 'Invalid email or password.' });
-      }
+    let isValid = await comparePassword(password, userRecord.password_hash);
+    if (!isValid && normalizedEmail === 'alex@wrightsolutions.io' && password === 'demoPassword123') {
+      isValid = true;
+    }
+
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     const user = {

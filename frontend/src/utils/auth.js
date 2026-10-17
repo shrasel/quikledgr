@@ -52,56 +52,50 @@ export function clearUserSession() {
 }
 
 export async function loginWithEmail(email, password) {
+  const normalizedEmail = email.trim().toLowerCase();
+  
   try {
-    // Attempt backend API login
-    const res = await authApi.login(email, password);
+    const res = await authApi.login(normalizedEmail, password);
     if (res?.user) {
       saveUserSession(res.user);
       return res.user;
     }
   } catch (err) {
-    console.warn('[Auth] Backend API unreachable or error, falling back to local simulation:', err.message);
+    // If backend returned a clear rejection (e.g. 401 or 400), throw to display message
+    if (err.message && !err.message.includes('Failed to fetch')) {
+      throw err;
+    }
+
+    // Offline demo fallback only for the preset demo consultant
+    if (normalizedEmail === 'alex@wrightsolutions.io' && password === 'demoPassword123') {
+      saveUserSession(DEMO_USER);
+      return DEMO_USER;
+    }
+
+    throw new Error(err.message || 'Unable to connect to authentication server. Please try again.');
   }
 
-  // Graceful local fallback
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = {
-    id: 'usr_' + Math.random().toString(36).substring(2, 9),
-    name: normalizedEmail.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    email: normalizedEmail,
-    businessName: normalizedEmail.includes('alex') ? 'Wright Advisory & Solutions LLC' : 'Consulting Advisory Services',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&h=120&q=80',
-    provider: 'email',
-    createdAt: new Date().toISOString(),
-  };
-
-  saveUserSession(user);
-  return user;
+  throw new Error('Authentication failed. Please verify your credentials.');
 }
 
 export async function signupWithEmail(name, email, password, businessName) {
+  const normalizedEmail = email.trim().toLowerCase();
+
   try {
-    const res = await authApi.register(name, email, password, businessName);
+    const res = await authApi.register(name.trim(), normalizedEmail, password, businessName?.trim());
     if (res?.user) {
       saveUserSession(res.user);
       return res.user;
     }
   } catch (err) {
-    console.warn('[Auth] Backend registration offline fallback:', err.message);
+    if (err.message && !err.message.includes('Failed to fetch')) {
+      throw err;
+    }
+
+    throw new Error(err.message || 'Unable to connect to authentication server. Please try again.');
   }
 
-  const user = {
-    id: 'usr_' + Math.random().toString(36).substring(2, 9),
-    name: name.trim(),
-    email: email.trim().toLowerCase(),
-    businessName: businessName?.trim() || `${name.trim()} Consulting`,
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
-    provider: 'email',
-    createdAt: new Date().toISOString(),
-  };
-
-  saveUserSession(user);
-  return user;
+  throw new Error('Registration failed. Please try again.');
 }
 
 export async function getGoogleAuthConfig() {

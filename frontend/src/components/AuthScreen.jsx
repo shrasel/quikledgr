@@ -9,9 +9,7 @@ import {
   ArrowRight, 
   Eye, 
   EyeOff, 
-  Sparkles,
-  Info,
-  CheckCircle2
+  Sparkles
 } from 'lucide-react';
 import { 
   loginWithEmail, 
@@ -31,7 +29,6 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [googleConfig, setGoogleConfig] = useState({ googleClientId: '', googleAuthEnabled: false });
-  const [showConfigHelp, setShowConfigHelp] = useState(false);
 
   const googleButtonRef = useRef(null);
 
@@ -102,10 +99,33 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
     };
   }, [googleConfig.googleClientId]);
 
+  // Handle email submission (Login or Register)
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setErrorMessage('');
+
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address.');
+      return;
+    }
+
+    if (!password) {
+      setErrorMessage('Please enter your password.');
+      return;
+    }
+
+    if (mode === 'signup') {
+      if (!name.trim()) {
+        setErrorMessage('Please enter your full name.');
+        return;
+      }
+      if (password.length < 6) {
+        setErrorMessage('Password must be at least 6 characters long.');
+        return;
+      }
+    }
+
+    setIsLoading(true);
 
     try {
       let user;
@@ -114,11 +134,12 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
         onTriggerToast(`Welcome back, ${user.name}!`);
       } else {
         user = await signupWithEmail(name, email, password, businessName);
-        onTriggerToast(`Account created! Welcome, ${user.name}!`);
+        onTriggerToast(`Account created successfully! Welcome, ${user.name}!`);
       }
       onLoginSuccess(user);
     } catch (err) {
-      setErrorMessage(err.message || 'Authentication failed. Please try again.');
+      console.error('[Auth Error]', err);
+      setErrorMessage(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -132,7 +153,7 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
       onTriggerToast(`Signed in with Google as ${user.name}`);
       onLoginSuccess(user);
     } catch (err) {
-      setErrorMessage('Google authentication failed.');
+      setErrorMessage(err.message || 'Google authentication failed.');
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +167,7 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
       onTriggerToast(`Signed in as demo consultant: ${user.name}`);
       onLoginSuccess(user);
     } catch (err) {
-      setErrorMessage('Demo login failed.');
+      setErrorMessage(err.message || 'Demo login failed.');
     } finally {
       setIsLoading(false);
     }
@@ -212,46 +233,6 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
               <span>Continue with Google</span>
             </button>
           )}
-
-          {/* Configuration Status Indicator */}
-          <div 
-            className="google-status-pill"
-            onClick={() => setShowConfigHelp(!showConfigHelp)}
-            title="Click to view Google OAuth status and instructions"
-          >
-            <Info size={13} color={googleConfig.googleAuthEnabled ? "#059669" : "#64748b"} />
-            <span>
-              {googleConfig.googleAuthEnabled ? 'Google OAuth 2.0 Active' : 'OAuth Config: Demo Mode (Click for details)'}
-            </span>
-          </div>
-
-          {showConfigHelp && (
-            <div className="google-config-help">
-              {googleConfig.googleAuthEnabled ? (
-                <div>
-                  <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
-                    Google Identity Services Active
-                  </div>
-                  <div>Client ID: <code>{googleConfig.googleClientId}</code></div>
-                </div>
-              ) : (
-                <div>
-                  <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
-                    To enable live Google Sign-In:
-                  </div>
-                  <div>
-                    1. Create an OAuth 2.0 Client ID in <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-600)', textDecoration: 'underline' }}>Google Cloud Console</a>.
-                  </div>
-                  <div>
-                    2. Add <code>GOOGLE_CLIENT_ID=&lt;your-id&gt;.apps.googleusercontent.com</code> to your <code>.env</code> file.
-                  </div>
-                  <div style={{ marginTop: '0.25rem', color: 'var(--text-subtle)' }}>
-                    Currently running in seamless demo mode with instant sign-in.
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Divider */}
@@ -274,6 +255,7 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
+                    autoComplete="name"
                   />
                 </div>
               </div>
@@ -288,6 +270,7 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
                     placeholder="e.g. Wright Advisory LLC"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
+                    autoComplete="organization"
                   />
                 </div>
               </div>
@@ -305,21 +288,29 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">PASSWORD</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className="form-label">PASSWORD</label>
+              {mode === 'signup' && (
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Min. 6 characters</span>
+              )}
+            </div>
             <div className="input-with-icon">
               <Lock size={16} className="input-icon" />
               <input 
                 type={showPassword ? 'text' : 'password'} 
                 className="form-input" 
-                placeholder="••••••••"
+                placeholder={mode === 'signup' ? 'Create a secure password' : 'Enter your password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
+                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
               />
               <button 
                 type="button" 
@@ -338,7 +329,11 @@ export function AuthScreen({ onLoginSuccess, onTriggerToast }) {
             style={{ width: '100%', marginTop: '0.75rem' }}
             disabled={isLoading}
           >
-            <span>{isLoading ? 'Authenticating...' : mode === 'login' ? 'Sign In to Dashboard' : 'Create Consultant Account'}</span>
+            <span>
+              {isLoading 
+                ? (mode === 'login' ? 'Signing in...' : 'Creating account...') 
+                : (mode === 'login' ? 'Sign In to Dashboard' : 'Create Consultant Account')}
+            </span>
             <ArrowRight size={18} />
           </button>
         </form>

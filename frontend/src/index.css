@@ -1559,48 +1559,6 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 44px;
 }
 
-.google-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.725rem;
-  color: var(--text-muted);
-  background: var(--bg-main);
-  border: 1px solid var(--border-color);
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.google-status-pill:hover {
-  border-color: var(--primary-500);
-  color: var(--text-main);
-}
-
-.google-config-help {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: var(--bg-main);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.6rem 0.8rem;
-  text-align: left;
-  line-height: 1.4;
-  margin-top: 0.25rem;
-}
-
-.google-config-help code {
-  background: rgba(0, 0, 0, 0.06);
-  padding: 0.1rem 0.3rem;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-}
-
-[data-theme='dark'] .google-config-help code {
-  background: rgba(255, 255, 255, 0.1);
-}
 
 .auth-divider {
   display: flex;
