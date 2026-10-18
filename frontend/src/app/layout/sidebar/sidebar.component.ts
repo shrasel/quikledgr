@@ -29,15 +29,15 @@ export interface MenuGroup {
       ></div>
     }
 
-    <!-- TailAdmin Sidebar -->
+    <!-- TailAdmin Sidebar (Light by default, Dark when switched) -->
     <aside
-      class="fixed left-0 top-0 z-50 flex h-screen w-72 min-w-[288px] max-w-[288px] shrink-0 flex-col overflow-y-hidden bg-[#1C2434] duration-200 ease-in-out border-r border-[#2E3A47] lg:static lg:translate-x-0"
+      class="fixed left-0 top-0 z-50 flex h-screen w-72 min-w-[288px] max-w-[288px] shrink-0 flex-col overflow-y-hidden bg-white dark:bg-[#1C2434] duration-200 ease-in-out border-r border-[#E2E8F0] dark:border-[#2E3A47] lg:static lg:translate-x-0"
       [class.translate-x-0]="sidebarOpen()"
       [class.shadow-2xl]="sidebarOpen()"
       [class.-translate-x-full]="!sidebarOpen()"
     >
       <!-- Logo Header -->
-      <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-[#2E3A47]">
+      <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
         <a 
           routerLink="/dashboard"
           (click)="onLinkClick()"
@@ -50,12 +50,12 @@ export interface MenuGroup {
           </div>
           <div>
             <div class="flex items-center gap-1.5">
-              <span class="text-lg font-bold tracking-tight text-white leading-none">QuikLedgr</span>
+              <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">QuikLedgr</span>
               <span class="rounded bg-[#3C50E0]/80 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
                 ANGULAR 19
               </span>
             </div>
-            <p class="text-[10px] text-[#8A99AD] font-medium tracking-wide mt-1">
+            <p class="text-[10px] text-[#64748B] dark:text-[#8A99AD] font-medium tracking-wide mt-1">
               Enterprise Ledger & AR
             </p>
           </div>
@@ -64,7 +64,7 @@ export interface MenuGroup {
         <button
           type="button"
           (click)="closeSidebar()"
-          class="block text-[#8A99AD] hover:text-white lg:hidden p-1.5 rounded-md hover:bg-[#333A48]"
+          class="block text-slate-500 hover:text-slate-800 dark:text-[#8A99AD] dark:hover:text-white lg:hidden p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-[#333A48]"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -77,7 +77,7 @@ export interface MenuGroup {
         <nav class="space-y-6">
           @for (group of menuGroups; track group.name) {
             <div>
-              <h3 class="mb-2.5 ml-3 text-[10px] font-bold uppercase tracking-wider text-[#8A99AD]">
+              <h3 class="mb-2.5 ml-3 text-[10px] font-bold uppercase tracking-wider text-[#64748B] dark:text-[#8A99AD]">
                 {{ group.name }}
               </h3>
 
@@ -86,15 +86,15 @@ export interface MenuGroup {
                   <li>
                     <a
                       [routerLink]="item.route"
-                      routerLinkActive="bg-[#333A48] text-white font-semibold shadow-xs"
+                      routerLinkActive="bg-[#3C50E0]/10 text-[#3C50E0] font-bold shadow-xs dark:bg-[#333A48] dark:text-white"
                       [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
                       #rla="routerLinkActive"
                       (click)="onLinkClick()"
-                      class="group relative flex w-full items-center gap-3 rounded-lg py-2.5 px-3.5 text-xs duration-150 transition-all cursor-pointer text-[#DEE4EE] hover:bg-[#333A48]/50 hover:text-white font-medium"
+                      class="group relative flex w-full items-center gap-3 rounded-lg py-2.5 px-3.5 text-xs duration-150 transition-all cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-[#DEE4EE] dark:hover:bg-[#333A48]/50 dark:hover:text-white font-medium"
                     >
                       <span 
                         class="shrink-0"
-                        [ngClass]="rla.isActive ? 'text-[#3C50E0]' : 'text-[#8A99AD] group-hover:text-white'"
+                        [ngClass]="rla.isActive ? 'text-[#3C50E0]' : 'text-slate-400 group-hover:text-slate-700 dark:text-[#8A99AD] dark:group-hover:text-white'"
                         [innerHTML]="item.iconSvg"
                       ></span>
 
@@ -107,7 +107,7 @@ export interface MenuGroup {
                       }
 
                       @if (item.tag) {
-                        <span class="shrink-0 rounded bg-emerald-500/15 border border-emerald-500/25 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 uppercase tracking-tight">
+                        <span class="shrink-0 rounded bg-emerald-500/15 border border-emerald-500/25 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
                           {{ item.tag }}
                         </span>
                       }
@@ -122,19 +122,19 @@ export interface MenuGroup {
 
       <!-- Footer Workspace Status -->
       @if (auth.activeOrganization(); as org) {
-        <div class="border-t border-[#2E3A47] p-3.5 bg-[#1A222C]/80 shrink-0">
+        <div class="border-t border-[#E2E8F0] dark:border-[#2E3A47] p-3.5 bg-slate-50/90 dark:bg-[#1A222C]/80 shrink-0">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2.5 truncate">
-              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#333A48] text-white">
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-slate-700 dark:bg-[#333A48] dark:text-white">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21"/>
                 </svg>
               </div>
               <div class="truncate">
-                <p class="truncate text-xs font-semibold text-white">
+                <p class="truncate text-xs font-semibold text-slate-900 dark:text-white">
                   {{ org.name }}
                 </p>
-                <p class="text-[10px] text-[#8A99AD] capitalize leading-none mt-0.5">
+                <p class="text-[10px] text-[#64748B] dark:text-[#8A99AD] capitalize leading-none mt-0.5">
                   {{ org.role || 'Owner' }} • {{ org.currency || 'USD' }}
                 </p>
               </div>
