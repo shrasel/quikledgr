@@ -75,46 +75,132 @@ import { Invoice } from '../../core/models/invoice.model';
         </div>
       }
 
-      <!-- 2. QUICK STATS SUMMARY STRIP -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div class="rounded-xl border border-[#E2E8F0] bg-white p-4.5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434]">
-          <span class="text-xs font-medium text-[#64748B] dark:text-[#8A99AD]">Total Receivables</span>
-          <h4 class="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
-            {{ formatMoney(totalReceivables()) }}
-          </h4>
-          <span class="text-[11px] text-[#64748B] dark:text-[#8A99AD] mt-1 block">
-            Across {{ invoices().length }} total documents
-          </span>
+      <!-- 2. TAILADMIN 4 KPI STAT CARDS (Matches Dashboard Styling) -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- KPI 1: Total Receivables -->
+        <div class="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434] hover:border-[#3C50E0]/40 transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#3C50E0]/10 text-[#3C50E0] dark:bg-[#3C50E0]/20 font-bold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <span class="inline-flex items-center gap-1 rounded-full bg-[#3C50E0]/10 px-2.5 py-0.5 text-xs font-bold text-[#3C50E0]">
+              {{ invoices().length }} Total
+            </span>
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+              {{ formatMoney(totalReceivables()) }}
+            </h3>
+            <p class="text-xs font-medium text-[#64748B] dark:text-[#8A99AD] mt-1">
+              Total Receivables
+            </p>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between border-t border-[#E2E8F0] pt-2.5 dark:border-[#2E3A47] text-[11px] text-[#64748B] dark:text-[#8A99AD]">
+            <span>Portfolio Scope</span>
+            <span class="font-mono font-semibold text-slate-800 dark:text-slate-200">Across {{ invoices().length }} documents</span>
+          </div>
         </div>
 
-        <div class="rounded-xl border border-[#E2E8F0] bg-white p-4.5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434]">
-          <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Collected Cash</span>
-          <h4 class="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1">
-            {{ formatMoney(paidAmount()) }}
-          </h4>
-          <span class="text-[11px] text-[#64748B] dark:text-[#8A99AD] mt-1 block">
-            {{ paidCount() }} invoices settled
-          </span>
+        <!-- KPI 2: Realized Cash Collections -->
+        <div class="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434] hover:border-emerald-500/40 transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 font-bold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              {{ realizationRate() }}% Realized
+            </span>
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+              {{ formatMoney(paidAmount()) }}
+            </h3>
+            <p class="text-xs font-medium text-[#64748B] dark:text-[#8A99AD] mt-1">
+              Collected Cash
+            </p>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between border-t border-[#E2E8F0] pt-2.5 dark:border-[#2E3A47] text-[11px] text-[#64748B] dark:text-[#8A99AD]">
+            <span>Settled Invoices</span>
+            <span class="font-semibold text-emerald-600 dark:text-emerald-400">{{ paidCount() }} Settled</span>
+          </div>
         </div>
 
-        <div class="rounded-xl border border-[#E2E8F0] bg-white p-4.5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434]">
-          <span class="text-xs font-medium text-amber-500">Outstanding Balance</span>
-          <h4 class="text-xl font-bold font-mono text-amber-500 mt-1">
-            {{ formatMoney(pendingAmount()) }}
-          </h4>
-          <span class="text-[11px] text-[#64748B] dark:text-[#8A99AD] mt-1 block">
-            {{ pendingCount() }} pending payment
-          </span>
+        <!-- KPI 3: Outstanding Receivables -->
+        <div class="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434] hover:border-amber-500/40 transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 font-bold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            @if (overdueCount() > 0) {
+              <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-bold text-rose-600 dark:text-rose-400">
+                {{ overdueCount() }} Overdue
+              </span>
+            } @else {
+              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                Healthy
+              </span>
+            }
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+              {{ formatMoney(pendingAmount()) }}
+            </h3>
+            <p class="text-xs font-medium text-[#64748B] dark:text-[#8A99AD] mt-1">
+              Outstanding Balance (AR)
+            </p>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between border-t border-[#E2E8F0] pt-2.5 dark:border-[#2E3A47] text-[11px] text-[#64748B] dark:text-[#8A99AD]">
+            <span>Pending Payment</span>
+            <span class="font-mono font-semibold text-slate-800 dark:text-slate-200">{{ pendingCount() }} Pending</span>
+          </div>
         </div>
 
-        <div class="rounded-xl border border-[#E2E8F0] bg-white p-4.5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434]">
-          <span class="text-xs font-medium text-rose-500">Overdue / Action Needed</span>
-          <h4 class="text-xl font-bold font-mono text-rose-500 mt-1">
-            {{ overdueCount() }} Invoices
-          </h4>
-          <span class="text-[11px] text-[#64748B] dark:text-[#8A99AD] mt-1 block">
-            {{ formatMoney(overdueAmount()) }} overdue
-          </span>
+        <!-- KPI 4: Overdue Receivables -->
+        <div class="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434] hover:border-rose-500/40 transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 font-bold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+              </svg>
+            </div>
+            @if (overdueCount() > 0) {
+              <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-bold text-rose-600 dark:text-rose-400">
+                Action Required
+              </span>
+            } @else {
+              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                Zero Arrears
+              </span>
+            }
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+              {{ overdueCount() > 0 ? formatMoney(overdueAmount()) : '$0.00' }}
+            </h3>
+            <p class="text-xs font-medium text-[#64748B] dark:text-[#8A99AD] mt-1">
+              Overdue / Action Needed
+            </p>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between border-t border-[#E2E8F0] pt-2.5 dark:border-[#2E3A47] text-[11px] text-[#64748B] dark:text-[#8A99AD]">
+            <span>Arrears Status</span>
+            <span class="font-mono font-semibold" [class.text-rose-600]="overdueCount() > 0" [class.dark:text-rose-400]="overdueCount() > 0" [class.text-emerald-600]="overdueCount() === 0" [class.dark:text-emerald-400]="overdueCount() === 0">
+              {{ overdueCount() }} Overdue
+            </span>
+          </div>
         </div>
       </div>
 
@@ -691,6 +777,11 @@ export class InvoicesComponent {
 
   paidCount = computed(() => {
     return this.invoices().filter(i => this.isPaid(i.status)).length;
+  });
+
+  realizationRate = computed(() => {
+    const total = this.totalReceivables();
+    return total > 0 ? Math.round((this.paidAmount() / total) * 100) : 0;
   });
 
   pendingAmount = computed(() => {
