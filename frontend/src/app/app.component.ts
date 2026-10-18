@@ -10,6 +10,7 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
 import { CreateInvoiceModalComponent } from './views/invoices/create-invoice-modal.component';
 import { GenericTabComponent } from './views/generic-tab/generic-tab.component';
+import { ExpensesComponent } from './views/expenses/expenses.component';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,8 @@ import { GenericTabComponent } from './views/generic-tab/generic-tab.component';
     DashboardComponent,
     InvoicesComponent,
     CreateInvoiceModalComponent,
-    GenericTabComponent
+    GenericTabComponent,
+    ExpensesComponent
   ],
   template: `
     <!-- If not authenticated, render the TailAdmin Auth View -->
@@ -80,12 +82,7 @@ import { GenericTabComponent } from './views/generic-tab/generic-tab.component';
                 />
               }
               @case ('expenses') {
-                <app-generic-tab
-                  tabName="Expense Management & OCR Receipts"
-                  title="Expense Management & OCR Receipts"
-                  subtitle="Accounts Payable ledger, vendor invoice scanning, and receipt OCR processing."
-                  (onBackToDashboard)="setActiveTab('dashboard')"
-                />
+                <app-expenses />
               }
               @case ('banking') {
                 <app-generic-tab

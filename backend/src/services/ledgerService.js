@@ -500,3 +500,132 @@ export async function lockAccountingPeriod(organizationId, lockUntilDate, userId
   );
   return { success: true, booksLockedUntil: lockUntilDate };
 }
+
+/**
+ * Automatically record balanced journal entries for Vendor Bills (Accounts Payable)
+ */
+export async function recordBillJournal(bill, organizationId) {
+  const total = parseFloat(bill.total_amount || 0);
+  const subtotal = parseFloat(bill.subtotal || total);
+  const taxAmount = parseFloat(bill.tax_amount || 0);
+  const billDate = bill.bill_date || new Date().toISOString().split('T')[0];
+
+  if (total <= 0) return null;
+
+  const lines = [];
+  if (Array.isArray(bill.items) && bill.items.length > 0) {
+    for (const item of bill.items) {
+      lines.push({
+        accountId: item.account_id || null,
+        accountNumber: !item.account_id ? '6200' : null,
+        debitAmount: parseFloat(item.amount || 0),
+        creditAmount: 0,
+        memo: item.description || `Bill item for ${bill.bill_number}`
+      });
+    }
+  } else {
+    lines.push({
+      accountNumber: '6200',
+      debitAmount: subtotal,
+      creditAmount: 0,
+      memo: `Operating expense for Bill #${bill.bill_number}`
+    });
+  }
+
+  if (taxAmount > 0) {
+    lines.push({
+      accountNumber: '6200',
+      debitAmount: taxAmount,
+      creditAmount: 0,
+      memo: `Tax on Bill #${bill.bill_number}`
+    });
+  }
+
+  // Credit Accounts Payable (2000)
+  lines.push({
+    accountNumber: '2000',
+    debitAmount: 0,
+    creditAmount: total,
+    memo: `Accounts Payable for Bill #${bill.bill_number} from ${bill.vendor_name || 'Vendor'}`
+  });
+
+  return postJournalEntry({
+    organizationId,
+    entryDate: billDate,
+    sourceType: 'bill',
+    sourceId: bill.id,
+    description: `Vendor Bill #${bill.bill_number} from ${bill.vendor_name || 'Vendor'}`,
+    lines
+  });
+}
+
+/**
+ * Automatically record balanced journal entries for Bill Payments
+ */
+export async function recordBillPaymentJournal(payment, bill, organizationId) {
+  const amount = parseFloat(payment.amount || 0);
+  const paymentDate = payment.payment_date || new Date().toISOString().split('T')[0];
+
+  if (amount <= 0) return null;
+
+  const lines = [
+    {
+      accountNumber: '2000',
+      debitAmount: amount,
+      creditAmount: 0,
+      memo: `Payment for Bill #${bill?.bill_number || payment.bill_id}`
+    },
+    {
+      accountId: payment.payment_account_id || null,
+      accountNumber: !payment.payment_account_id ? '1010' : null,
+      debitAmount: 0,
+      creditAmount: amount,
+      memo: `Disbursement for Bill #${bill?.bill_number || payment.bill_id}`
+    }
+  ];
+
+  return postJournalEntry({
+    organizationId,
+    entryDate: paymentDate,
+    sourceType: 'bill_payment',
+    sourceId: payment.id,
+    description: `Disbursement for Bill #${bill?.bill_number || payment.bill_id}`,
+    lines
+  });
+}
+
+/**
+ * Automatically record balanced journal entries for Direct Expenses & Receipts
+ */
+export async function recordExpenseJournal(expense, organizationId) {
+  const amount = parseFloat(expense.amount || 0);
+  const expenseDate = expense.expense_date || new Date().toISOString().split('T')[0];
+
+  if (amount <= 0) return null;
+
+  const lines = [
+    {
+      accountId: expense.account_id || null,
+      accountNumber: !expense.account_id ? '6200' : null,
+      debitAmount: amount,
+      creditAmount: 0,
+      memo: expense.description || `Expense at ${expense.merchant_name}`
+    },
+    {
+      accountId: expense.payment_account_id || null,
+      accountNumber: !expense.payment_account_id ? '1010' : null,
+      debitAmount: 0,
+      creditAmount: amount,
+      memo: `Paid via bank/card for ${expense.merchant_name}`
+    }
+  ];
+
+  return postJournalEntry({
+    organizationId,
+    entryDate: expenseDate,
+    sourceType: 'expense',
+    sourceId: expense.id,
+    description: `Expense at ${expense.merchant_name} (${expense.category || 'General'})`,
+    lines
+  });
+}
