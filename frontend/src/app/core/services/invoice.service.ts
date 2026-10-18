@@ -69,19 +69,58 @@ export class InvoiceService {
     return local;
   }
 
+  async getInvoiceById(id: string): Promise<Invoice | null> {
+    try {
+      const data = await firstValueFrom(
+        this.http.get<Invoice>(`${this.API_URL}/${id}`, {
+          headers: this.auth.getAuthHeaders()
+        })
+      );
+      if (data && data.id) {
+        this.selectedInvoice.set(data);
+        return data;
+      }
+    } catch {
+      console.log('[InvoiceService] Fetching from local cache for ID:', id);
+    }
+
+    const found = this.invoices().find(i => i.id === id) || this.getFromLocal().find(i => i.id === id) || null;
+    if (found) {
+      this.selectedInvoice.set(found);
+    }
+    return found;
+  }
+
   async createInvoice(invoice: Partial<Invoice>): Promise<Invoice> {
+    const id = invoice.id || 'INV-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    const invoiceNumber = invoice.invoiceNumber || id;
+    const subtotal = invoice.subtotal || 0;
+    const additionalChargesTotal = invoice.additionalChargesTotal || 0;
+    const discountAmount = invoice.discountAmount || 0;
+    const taxAmount = invoice.taxAmount || 0;
+    const total = invoice.total !== undefined ? invoice.total : (subtotal + additionalChargesTotal + taxAmount - discountAmount);
+
     const newInvoice: Invoice = {
-      id: 'INV-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
-      invoiceNumber: 'INV-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
-      invoiceDate: new Date().toISOString().split('T')[0],
-      dueDate: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
-      servicePeriod: 'Monthly Consulting Advisory',
-      status: 'draft',
-      currency: 'USD',
-      subtotal: invoice.subtotal || 4500,
-      total: invoice.total || 4500,
+      id,
+      invoiceNumber,
+      invoiceDate: invoice.invoiceDate || new Date().toISOString().split('T')[0],
+      dueDate: invoice.dueDate || new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
+      servicePeriod: invoice.servicePeriod || 'Monthly Consulting Advisory',
+      status: invoice.status || 'draft',
+      currency: invoice.currency || 'USD',
+      currencySymbol: invoice.currencySymbol || '$',
+      paymentTerms: invoice.paymentTerms || 'Payment due on or before the 15th of the month',
+      subtotal,
+      additionalChargesTotal,
+      discountAmount,
+      discountRate: invoice.discountRate || 0,
+      taxAmount,
+      taxRate: invoice.taxRate || 0,
+      total,
       amount_paid: 0,
-      balance_due: invoice.total || 4500,
+      balance_due: total,
+      notes: invoice.notes || '',
+      agreementComplianceNote: invoice.agreementComplianceNote || 'Submitted in accordance with Consulting Agreement.',
       client: invoice.client || {
         companyName: 'Acme Global Ventures',
         contactName: 'Operations Lead',
@@ -90,29 +129,97 @@ export class InvoiceService {
       items: invoice.items || [
         { description: 'Cloud Architecture & Fractional CTO Retainer', quantity: 1, rate: 4500, amount: 4500 }
       ],
+      additionalCharges: invoice.additionalCharges || [],
+      wireDetails: invoice.wireDetails,
+      security: invoice.security,
       ...invoice
     } as Invoice;
 
     try {
-      const remote = await firstValueFrom(
-        this.http.post<Invoice>(this.API_URL, newInvoice, {
+      const remoteRes = await firstValueFrom(
+        this.http.post<any>(this.API_URL, newInvoice, {
           headers: this.auth.getAuthHeaders()
         })
       );
-      if (remote?.id) {
-        this.invoices.update(list => [remote, ...list]);
-        this.selectedInvoice.set(remote);
-        this.saveToLocal(this.invoices());
-        return remote;
+      if (remoteRes?.id) {
+        newInvoice.id = remoteRes.id;
+        if (remoteRes.invoiceNumber) {
+          newInvoice.invoiceNumber = remoteRes.invoiceNumber;
+        }
       }
-    } catch {
-      // Local fallback
+    } catch (err) {
+      console.warn('[InvoiceService] Failed to post remote invoice, saving locally:', err);
     }
 
-    this.invoices.update(list => [newInvoice, ...list]);
+    this.invoices.update(list => [newInvoice, ...list.filter(i => i.id !== newInvoice.id)]);
     this.selectedInvoice.set(newInvoice);
     this.saveToLocal(this.invoices());
     return newInvoice;
+  }
+
+  async updateInvoice(id: string, invoice: Partial<Invoice>): Promise<Invoice> {
+    const existing = this.invoices().find(i => i.id === id) || {} as Invoice;
+    const subtotal = invoice.subtotal !== undefined ? invoice.subtotal : (existing.subtotal || 0);
+    const additionalChargesTotal = invoice.additionalChargesTotal !== undefined ? invoice.additionalChargesTotal : (existing.additionalChargesTotal || 0);
+    const discountAmount = invoice.discountAmount !== undefined ? invoice.discountAmount : (existing.discountAmount || 0);
+    const taxAmount = invoice.taxAmount !== undefined ? invoice.taxAmount : (existing.taxAmount || 0);
+    const total = invoice.total !== undefined ? invoice.total : (subtotal + additionalChargesTotal + taxAmount - discountAmount);
+    const amountPaid = invoice.amount_paid !== undefined ? invoice.amount_paid : (existing.amount_paid || 0);
+    const balanceDue = Math.max(0, total - amountPaid);
+
+    const merged: Invoice = {
+      ...existing,
+      ...invoice,
+      id,
+      subtotal,
+      additionalChargesTotal,
+      discountAmount,
+      taxAmount,
+      total,
+      amount_paid: amountPaid,
+      balance_due: balanceDue
+    };
+
+    try {
+      await firstValueFrom(
+        this.http.put(`${this.API_URL}/${id}`, merged, {
+          headers: this.auth.getAuthHeaders()
+        })
+      );
+    } catch (err) {
+      console.warn('[InvoiceService] Failed to put remote invoice, saving locally:', err);
+    }
+
+    this.invoices.update(list => list.map(i => i.id === id ? merged : i));
+    this.selectedInvoice.set(merged);
+    this.saveToLocal(this.invoices());
+    return merged;
+  }
+
+  async updateStatus(id: string, status: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.patch(`${this.API_URL}/${id}/status`, { status }, {
+          headers: this.auth.getAuthHeaders()
+        })
+      );
+    } catch (err) {
+      console.warn('[InvoiceService] Failed to update status on server:', err);
+    }
+
+    this.invoices.update(list => list.map(i => {
+      if (i.id === id) {
+        const isPaid = status === 'paid';
+        return {
+          ...i,
+          status,
+          amount_paid: isPaid ? i.total : i.amount_paid,
+          balance_due: isPaid ? 0 : i.total
+        };
+      }
+      return i;
+    }));
+    this.saveToLocal(this.invoices());
   }
 
   async deleteInvoice(id: string): Promise<void> {
@@ -122,7 +229,9 @@ export class InvoiceService {
           headers: this.auth.getAuthHeaders()
         })
       );
-    } catch {}
+    } catch (err) {
+      console.warn('[InvoiceService] Server delete notice:', err);
+    }
 
     this.invoices.update(list => list.filter(i => i.id !== id));
     this.saveToLocal(this.invoices());

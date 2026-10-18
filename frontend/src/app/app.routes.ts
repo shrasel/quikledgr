@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
+import { InvoiceFormComponent } from './views/invoices/invoice-form.component';
 import { ExpensesComponent } from './views/expenses/expenses.component';
 import { AuthComponent } from './views/auth/auth.component';
 import { SetupComponent } from './views/setup/setup.component';
@@ -39,6 +40,9 @@ export const routes: Routes = [
   { path: 'onboarding', redirectTo: 'setup', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'invoices', component: InvoicesComponent, canActivate: [authGuard] },
+  { path: 'invoices/create', component: InvoiceFormComponent, canActivate: [authGuard] },
+  { path: 'invoices/new', redirectTo: 'invoices/create', pathMatch: 'full' },
+  { path: 'invoices/:id/edit', component: InvoiceFormComponent, canActivate: [authGuard] },
   { path: 'expenses', component: ExpensesComponent, canActivate: [authGuard] },
   {
     path: 'payments',

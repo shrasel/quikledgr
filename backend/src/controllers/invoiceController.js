@@ -75,6 +75,8 @@ export async function getInvoices(req, res, next) {
       discountAmount: parseFloat(inv.discount_amount),
       taxAmount: parseFloat(inv.tax_amount),
       total: parseFloat(inv.total),
+      amount_paid: parseFloat(inv.amount_paid || 0),
+      balance_due: parseFloat(inv.balance_due !== undefined ? inv.balance_due : inv.total),
       notes: inv.notes,
       agreementComplianceNote: inv.agreement_compliance_note,
       client: {
@@ -98,6 +100,104 @@ export async function getInvoices(req, res, next) {
         passcodeHint: inv.passcode_hint,
       }
     }));
+
+    res.json(formatted);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getInvoiceById(req, res, next) {
+  try {
+    const userId = req.user.id;
+    const orgId = req.organizationId;
+    const { id } = req.params;
+
+    const [invoices] = await pool.query(
+      `SELECT i.*, 
+              s.passcode_hint,
+              w.account_holder_name, w.bank_name, w.bank_address, w.account_number_or_iban, w.swift_bic_code, w.routing_aba, w.ach_routing, w.wire_reference, w.payment_instructions
+       FROM invoices i
+       LEFT JOIN invoice_security s ON i.id = s.invoice_id
+       LEFT JOIN invoice_wire_details w ON i.id = w.invoice_id
+       WHERE i.id = ? AND (i.organization_id = ? OR (i.organization_id IS NULL AND i.user_id = ?))`,
+      [id, orgId || null, userId]
+    );
+
+    if (invoices.length === 0) {
+      return res.status(404).json({ error: 'Invoice not found or unauthorized.' });
+    }
+
+    const inv = invoices[0];
+
+    const [items] = await pool.query(
+      `SELECT * FROM invoice_items WHERE invoice_id = ? ORDER BY sort_order ASC, id ASC`,
+      [id]
+    );
+
+    const [charges] = await pool.query(
+      `SELECT * FROM invoice_additional_charges WHERE invoice_id = ? ORDER BY id ASC`,
+      [id]
+    );
+
+    const formatted = {
+      id: inv.id,
+      organizationId: inv.organization_id,
+      invoiceNumber: inv.invoice_number,
+      title: 'CONSULTING SERVICES INVOICE',
+      status: inv.status,
+      currency: inv.currency || 'USD',
+      currencySymbol: inv.currency_symbol || '$',
+      invoiceDate: inv.invoice_date,
+      dueDate: inv.due_date,
+      servicePeriod: inv.service_period,
+      serviceStartDate: inv.service_start_date,
+      serviceEndDate: inv.service_end_date,
+      paymentTerms: inv.payment_terms,
+      subtotal: parseFloat(inv.subtotal),
+      additionalChargesTotal: parseFloat(inv.additional_charges_total),
+      discountAmount: parseFloat(inv.discount_amount),
+      taxAmount: parseFloat(inv.tax_amount),
+      total: parseFloat(inv.total),
+      amount_paid: parseFloat(inv.amount_paid || 0),
+      balance_due: parseFloat(inv.balance_due !== undefined ? inv.balance_due : inv.total),
+      notes: inv.notes,
+      agreementComplianceNote: inv.agreement_compliance_note,
+      client: {
+        companyName: inv.client_name,
+        email: inv.client_email,
+        ccEmail: inv.client_cc_email,
+        address: inv.client_address,
+      },
+      items: items.map(item => ({
+        id: item.id,
+        description: item.description,
+        category: item.category,
+        quantity: parseFloat(item.quantity),
+        rate: parseFloat(item.rate),
+        amount: parseFloat(item.amount),
+      })),
+      additionalCharges: charges.map(chg => ({
+        id: chg.id,
+        description: chg.description,
+        amount: parseFloat(chg.amount),
+      })),
+      wireDetails: {
+        accountHolderName: inv.account_holder_name,
+        bankName: inv.bank_name,
+        bankAddress: inv.bank_address,
+        accountNumberOrIban: inv.account_number_or_iban,
+        swiftBicCode: inv.swift_bic_code,
+        routingAba: inv.routing_aba,
+        achRouting: inv.ach_routing,
+        wireReference: inv.wire_reference,
+        paymentInstructions: inv.payment_instructions,
+      },
+      security: {
+        requireCode: true,
+        passcodeHint: inv.passcode_hint,
+      }
+    };
 
     res.json(formatted);
   } catch (err) {
@@ -320,6 +420,222 @@ export async function updateInvoiceStatus(req, res, next) {
   }
 }
 
+export async function updateInvoice(req, res, next) {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const userId = req.user.id;
+    const orgId = req.organizationId;
+    const { id } = req.params;
+    const inv = req.body;
+
+    // 1. Verify existence & authorization
+    const [existing] = await connection.query(
+      'SELECT * FROM invoices WHERE id = ? AND (organization_id = ? OR (organization_id IS NULL AND user_id = ?))',
+      [id, orgId || null, userId]
+    );
+
+    if (existing.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ error: 'Invoice not found or unauthorized.' });
+    }
+
+    const current = existing[0];
+    const targetOrgId = current.organization_id || orgId;
+
+    // 2. Check period lock
+    if (targetOrgId) {
+      const [orgRows] = await connection.query(
+        'SELECT books_locked_until FROM organizations WHERE id = ?',
+        [targetOrgId]
+      );
+      if (orgRows.length > 0 && orgRows[0].books_locked_until) {
+        const lockDate = new Date(orgRows[0].books_locked_until);
+        const invDate = new Date(inv.invoiceDate || current.invoice_date);
+        if (invDate <= lockDate) {
+          await connection.rollback();
+          return res.status(400).json({
+            error: `Cannot modify invoice on or before locked accounting period date (${orgRows[0].books_locked_until.toISOString().split('T')[0]}).`
+          });
+        }
+      }
+    }
+
+    const subtotal = parseFloat(inv.subtotal) || 0;
+    const additionalChargesTotal = parseFloat(inv.additionalChargesTotal) || 0;
+    const discountAmount = parseFloat(inv.discountAmount) || 0;
+    const taxAmount = parseFloat(inv.taxAmount) || 0;
+    const total = parseFloat(inv.total) || (subtotal + additionalChargesTotal + taxAmount - discountAmount);
+    const amountPaid = parseFloat(current.amount_paid) || 0;
+    const balanceDue = Math.max(0, total - amountPaid);
+    const status = inv.status || current.status;
+
+    // 3. Update invoice header
+    await connection.query(
+      `UPDATE invoices SET
+        invoice_number = ?,
+        client_name = ?,
+        client_email = ?,
+        client_cc_email = ?,
+        client_address = ?,
+        status = ?,
+        currency = ?,
+        currency_symbol = ?,
+        invoice_date = ?,
+        due_date = ?,
+        service_period = ?,
+        payment_terms = ?,
+        subtotal = ?,
+        additional_charges_total = ?,
+        discount_amount = ?,
+        tax_amount = ?,
+        total = ?,
+        balance_due = ?,
+        notes = ?,
+        agreement_compliance_note = ?
+      WHERE id = ?`,
+      [
+        inv.invoiceNumber || current.invoice_number,
+        inv.client?.companyName || inv.client?.name || inv.client_name || current.client_name,
+        inv.client?.email || inv.client_email || current.client_email,
+        inv.client?.ccEmail || inv.client_cc_email || current.client_cc_email,
+        inv.client?.address || current.client_address,
+        status,
+        inv.currency || current.currency || 'USD',
+        inv.currencySymbol || current.currency_symbol || '$',
+        inv.invoiceDate || current.invoice_date,
+        inv.dueDate || current.due_date,
+        inv.servicePeriod !== undefined ? inv.servicePeriod : current.service_period,
+        inv.paymentTerms !== undefined ? inv.paymentTerms : current.payment_terms,
+        subtotal,
+        additionalChargesTotal,
+        discountAmount,
+        taxAmount,
+        total,
+        balanceDue,
+        inv.notes !== undefined ? inv.notes : current.notes,
+        inv.agreementComplianceNote !== undefined ? inv.agreementComplianceNote : current.agreement_compliance_note,
+        id
+      ]
+    );
+
+    // 4. Update line items
+    if (inv.items && Array.isArray(inv.items)) {
+      await connection.query('DELETE FROM invoice_items WHERE invoice_id = ?', [id]);
+      for (let i = 0; i < inv.items.length; i++) {
+        const item = inv.items[i];
+        const itemId = item.id || `item_${Date.now()}_${i}`;
+        const qty = parseFloat(item.quantity) || 1;
+        const rate = parseFloat(item.rate !== undefined ? item.rate : (item.unitPrice || 0));
+        const amt = parseFloat(item.amount) || (qty * rate);
+        await connection.query(
+          `INSERT INTO invoice_items (id, invoice_id, description, category, quantity, rate, amount, sort_order)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            itemId,
+            id,
+            item.description || 'Consulting Services',
+            item.category || 'consulting',
+            qty,
+            rate,
+            amt,
+            i
+          ]
+        );
+      }
+    }
+
+    // 5. Update additional charges
+    if (inv.additionalCharges && Array.isArray(inv.additionalCharges)) {
+      await connection.query('DELETE FROM invoice_additional_charges WHERE invoice_id = ?', [id]);
+      for (let i = 0; i < inv.additionalCharges.length; i++) {
+        const chg = inv.additionalCharges[i];
+        const chgId = chg.id || `chg_${Date.now()}_${i}`;
+        await connection.query(
+          `INSERT INTO invoice_additional_charges (id, invoice_id, description, amount)
+           VALUES (?, ?, ?, ?)`,
+          [chgId, id, chg.description, parseFloat(chg.amount) || 0]
+        );
+      }
+    }
+
+    // 6. Update wire details
+    if (inv.wireDetails) {
+      const wire = inv.wireDetails;
+      await connection.query(
+        `INSERT INTO invoice_wire_details (
+          id, invoice_id, account_holder_name, bank_name, bank_address, account_number_or_iban,
+          swift_bic_code, routing_aba, ach_routing, wire_reference, payment_instructions
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          account_holder_name = VALUES(account_holder_name),
+          bank_name = VALUES(bank_name),
+          bank_address = VALUES(bank_address),
+          account_number_or_iban = VALUES(account_number_or_iban),
+          swift_bic_code = VALUES(swift_bic_code),
+          routing_aba = VALUES(routing_aba),
+          ach_routing = VALUES(ach_routing),
+          wire_reference = VALUES(wire_reference),
+          payment_instructions = VALUES(payment_instructions)`,
+        [
+          'wire_' + Math.random().toString(36).substring(2, 11),
+          id,
+          wire.accountHolderName || '',
+          wire.bankName || '',
+          wire.bankAddress || '',
+          wire.accountNumberOrIban || '',
+          wire.swiftBicCode || '',
+          wire.routingAba || '',
+          wire.achRouting || '',
+          wire.wireReference || '',
+          wire.paymentInstructions || ''
+        ]
+      );
+    }
+
+    // 7. Update security PIN if provided
+    if (inv.security?.accessPin) {
+      const { hash: pinHash, salt: pinSalt } = await hashAccessPin(inv.security.accessPin);
+      await connection.query(
+        `INSERT INTO invoice_security (id, invoice_id, access_pin_hash, access_pin_salt, passcode_hint)
+         VALUES (?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           access_pin_hash = VALUES(access_pin_hash),
+           access_pin_salt = VALUES(access_pin_salt),
+           passcode_hint = VALUES(passcode_hint)`,
+        [
+          'sec_' + Math.random().toString(36).substring(2, 11),
+          id,
+          pinHash,
+          pinSalt,
+          inv.security.passcodeHint || 'Enter your 6-digit access PIN.'
+        ]
+      );
+    }
+
+    await connection.commit();
+
+    // 8. Audit log
+    await recordAuditLog({
+      organizationId: targetOrgId,
+      userId,
+      entityType: 'invoice',
+      entityId: id,
+      action: 'update',
+      beforeState: { invoiceNumber: current.invoice_number, total: current.total, status: current.status },
+      afterState: { invoiceNumber: inv.invoiceNumber || current.invoice_number, total, status }
+    });
+
+    res.json({ success: true, id, message: 'Invoice updated successfully.' });
+  } catch (err) {
+    await connection.rollback();
+    next(err);
+  } finally {
+    connection.release();
+  }
+}
+
 export async function deleteInvoice(req, res, next) {
   try {
     const userId = req.user.id;
@@ -336,11 +652,29 @@ export async function deleteInvoice(req, res, next) {
     }
 
     const current = invoices[0];
+    const targetOrgId = current.organization_id || orgId;
+
+    // Check period lock before delete
+    if (targetOrgId) {
+      const [orgRows] = await pool.query(
+        'SELECT books_locked_until FROM organizations WHERE id = ?',
+        [targetOrgId]
+      );
+      if (orgRows.length > 0 && orgRows[0].books_locked_until) {
+        const lockDate = new Date(orgRows[0].books_locked_until);
+        const invDate = new Date(current.invoice_date);
+        if (invDate <= lockDate) {
+          return res.status(400).json({
+            error: `Cannot delete invoice in a locked accounting period (Period locked until ${orgRows[0].books_locked_until.toISOString().split('T')[0]}).`
+          });
+        }
+      }
+    }
 
     await pool.query('DELETE FROM invoices WHERE id = ?', [id]);
 
     await recordAuditLog({
-      organizationId: current.organization_id || orgId,
+      organizationId: targetOrgId,
       userId,
       entityType: 'invoice',
       entityId: id,

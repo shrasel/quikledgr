@@ -295,7 +295,7 @@ export class HeaderComponent {
   }
 
   onNewInvoiceClick(): void {
-    this.invoiceService.openCreateModal();
+    this.router.navigate(['/invoices/create']);
     this.onNewInvoice.emit();
   }
 

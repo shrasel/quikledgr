@@ -31,7 +31,7 @@ import { CreateInvoiceModalComponent } from './views/invoices/create-invoice-mod
           [sidebarOpen]="sidebarOpen()"
           [invoiceCount]="invoiceService.invoices().length"
           (sidebarOpenChange)="sidebarOpen.set($event)"
-          (newInvoice)="invoiceService.openCreateModal()"
+          (newInvoice)="router.navigate(['/invoices/create'])"
         />
 
         <!-- Main Content Area -->
@@ -40,7 +40,7 @@ import { CreateInvoiceModalComponent } from './views/invoices/create-invoice-mod
           <app-header
             [sidebarOpen]="sidebarOpen()"
             (sidebarOpenChange)="sidebarOpen.set($event)"
-            (newInvoice)="invoiceService.openCreateModal()"
+            (newInvoice)="router.navigate(['/invoices/create'])"
           />
 
           <!-- View Router Outlet Container with dedicated page URLs -->
