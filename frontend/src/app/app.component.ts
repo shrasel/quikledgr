@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
 import { InvoiceService } from './core/services/invoice.service';
@@ -19,8 +20,8 @@ import { CreateInvoiceModalComponent } from './views/invoices/create-invoice-mod
     CreateInvoiceModalComponent
   ],
   template: `
-    <!-- If not authenticated, render the router outlet directly (which routes to /auth) -->
-    @if (!auth.isAuthenticated()) {
+    <!-- If not authenticated or in chromeless setup flow, render the router outlet directly -->
+    @if (!auth.isAuthenticated() || isSetupRoute()) {
       <router-outlet />
     } @else {
       <!-- Authenticated TailAdmin Layout Shell -->
@@ -60,8 +61,19 @@ export class AppComponent {
   auth = inject(AuthService);
   theme = inject(ThemeService);
   invoiceService = inject(InvoiceService);
+  router = inject(Router);
 
   sidebarOpen = signal<boolean>(false);
+  isSetupRoute = signal<boolean>(typeof window !== 'undefined' && (window.location.pathname.includes('/setup') || window.location.pathname.includes('/onboarding')));
+
+  constructor() {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => {
+      const url = e.urlAfterRedirects || e.url;
+      this.isSetupRoute.set(url.includes('/setup') || url.includes('/onboarding'));
+    });
+  }
 
   toggleSidebar() {
     this.sidebarOpen.update(v => !v);

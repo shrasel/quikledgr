@@ -6,6 +6,7 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
 import { ExpensesComponent } from './views/expenses/expenses.component';
 import { AuthComponent } from './views/auth/auth.component';
+import { SetupComponent } from './views/setup/setup.component';
 import { GenericTabComponent } from './views/generic-tab/generic-tab.component';
 
 export const authGuard = () => {
@@ -21,6 +22,11 @@ export const guestGuard = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
   if (auth.isAuthenticated()) {
+    const org = auth.activeOrganization();
+    const isCompleted = org?.setupCompleted || (org && localStorage.getItem(`quikledgr_setup_completed_${org.id}`));
+    if (!isCompleted) {
+      return router.parseUrl('/setup');
+    }
     return router.parseUrl('/dashboard');
   }
   return true;
@@ -29,6 +35,8 @@ export const guestGuard = () => {
 export const routes: Routes = [
   { path: 'auth', component: AuthComponent, canActivate: [guestGuard] },
   { path: 'login', redirectTo: 'auth', pathMatch: 'full' },
+  { path: 'setup', component: SetupComponent, canActivate: [authGuard] },
+  { path: 'onboarding', redirectTo: 'setup', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'invoices', component: InvoicesComponent, canActivate: [authGuard] },
   { path: 'expenses', component: ExpensesComponent, canActivate: [authGuard] },

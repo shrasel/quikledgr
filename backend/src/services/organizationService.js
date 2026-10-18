@@ -9,7 +9,9 @@ export async function getUserOrganizations(userId) {
   const [memberships] = await pool.query(
     `SELECT om.organization_id, om.role, om.is_active,
             o.name, o.legal_name, o.tax_id, o.currency, o.fiscal_year_start_month,
-            o.accounting_method, o.books_locked_until, o.created_at
+            o.accounting_method, o.books_locked_until, o.user_role, o.business_type,
+            o.industry, o.annual_revenue, o.bank_name, o.bank_account_last4,
+            o.is_bank_connected, o.setup_completed, o.created_at
      FROM organization_members om
      JOIN organizations o ON om.organization_id = o.id
      WHERE om.user_id = ? AND om.is_active = TRUE
@@ -33,6 +35,14 @@ export async function getUserOrganizations(userId) {
     accountingMethod: m.accounting_method,
     booksLockedUntil: m.books_locked_until,
     role: m.role,
+    userRole: m.user_role,
+    businessType: m.business_type,
+    industry: m.industry,
+    annualRevenue: m.annual_revenue,
+    bankName: m.bank_name,
+    bankAccountLast4: m.bank_account_last4,
+    isBankConnected: Boolean(m.is_bank_connected),
+    setupCompleted: Boolean(m.setup_completed),
     createdAt: m.created_at,
   }));
 }
@@ -218,6 +228,14 @@ export async function getOrganization(orgId, userId) {
     accountingMethod: r.accounting_method,
     booksLockedUntil: r.books_locked_until,
     role: r.role,
+    userRole: r.user_role,
+    businessType: r.business_type,
+    industry: r.industry,
+    annualRevenue: r.annual_revenue,
+    bankName: r.bank_name,
+    bankAccountLast4: r.bank_account_last4,
+    isBankConnected: Boolean(r.is_bank_connected),
+    setupCompleted: Boolean(r.setup_completed),
     createdAt: r.created_at,
   };
 }
@@ -237,7 +255,12 @@ export async function updateOrganization(orgId, userId, updateData) {
     throw new Error('Unauthorized: Only an Organization Owner or Admin can modify settings.');
   }
 
-  const { name, legalName, taxId, currency, fiscalYearStartMonth, accountingMethod, booksLockedUntil } = updateData;
+  const {
+    name, legalName, taxId, currency, fiscalYearStartMonth,
+    accountingMethod, booksLockedUntil,
+    userRole, businessType, industry, annualRevenue,
+    bankName, bankAccountLast4, isBankConnected, setupCompleted
+  } = updateData;
 
   const [currentRows] = await pool.query('SELECT * FROM organizations WHERE id = ?', [orgId]);
   const current = currentRows[0];
@@ -250,16 +273,32 @@ export async function updateOrganization(orgId, userId, updateData) {
       currency = COALESCE(?, currency),
       fiscal_year_start_month = COALESCE(?, fiscal_year_start_month),
       accounting_method = COALESCE(?, accounting_method),
-      books_locked_until = ?
+      books_locked_until = ?,
+      user_role = COALESCE(?, user_role),
+      business_type = COALESCE(?, business_type),
+      industry = COALESCE(?, industry),
+      annual_revenue = COALESCE(?, annual_revenue),
+      bank_name = COALESCE(?, bank_name),
+      bank_account_last4 = COALESCE(?, bank_account_last4),
+      is_bank_connected = COALESCE(?, is_bank_connected),
+      setup_completed = COALESCE(?, setup_completed)
      WHERE id = ?`,
     [
       name ? name.trim() : null,
       legalName ? legalName.trim() : null,
-      taxId || null,
+      taxId !== undefined ? taxId : null,
       currency || null,
       fiscalYearStartMonth || null,
       accountingMethod || null,
       booksLockedUntil !== undefined ? booksLockedUntil : current.books_locked_until,
+      userRole !== undefined ? userRole : null,
+      businessType !== undefined ? businessType : null,
+      industry !== undefined ? industry : null,
+      annualRevenue !== undefined ? annualRevenue : null,
+      bankName !== undefined ? bankName : null,
+      bankAccountLast4 !== undefined ? bankAccountLast4 : null,
+      isBankConnected !== undefined ? isBankConnected : null,
+      setupCompleted !== undefined ? setupCompleted : null,
       orgId
     ]
   );

@@ -388,7 +388,14 @@ export class AuthComponent {
       } else {
         await this.auth.login(this.email, this.password);
       }
-      await this.router.navigate(['/dashboard']);
+      
+      const activeOrg = this.auth.activeOrganization();
+      const setupDone = activeOrg?.setupCompleted || (activeOrg && localStorage.getItem(`quikledgr_setup_completed_${activeOrg.id}`));
+      if (!setupDone) {
+        await this.router.navigate(['/setup']);
+      } else {
+        await this.router.navigate(['/dashboard']);
+      }
     } catch (err: any) {
       console.error('Auth error:', err);
       const msg = err?.error?.message || err?.message || 'Authentication failed. Please verify credentials.';
@@ -402,7 +409,13 @@ export class AuthComponent {
     try {
       this.isLoading.set(true);
       await this.auth.loginWithGoogle();
-      await this.router.navigate(['/dashboard']);
+      const activeOrg = this.auth.activeOrganization();
+      const setupDone = activeOrg?.setupCompleted || (activeOrg && localStorage.getItem(`quikledgr_setup_completed_${activeOrg.id}`));
+      if (!setupDone) {
+        await this.router.navigate(['/setup']);
+      } else {
+        await this.router.navigate(['/dashboard']);
+      }
     } catch (err: any) {
       this.errorMessage.set('Google sign-in could not be initiated.');
     } finally {

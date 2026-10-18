@@ -16,6 +16,14 @@ export interface Organization {
   role?: string;
   accountingMethod?: string;
   booksLockedUntil?: string | null;
+  userRole?: string;
+  businessType?: string;
+  industry?: string;
+  annualRevenue?: string;
+  bankName?: string;
+  bankAccountLast4?: string;
+  isBankConnected?: boolean;
+  setupCompleted?: boolean;
 }
 
 export interface AuthResponse {

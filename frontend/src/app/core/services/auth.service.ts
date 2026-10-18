@@ -146,6 +146,35 @@ export class AuthService {
     return created;
   }
 
+  async updateCurrentOrganization(data: Partial<Organization>): Promise<Organization> {
+    try {
+      const updated = await firstValueFrom(
+        this.http.put<Organization>(`${this.API_URL}/organizations/current`, data, {
+          headers: this.getAuthHeaders()
+        })
+      );
+      if (updated) {
+        this.activeOrganization.set(updated);
+        this.organizations.update(list =>
+          list.map(o => o.id === updated.id ? updated : o)
+        );
+      }
+      return updated;
+    } catch (e) {
+      // In case of local-only fallback, update local activeOrganization signal
+      const curr = this.activeOrganization();
+      if (curr) {
+        const merged = { ...curr, ...data };
+        this.activeOrganization.set(merged);
+        this.organizations.update(list =>
+          list.map(o => o.id === curr.id ? merged : o)
+        );
+        return merged;
+      }
+      throw e;
+    }
+  }
+
   private saveSession(res: AuthResponse): void {
     if (res.token) {
       localStorage.setItem(this.TOKEN_KEY, res.token);
