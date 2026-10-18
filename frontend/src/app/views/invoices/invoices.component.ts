@@ -4,12 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { AuthService } from '../../core/services/auth.service';
+import { InvoiceTemplateService, InvoiceTemplateId } from '../../core/services/invoice-template.service';
+import { InvoiceTemplateRendererComponent } from './components/invoice-template-renderer.component';
 import { Invoice } from '../../core/models/invoice.model';
 
 @Component({
   selector: 'app-invoices',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, InvoiceTemplateRendererComponent],
   template: `
     <div class="space-y-6">
       <!-- 1. HEADER & ACTIONS -->
@@ -336,12 +338,14 @@ import { Invoice } from '../../core/models/invoice.model';
                 <tr class="hover:bg-[#F8FAFC] dark:hover:bg-[#1A222C]/60 transition-colors">
                   <!-- Invoice ID -->
                   <td class="py-3.5 px-5">
-                    <a
-                      [routerLink]="['/invoices', inv.id, 'edit']"
-                      class="font-mono font-bold text-[#3C50E0] dark:text-[#6574f8] hover:underline cursor-pointer"
+                    <button
+                      type="button"
+                      (click)="openPreview(inv)"
+                      class="font-mono font-bold text-[#3C50E0] dark:text-[#6574f8] hover:underline cursor-pointer text-left"
+                      title="View invoice details"
                     >
                       #{{ inv.invoiceNumber || inv.id }}
-                    </a>
+                    </button>
                     @if (inv.servicePeriod) {
                       <span class="block text-[10px] text-[#64748B] dark:text-[#8A99AD] truncate max-w-[180px]">
                         {{ inv.servicePeriod }}
@@ -544,23 +548,52 @@ import { Invoice } from '../../core/models/invoice.model';
       </div>
     }
 
-    <!-- 5. PREVIEW / PRINT MODAL -->
+    <!-- 5. PREVIEW / PRINT MODAL (Supports World's 3 Best Templates) -->
     @if (previewingInvoice()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-        <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col">
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <div class="w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-2xl bg-[#F8FAFC] dark:bg-[#1A222C] shadow-2xl border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col">
           
-          <!-- Modal Header -->
-          <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-bold text-slate-900 dark:text-white">
-                Invoice #{{ previewingInvoice()?.invoiceNumber || previewingInvoice()?.id }}
+          <!-- Modal Top Toolbar -->
+          <div class="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 px-6 py-3.5 bg-white dark:bg-[#1C2434] border-b border-[#E2E8F0] dark:border-[#2E3A47]">
+            <div class="flex items-center gap-2.5">
+              <span class="font-mono text-sm font-bold text-slate-900 dark:text-white">
+                #{{ previewingInvoice()?.invoiceNumber || previewingInvoice()?.id }}
               </span>
               <span class="text-xs font-bold px-2 py-0.5 rounded-full capitalize" [class]="isPaid(previewingInvoice()?.status) ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'">
                 {{ previewingInvoice()?.status }}
               </span>
             </div>
 
+            <!-- Template Switcher Pills -->
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-[#24303F] p-1 rounded-xl">
+              <span class="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#8A99AD] px-2 hidden sm:inline">
+                Template:
+              </span>
+              @for (tmpl of templateService.templates; track tmpl.id) {
+                <button
+                  type="button"
+                  (click)="currentPreviewTemplate.set(tmpl.id)"
+                  class="px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+                  [ngClass]="currentPreviewTemplate() === tmpl.id 
+                    ? 'bg-[#3C50E0] text-white shadow-xs font-bold' 
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
+                >
+                  {{ tmpl.name }}
+                </button>
+              }
+            </div>
+
+            <!-- Right Actions -->
             <div class="flex items-center gap-2">
+              <a
+                [routerLink]="['/invoices', previewingInvoice()?.id]"
+                (click)="previewingInvoice.set(null)"
+                title="Open Dedicated Full Page"
+                class="hidden md:inline-flex items-center gap-1 rounded-lg border border-[#E2E8F0] px-3 py-1.5 text-xs font-semibold hover:bg-[#F8FAFC] dark:border-[#2E3A47] dark:hover:bg-[#24303F] cursor-pointer"
+              >
+                <span>Full Page ↗</span>
+              </a>
+
               <button
                 type="button"
                 (click)="printInvoice()"
@@ -577,125 +610,25 @@ import { Invoice } from '../../core/models/invoice.model';
                 (click)="previewingInvoice.set(null)"
                 class="inline-flex items-center gap-1 rounded-lg bg-[#3C50E0] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#3444bf] cursor-pointer"
               >
-                Edit Invoice
+                Edit
               </a>
 
               <button
                 type="button"
                 (click)="previewingInvoice.set(null)"
-                class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
+                class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer text-sm"
               >
                 ✕
               </button>
             </div>
           </div>
 
-          <!-- Printable Modal Body -->
-          <div class="p-6 text-xs space-y-5 flex-1">
-            <div class="flex justify-between items-start border-b border-[#E2E8F0] dark:border-[#2E3A47] pb-4">
-              <div>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">
-                  {{ previewingInvoice()?.issuer?.companyName || 'QuikLedgr Enterprise LLC' }}
-                </h3>
-                <p class="text-[11px] text-[#64748B] dark:text-[#8A99AD] mt-0.5">
-                  {{ previewingInvoice()?.issuer?.address || 'Corporate Headquarters' }}
-                </p>
-              </div>
-
-              <div class="text-right">
-                <span class="text-[10px] font-bold text-[#3C50E0] uppercase">INVOICE</span>
-                <span class="block text-base font-mono font-bold text-slate-900 dark:text-white mt-0.5">
-                  #{{ previewingInvoice()?.invoiceNumber || previewingInvoice()?.id }}
-                </span>
-                <span class="block text-[11px] text-[#64748B] dark:text-[#8A99AD]">
-                  Issued: {{ formatDate(previewingInvoice()?.invoiceDate) }}
-                </span>
-                <span class="block text-[11px] font-bold text-[#3C50E0]">
-                  Due: {{ formatDate(previewingInvoice()?.dueDate) }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Client Info -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <span class="text-[10px] font-bold uppercase text-[#64748B] dark:text-[#8A99AD] block mb-1">Billed To</span>
-                <p class="font-bold text-sm text-slate-900 dark:text-white">{{ getClientName(previewingInvoice()!) }}</p>
-                <p class="text-slate-600 dark:text-slate-300">{{ previewingInvoice()?.client?.email || previewingInvoice()?.client_email }}</p>
-                @if (previewingInvoice()?.client?.address) {
-                  <p class="text-[11px] text-[#64748B] dark:text-[#8A99AD] mt-0.5">{{ previewingInvoice()?.client?.address }}</p>
-                }
-              </div>
-
-              @if (previewingInvoice()?.servicePeriod) {
-                <div class="text-right">
-                  <span class="text-[10px] font-bold uppercase text-[#64748B] dark:text-[#8A99AD] block mb-1">Engagement Period</span>
-                  <p class="font-semibold text-slate-800 dark:text-slate-200">{{ previewingInvoice()?.servicePeriod }}</p>
-                </div>
-              }
-            </div>
-
-            <!-- Line Items Table -->
-            <div class="border-t border-b border-[#E2E8F0] dark:border-[#2E3A47] py-3">
-              <table class="w-full text-left">
-                <thead>
-                  <tr class="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#8A99AD]">
-                    <th class="pb-1.5">Description</th>
-                    <th class="pb-1.5 text-center">Qty</th>
-                    <th class="pb-1.5 text-right">Rate</th>
-                    <th class="pb-1.5 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-[#E2E8F0]/50 dark:divide-[#2E3A47]/50">
-                  @for (item of previewingInvoice()?.items; track $index) {
-                    <tr>
-                      <td class="py-2 font-medium">{{ item.description }}</td>
-                      <td class="py-2 text-center font-mono">{{ item.quantity }}</td>
-                      <td class="py-2 text-right font-mono">{{ formatMoney(item.rate !== undefined ? item.rate : (item.unitPrice || 0), previewingInvoice()?.currency) }}</td>
-                      <td class="py-2 text-right font-mono font-bold">{{ formatMoney(item.amount, previewingInvoice()?.currency) }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Totals -->
-            <div class="space-y-1 text-right text-xs">
-              <div class="flex justify-between">
-                <span class="text-[#64748B] dark:text-[#8A99AD]">Subtotal:</span>
-                <span class="font-mono">{{ formatMoney(previewingInvoice()?.subtotal || 0, previewingInvoice()?.currency) }}</span>
-              </div>
-              @if (previewingInvoice()?.discountAmount) {
-                <div class="flex justify-between text-emerald-600">
-                  <span>Discount:</span>
-                  <span class="font-mono">-{{ formatMoney(previewingInvoice()?.discountAmount || 0, previewingInvoice()?.currency) }}</span>
-                </div>
-              }
-              @if (previewingInvoice()?.taxAmount) {
-                <div class="flex justify-between">
-                  <span class="text-[#64748B] dark:text-[#8A99AD]">Tax:</span>
-                  <span class="font-mono">+{{ formatMoney(previewingInvoice()?.taxAmount || 0, previewingInvoice()?.currency) }}</span>
-                </div>
-              }
-              <div class="flex justify-between text-base font-bold pt-2 border-t border-[#E2E8F0] dark:border-[#2E3A47] text-slate-900 dark:text-white">
-                <span>Total Amount:</span>
-                <span class="font-mono text-[#3C50E0]">{{ formatMoney(previewingInvoice()?.total || 0, previewingInvoice()?.currency) }}</span>
-              </div>
-            </div>
-
-            <!-- Wire / Notes -->
-            @if (previewingInvoice()?.wireDetails?.bankName) {
-              <div class="rounded-xl bg-[#F8FAFC] dark:bg-[#1A222C] p-3 text-[11px] font-mono">
-                <span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">Wire Instructions:</span>
-                Bank: {{ previewingInvoice()?.wireDetails?.bankName }} | Account: {{ previewingInvoice()?.wireDetails?.accountNumberOrIban }} | Routing: {{ previewingInvoice()?.wireDetails?.routingAba || previewingInvoice()?.wireDetails?.achRouting }}
-              </div>
-            }
-
-            @if (previewingInvoice()?.notes) {
-              <p class="text-[11px] text-[#64748B] dark:text-[#8A99AD] italic border-t border-[#E2E8F0] dark:border-[#2E3A47] pt-3">
-                {{ previewingInvoice()?.notes }}
-              </p>
-            }
+          <!-- Printable Modal Content Rendering Default or Selected Template -->
+          <div class="p-4 sm:p-6 flex-1 overflow-y-auto">
+            <app-invoice-template-renderer
+              [invoice]="previewingInvoice()!"
+              [template]="currentPreviewTemplate()"
+            />
           </div>
         </div>
       </div>
@@ -704,9 +637,11 @@ import { Invoice } from '../../core/models/invoice.model';
 })
 export class InvoicesComponent {
   invoiceService = inject(InvoiceService);
+  templateService = inject(InvoiceTemplateService);
   auth = inject(AuthService);
   router = inject(Router);
 
+  currentPreviewTemplate = signal<InvoiceTemplateId>(this.templateService.defaultTemplate());
   invoices = this.invoiceService.invoices;
   selectedStatus = signal<'ALL' | 'PAID' | 'PENDING' | 'OVERDUE' | 'DRAFT'>('ALL');
   searchQuery = signal<string>('');
@@ -860,6 +795,7 @@ export class InvoicesComponent {
   }
 
   openPreview(inv: Invoice): void {
+    this.currentPreviewTemplate.set(this.templateService.defaultTemplate());
     this.previewingInvoice.set(inv);
   }
 

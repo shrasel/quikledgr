@@ -24,6 +24,11 @@ export interface Organization {
   bankAccountLast4?: string;
   isBankConnected?: boolean;
   setupCompleted?: boolean;
+  address?: string;
+  taxId?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
 }
 
 export interface AuthResponse {

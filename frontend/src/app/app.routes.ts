@@ -5,9 +5,11 @@ import { AuthService } from './core/services/auth.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
 import { InvoiceFormComponent } from './views/invoices/invoice-form.component';
+import { InvoiceDetailComponent } from './views/invoices/invoice-detail.component';
 import { ExpensesComponent } from './views/expenses/expenses.component';
 import { AuthComponent } from './views/auth/auth.component';
 import { SetupComponent } from './views/setup/setup.component';
+import { SettingsComponent } from './views/settings/settings.component';
 import { GenericTabComponent } from './views/generic-tab/generic-tab.component';
 
 export const authGuard = () => {
@@ -43,6 +45,8 @@ export const routes: Routes = [
   { path: 'invoices/create', component: InvoiceFormComponent, canActivate: [authGuard] },
   { path: 'invoices/new', redirectTo: 'invoices/create', pathMatch: 'full' },
   { path: 'invoices/:id/edit', component: InvoiceFormComponent, canActivate: [authGuard] },
+  { path: 'invoices/:id/view', component: InvoiceDetailComponent, canActivate: [authGuard] },
+  { path: 'invoices/:id', component: InvoiceDetailComponent, canActivate: [authGuard] },
   { path: 'expenses', component: ExpensesComponent, canActivate: [authGuard] },
   {
     path: 'payments',
@@ -104,16 +108,7 @@ export const routes: Routes = [
     },
     canActivate: [authGuard]
   },
-  {
-    path: 'settings',
-    component: GenericTabComponent,
-    data: {
-      tabName: 'organization settings',
-      title: 'Organization Settings & Multi-Tenant Controls',
-      subtitle: 'Manage company legal profiles, tax jurisdictions, team members, and wire details.'
-    },
-    canActivate: [authGuard]
-  },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: 'profile', redirectTo: 'settings', pathMatch: 'full' },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'dashboard' }
