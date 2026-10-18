@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { InvoiceService } from '../../core/services/invoice.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -106,7 +108,7 @@ import { ThemeService } from '../../core/services/theme.service';
           <!-- "+ New Invoice" Quick Button -->
           <button
             type="button"
-            (click)="onNewInvoice.emit()"
+            (click)="onNewInvoiceClick()"
             class="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-[#3C50E0] py-2 px-3.5 text-xs font-semibold text-white shadow-xs hover:bg-[#3444bf] transition-all cursor-pointer"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -252,6 +254,8 @@ import { ThemeService } from '../../core/services/theme.service';
 export class HeaderComponent {
   auth = inject(AuthService);
   themeService = inject(ThemeService);
+  invoiceService = inject(InvoiceService);
+  router = inject(Router);
 
   sidebarOpen = input<boolean>(false);
   sidebarOpenChange = output<boolean>();
@@ -290,14 +294,22 @@ export class HeaderComponent {
     this.isOrgDropdownOpen.set(false);
   }
 
+  onNewInvoiceClick(): void {
+    this.invoiceService.openCreateModal();
+    this.onNewInvoice.emit();
+  }
+
   navigateToTab(tab: string): void {
     this.isUserDropdownOpen.set(false);
+    const target = tab === 'profile' ? '/settings' : `/${tab}`;
+    this.router.navigate([target]);
     this.onTabSelected.emit(tab);
   }
 
   logout(): void {
     this.isUserDropdownOpen.set(false);
     this.auth.logout();
+    this.router.navigate(['/auth']);
   }
 
   getUserInitials(): string {

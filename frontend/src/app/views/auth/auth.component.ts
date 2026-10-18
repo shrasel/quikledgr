@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
 
@@ -352,6 +353,7 @@ import { ThemeService } from '../../core/services/theme.service';
 export class AuthComponent {
   auth = inject(AuthService);
   theme = inject(ThemeService);
+  router = inject(Router);
 
   isSignUp = signal(false);
   showPassword = signal(false);
@@ -386,6 +388,7 @@ export class AuthComponent {
       } else {
         await this.auth.login(this.email, this.password);
       }
+      await this.router.navigate(['/dashboard']);
     } catch (err: any) {
       console.error('Auth error:', err);
       const msg = err?.error?.message || err?.message || 'Authentication failed. Please verify credentials.';
@@ -399,6 +402,7 @@ export class AuthComponent {
     try {
       this.isLoading.set(true);
       await this.auth.loginWithGoogle();
+      await this.router.navigate(['/dashboard']);
     } catch (err: any) {
       this.errorMessage.set('Google sign-in could not be initiated.');
     } finally {

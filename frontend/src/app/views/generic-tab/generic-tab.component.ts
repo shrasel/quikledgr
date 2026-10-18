@@ -1,10 +1,11 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-generic-tab',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <div class="space-y-6">
       <!-- Breadcrumb & Header -->
@@ -23,13 +24,13 @@ import { CommonModule } from '@angular/common';
           </p>
         </div>
 
-        <button
-          type="button"
+        <a
+          routerLink="/dashboard"
           (click)="onBackToDashboard.emit()"
           class="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-xs hover:bg-[#F8FAFC] dark:border-[#2E3A47] dark:bg-[#1C2434] dark:text-white dark:hover:bg-[#24303F] transition-all cursor-pointer"
         >
           <span>← Back to Dashboard</span>
-        </button>
+        </a>
       </div>
 
       <!-- Feature Card -->

@@ -17,6 +17,15 @@ export class InvoiceService {
   invoices = signal<Invoice[]>([]);
   selectedInvoice = signal<Invoice | null>(null);
   isLoading = signal<boolean>(false);
+  isCreateModalOpen = signal<boolean>(false);
+
+  openCreateModal(): void {
+    this.isCreateModalOpen.set(true);
+  }
+
+  closeCreateModal(): void {
+    this.isCreateModalOpen.set(false);
+  }
 
   constructor() {
     this.loadInvoices();

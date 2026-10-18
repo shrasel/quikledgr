@@ -1,5 +1,6 @@
 import { Component, inject, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { Invoice } from '../../core/models/invoice.model';
@@ -29,7 +30,7 @@ import { Invoice } from '../../core/models/invoice.model';
         <div class="flex items-center gap-2.5">
           <button
             type="button"
-            (click)="onNavigateTab.emit('payments')"
+            (click)="router.navigate(['/payments'])"
             class="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-xs hover:bg-[#F8FAFC] dark:border-[#2E3A47] dark:bg-[#1C2434] dark:text-white dark:hover:bg-[#24303F] transition-all cursor-pointer"
           >
             <span>Payments Ledger</span>
@@ -37,7 +38,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNewInvoice.emit()"
+            (click)="invoiceService.openCreateModal(); onNewInvoice.emit()"
             class="inline-flex items-center gap-2 rounded-lg bg-[#3C50E0] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#3444bf] transition-all cursor-pointer"
           >
             <span>+ Create Invoice</span>
@@ -334,7 +335,7 @@ import { Invoice } from '../../core/models/invoice.model';
           <div class="pt-4 mt-4 border-t border-[#E2E8F0] dark:border-[#2E3A47]">
             <button
               type="button"
-              (click)="onNavigateTab.emit('ar')"
+              (click)="router.navigate(['/ar'])"
               class="flex w-full items-center justify-between text-xs font-bold text-[#3C50E0] hover:underline cursor-pointer"
             >
               <span>View Accounts Receivable Matrix</span>
@@ -353,7 +354,7 @@ import { Invoice } from '../../core/models/invoice.model';
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <button
             type="button"
-            (click)="onNewInvoice.emit()"
+            (click)="invoiceService.openCreateModal(); onNewInvoice.emit()"
             class="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-3.5 text-left hover:border-[#3C50E0] hover:bg-[#3C50E0]/5 dark:border-[#2E3A47] dark:hover:bg-[#3C50E0]/10 transition-all shadow-2xs group cursor-pointer"
           >
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3C50E0]/10 text-[#3C50E0] group-hover:bg-[#3C50E0] group-hover:text-white transition-colors font-bold">
@@ -367,7 +368,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNavigateTab.emit('quotes')"
+            (click)="router.navigate(['/quotes'])"
             class="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-3.5 text-left hover:border-[#8B5CF6] hover:bg-[#8B5CF6]/5 dark:border-[#2E3A47] dark:hover:bg-[#8B5CF6]/10 transition-all shadow-2xs group cursor-pointer"
           >
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6] group-hover:bg-[#8B5CF6] group-hover:text-white transition-colors font-bold">
@@ -381,7 +382,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNavigateTab.emit('payments')"
+            (click)="router.navigate(['/payments'])"
             class="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-3.5 text-left hover:border-[#10B981] hover:bg-[#10B981]/5 dark:border-[#2E3A47] dark:hover:bg-[#10B981]/10 transition-all shadow-2xs group cursor-pointer"
           >
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#10B981]/10 text-[#10B981] group-hover:bg-[#10B981] group-hover:text-white transition-colors font-bold">
@@ -395,7 +396,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNavigateTab.emit('recurring')"
+            (click)="router.navigate(['/recurring'])"
             class="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-3.5 text-left hover:border-[#F59E0B] hover:bg-[#F59E0B]/5 dark:border-[#2E3A47] dark:hover:bg-[#F59E0B]/10 transition-all shadow-2xs group cursor-pointer"
           >
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F59E0B]/10 text-[#F59E0B] group-hover:bg-[#F59E0B] group-hover:text-white transition-colors font-bold">
@@ -409,7 +410,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNavigateTab.emit('accounting')"
+            (click)="router.navigate(['/accounting'])"
             class="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-3.5 text-left hover:border-[#3C50E0] hover:bg-[#3C50E0]/5 dark:border-[#2E3A47] dark:hover:bg-[#3C50E0]/10 transition-all shadow-2xs group cursor-pointer"
           >
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3C50E0]/10 text-[#3C50E0] group-hover:bg-[#3C50E0] group-hover:text-white transition-colors font-bold">
@@ -437,7 +438,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNavigateTab.emit('list')"
+            (click)="router.navigate(['/invoices'])"
             class="inline-flex items-center gap-1.5 text-xs font-bold text-[#3C50E0] hover:underline cursor-pointer"
           >
             <span>View All Invoices</span>
@@ -475,7 +476,7 @@ import { Invoice } from '../../core/models/invoice.model';
                 @for (inv of invoiceService.invoices(); track inv.id) {
                   <tr 
                     class="hover:bg-[#F8FAFC] dark:hover:bg-[#24303F]/50 transition-colors cursor-pointer group"
-                    (click)="onSelectInvoice.emit(inv)"
+                    (click)="router.navigate(['/invoices'])"
                   >
                     <td class="py-3.5 px-4">
                       <div class="flex items-center gap-3">
@@ -539,6 +540,7 @@ import { Invoice } from '../../core/models/invoice.model';
 export class DashboardComponent {
   auth = inject(AuthService);
   invoiceService = inject(InvoiceService);
+  router = inject(Router);
 
   onNavigateTab = output<string>();
   onNewInvoice = output<void>();

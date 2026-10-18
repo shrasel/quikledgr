@@ -41,7 +41,7 @@ import { Invoice } from '../../core/models/invoice.model';
 
           <button
             type="button"
-            (click)="onNewInvoice.emit()"
+            (click)="invoiceService.openCreateModal(); onNewInvoice.emit()"
             class="inline-flex items-center gap-2 rounded-lg bg-[#3C50E0] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#3444bf] transition-all cursor-pointer"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@ import { Invoice } from '../../core/models/invoice.model';
                       </p>
                       <button
                         type="button"
-                        (click)="onNewInvoice.emit()"
+                        (click)="invoiceService.openCreateModal(); onNewInvoice.emit()"
                         class="mt-4 rounded-lg bg-[#3C50E0] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#3444bf] transition-all cursor-pointer"
                       >
                         + Create First Invoice

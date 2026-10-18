@@ -1,10 +1,12 @@
 import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 export interface MenuItem {
   id: string;
   label: string;
+  route: string;
   iconSvg: string;
   tag?: string;
 }
@@ -17,7 +19,7 @@ export interface MenuGroup {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <!-- Mobile Backdrop -->
     @if (sidebarOpen()) {
@@ -36,9 +38,10 @@ export interface MenuGroup {
     >
       <!-- Logo Header -->
       <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-[#2E3A47]">
-        <div 
+        <a 
+          routerLink="/dashboard"
+          (click)="onLinkClick()"
           class="flex items-center gap-3 cursor-pointer select-none"
-          (click)="selectTab('dashboard')"
         >
           <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#3C50E0] text-white shadow-md">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -56,7 +59,7 @@ export interface MenuGroup {
               Enterprise Ledger & AR
             </p>
           </div>
-        </div>
+        </a>
 
         <button
           type="button"
@@ -81,23 +84,23 @@ export interface MenuGroup {
               <ul class="space-y-1">
                 @for (item of group.items; track item.id) {
                   <li>
-                    <button
-                      type="button"
-                      (click)="selectTab(item.id)"
-                      class="group relative flex w-full items-center gap-3 rounded-lg py-2.5 px-3.5 text-xs duration-150 transition-all cursor-pointer"
-                      [ngClass]="currentTab() === item.id 
-                        ? 'bg-[#333A48] text-white font-semibold shadow-xs' 
-                        : 'text-[#DEE4EE] hover:bg-[#333A48]/50 hover:text-white font-medium'"
+                    <a
+                      [routerLink]="item.route"
+                      routerLinkActive="bg-[#333A48] text-white font-semibold shadow-xs"
+                      [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+                      #rla="routerLinkActive"
+                      (click)="onLinkClick()"
+                      class="group relative flex w-full items-center gap-3 rounded-lg py-2.5 px-3.5 text-xs duration-150 transition-all cursor-pointer text-[#DEE4EE] hover:bg-[#333A48]/50 hover:text-white font-medium"
                     >
                       <span 
                         class="shrink-0"
-                        [ngClass]="currentTab() === item.id ? 'text-[#3C50E0]' : 'text-[#8A99AD] group-hover:text-white'"
+                        [ngClass]="rla.isActive ? 'text-[#3C50E0]' : 'text-[#8A99AD] group-hover:text-white'"
                         [innerHTML]="item.iconSvg"
                       ></span>
 
                       <span class="flex-1 text-left truncate">{{ item.label }}</span>
 
-                      @if (item.id === 'list' && invoiceCount() > 0) {
+                      @if (item.id === 'invoices' && invoiceCount() > 0) {
                         <span class="shrink-0 rounded-full bg-[#3C50E0] px-2 py-0.5 text-[10px] font-bold text-white font-mono">
                           {{ invoiceCount() }}
                         </span>
@@ -108,7 +111,7 @@ export interface MenuGroup {
                           {{ item.tag }}
                         </span>
                       }
-                    </button>
+                    </a>
                   </li>
                 }
               </ul>
@@ -151,6 +154,7 @@ export class SidebarComponent {
 
   sidebarOpenChange = output<boolean>();
   tabSelected = output<string>();
+  newInvoice = output<void>();
 
   menuGroups: MenuGroup[] = [
     {
@@ -159,6 +163,7 @@ export class SidebarComponent {
         {
           id: 'dashboard',
           label: 'Dashboard',
+          route: '/dashboard',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>'
         }
       ]
@@ -167,29 +172,34 @@ export class SidebarComponent {
       name: 'INVOICING & AR',
       items: [
         {
-          id: 'list',
+          id: 'invoices',
           label: 'Invoices',
+          route: '/invoices',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>'
-        },
-        {
-          id: 'editor',
-          label: 'Invoice Editor',
-          iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>'
         },
         {
           id: 'quotes',
           label: 'Quotes & Proposals',
+          route: '/quotes',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>'
         },
         {
           id: 'recurring',
           label: 'Recurring Retainers',
+          route: '/recurring',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>'
         },
         {
           id: 'ar',
           label: 'AR Aging & Dunning',
+          route: '/ar',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        },
+        {
+          id: 'customers',
+          label: 'Clients & Directory',
+          route: '/customers',
+          iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>'
         }
       ]
     },
@@ -199,6 +209,7 @@ export class SidebarComponent {
         {
           id: 'expenses',
           label: 'Expenses & AP Bills',
+          route: '/expenses',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
           tag: 'OCR/1099'
         }
@@ -210,6 +221,7 @@ export class SidebarComponent {
         {
           id: 'payments',
           label: 'Payments & Portal',
+          route: '/payments',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>',
           tag: 'Stripe/ACH'
         }
@@ -221,6 +233,7 @@ export class SidebarComponent {
         {
           id: 'accounting',
           label: 'Chart of Accounts & GL',
+          route: '/accounting',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"/></svg>'
         }
       ]
@@ -231,14 +244,14 @@ export class SidebarComponent {
         {
           id: 'profile',
           label: 'Entity & Wire Details',
+          route: '/settings',
           iconSvg: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>'
         }
       ]
     }
   ];
 
-  selectTab(tabId: string): void {
-    this.tabSelected.emit(tabId);
+  onLinkClick(): void {
     if (window.innerWidth < 1024) {
       this.closeSidebar();
     }
