@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { AuthService } from '../../core/services/auth.service';
-import { InvoiceTemplateService, InvoiceTemplateId } from '../../core/services/invoice-template.service';
+import { InvoiceTemplateService } from '../../core/services/invoice-template.service';
 import { InvoiceTemplateRendererComponent } from './components/invoice-template-renderer.component';
 import { Invoice } from '../../core/models/invoice.model';
 
@@ -556,31 +556,12 @@ import { Invoice } from '../../core/models/invoice.model';
           <!-- Modal Top Toolbar -->
           <div class="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 px-6 py-3.5 bg-white dark:bg-[#1C2434] border-b border-[#E2E8F0] dark:border-[#2E3A47]">
             <div class="flex items-center gap-2.5">
-              <span class="font-mono text-sm font-bold text-slate-900 dark:text-white">
-                #{{ previewingInvoice()?.invoiceNumber || previewingInvoice()?.id }}
+              <span class="text-sm font-bold text-slate-900 dark:text-white">
+                Invoice Details
               </span>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full capitalize" [class]="isPaid(previewingInvoice()?.status) ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'">
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full capitalize" [class]="isPaid(previewingInvoice()?.status) ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'">
                 {{ previewingInvoice()?.status }}
               </span>
-            </div>
-
-            <!-- Template Switcher Pills -->
-            <div class="flex items-center gap-1 bg-slate-100 dark:bg-[#24303F] p-1 rounded-xl">
-              <span class="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#8A99AD] px-2 hidden sm:inline">
-                Template:
-              </span>
-              @for (tmpl of templateService.templates; track tmpl.id) {
-                <button
-                  type="button"
-                  (click)="currentPreviewTemplate.set(tmpl.id)"
-                  class="px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer"
-                  [ngClass]="currentPreviewTemplate() === tmpl.id 
-                    ? 'bg-[#3C50E0] text-white shadow-xs font-bold' 
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
-                >
-                  {{ tmpl.name }}
-                </button>
-              }
             </div>
 
             <!-- Right Actions -->
@@ -616,18 +597,18 @@ import { Invoice } from '../../core/models/invoice.model';
               <button
                 type="button"
                 (click)="previewingInvoice.set(null)"
-                class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer text-sm"
+                class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer text-sm"
               >
                 ✕
               </button>
             </div>
           </div>
 
-          <!-- Printable Modal Content Rendering Default or Selected Template -->
+          <!-- Printable Modal Content Rendering Default Template -->
           <div class="p-4 sm:p-6 flex-1 overflow-y-auto">
             <app-invoice-template-renderer
               [invoice]="previewingInvoice()!"
-              [template]="currentPreviewTemplate()"
+              [template]="templateService.defaultTemplate()"
             />
           </div>
         </div>
@@ -641,7 +622,6 @@ export class InvoicesComponent {
   auth = inject(AuthService);
   router = inject(Router);
 
-  currentPreviewTemplate = signal<InvoiceTemplateId>(this.templateService.defaultTemplate());
   invoices = this.invoiceService.invoices;
   selectedStatus = signal<'ALL' | 'PAID' | 'PENDING' | 'OVERDUE' | 'DRAFT'>('ALL');
   searchQuery = signal<string>('');
@@ -795,7 +775,6 @@ export class InvoicesComponent {
   }
 
   openPreview(inv: Invoice): void {
-    this.currentPreviewTemplate.set(this.templateService.defaultTemplate());
     this.previewingInvoice.set(inv);
   }
 

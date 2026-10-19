@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { InvoiceService } from '../../core/services/invoice.service';
-import { InvoiceTemplateService, InvoiceTemplateId } from '../../core/services/invoice-template.service';
+import { InvoiceTemplateService } from '../../core/services/invoice-template.service';
 import { InvoiceTemplateRendererComponent } from './components/invoice-template-renderer.component';
 import { Invoice } from '../../core/models/invoice.model';
 
@@ -15,36 +15,18 @@ import { Invoice } from '../../core/models/invoice.model';
       <!-- Top Action Bar -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
         <div>
-          <div class="flex items-center gap-1.5 text-xs font-semibold text-[#64748B] dark:text-[#8A99AD] mb-1">
-            <a routerLink="/invoices" class="hover:text-[#3C50E0]">Invoices</a>
-            <span class="text-slate-400">/</span>
-            <span class="text-[#3C50E0]">#{{ invoice()?.invoiceNumber || invoice()?.id }}</span>
-          </div>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Invoice #{{ invoice()?.invoiceNumber || invoice()?.id }}
-          </h1>
+          <a
+            routerLink="/invoices"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#64748B] hover:text-[#3C50E0] dark:text-[#8A99AD] dark:hover:text-[#6574f8] transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
+            <span>Back to Invoices</span>
+          </a>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2.5">
-          <!-- Live Template Selector Pills -->
-          <div class="flex items-center gap-1 bg-white dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] p-1 rounded-xl shadow-xs">
-            <span class="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#8A99AD] px-2 hidden md:inline">
-              Template:
-            </span>
-            @for (tmpl of templateService.templates; track tmpl.id) {
-              <button
-                type="button"
-                (click)="activeTemplate.set(tmpl.id)"
-                class="px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer"
-                [ngClass]="activeTemplate() === tmpl.id 
-                  ? 'bg-[#3C50E0] text-white shadow-xs font-bold' 
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
-              >
-                {{ tmpl.name }}
-              </button>
-            }
-          </div>
-
+        <div class="flex items-center gap-2.5">
           <!-- Print / PDF Button -->
           <button
             type="button"
@@ -74,7 +56,7 @@ import { Invoice } from '../../core/models/invoice.model';
       @if (invoice()) {
         <app-invoice-template-renderer
           [invoice]="invoice()!"
-          [template]="activeTemplate()"
+          [template]="templateService.defaultTemplate()"
         />
       } @else {
         <div class="rounded-xl border border-[#E2E8F0] bg-white p-12 text-center shadow-xs dark:border-[#2E3A47] dark:bg-[#1C2434]">
@@ -95,12 +77,8 @@ export class InvoiceDetailComponent implements OnInit {
   templateService = inject(InvoiceTemplateService);
 
   invoice = signal<Invoice | null>(null);
-  activeTemplate = signal<InvoiceTemplateId>(this.templateService.defaultTemplate());
 
   ngOnInit(): void {
-    // Reset to user's saved default template
-    this.activeTemplate.set(this.templateService.defaultTemplate());
-
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) {
