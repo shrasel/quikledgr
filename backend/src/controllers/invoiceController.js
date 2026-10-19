@@ -220,6 +220,30 @@ export async function createInvoice(req, res, next) {
 
     const { hash: pinHash, salt: pinSalt } = await hashAccessPin(pin);
 
+    // Calculate subtotal from items if provided, or fallback to inv.subtotal
+    let calculatedSubtotal = 0;
+    if (inv.items && Array.isArray(inv.items) && inv.items.length > 0) {
+      calculatedSubtotal = inv.items.reduce((sum, it) => {
+        const qty = parseFloat(it.quantity) || 0;
+        const rate = parseFloat(it.rate !== undefined ? it.rate : (it.unitPrice || 0));
+        return sum + (qty * rate);
+      }, 0);
+    }
+    const subtotal = calculatedSubtotal > 0 ? calculatedSubtotal : (parseFloat(inv.subtotal) || 0);
+
+    // Calculate additional charges total if provided
+    let calculatedAdditional = 0;
+    if (inv.additionalCharges && Array.isArray(inv.additionalCharges) && inv.additionalCharges.length > 0) {
+      calculatedAdditional = inv.additionalCharges.reduce((sum, chg) => {
+        return sum + (parseFloat(chg.amount) || 0);
+      }, 0);
+    }
+    const additionalChargesTotal = calculatedAdditional > 0 ? calculatedAdditional : (parseFloat(inv.additionalChargesTotal) || 0);
+
+    const discountAmount = parseFloat(inv.discountAmount) || 0;
+    const taxAmount = parseFloat(inv.taxAmount) || 0;
+    const total = Math.max(0, subtotal + additionalChargesTotal + taxAmount - discountAmount);
+
     // 1. Insert invoice header with organization_id
     await connection.query(
       `INSERT INTO invoices (
@@ -246,11 +270,11 @@ export async function createInvoice(req, res, next) {
         inv.serviceStartDate || null,
         inv.serviceEndDate || null,
         inv.paymentTerms || 'Payment due on or before the 15th of the month',
-        parseFloat(inv.subtotal) || 0,
-        parseFloat(inv.additionalChargesTotal) || 0,
-        parseFloat(inv.discountAmount) || 0,
-        parseFloat(inv.taxAmount) || 0,
-        parseFloat(inv.total) || 0,
+        subtotal,
+        additionalChargesTotal,
+        discountAmount,
+        taxAmount,
+        total,
         inv.notes || '',
         inv.agreementComplianceNote || 'Submitted in accordance with Consulting Agreement.'
       ]
@@ -338,7 +362,7 @@ export async function createInvoice(req, res, next) {
     if (orgId && (inv.status === 'sent' || inv.status === 'paid')) {
       try {
         await recordInvoiceJournal(
-          { ...inv, id: invoiceId, invoiceNumber },
+          { ...inv, id: invoiceId, invoiceNumber, subtotal, total, taxAmount },
           inv.status,
           orgId
         );
@@ -462,11 +486,27 @@ export async function updateInvoice(req, res, next) {
       }
     }
 
-    const subtotal = parseFloat(inv.subtotal) || 0;
-    const additionalChargesTotal = parseFloat(inv.additionalChargesTotal) || 0;
+    let calculatedSubtotal = 0;
+    if (inv.items && Array.isArray(inv.items) && inv.items.length > 0) {
+      calculatedSubtotal = inv.items.reduce((sum, it) => {
+        const qty = parseFloat(it.quantity) || 0;
+        const rate = parseFloat(it.rate !== undefined ? it.rate : (it.unitPrice || 0));
+        return sum + (qty * rate);
+      }, 0);
+    }
+    const subtotal = calculatedSubtotal > 0 ? calculatedSubtotal : (parseFloat(inv.subtotal) || 0);
+
+    let calculatedAdditional = 0;
+    if (inv.additionalCharges && Array.isArray(inv.additionalCharges) && inv.additionalCharges.length > 0) {
+      calculatedAdditional = inv.additionalCharges.reduce((sum, chg) => {
+        return sum + (parseFloat(chg.amount) || 0);
+      }, 0);
+    }
+    const additionalChargesTotal = calculatedAdditional > 0 ? calculatedAdditional : (parseFloat(inv.additionalChargesTotal) || 0);
+
     const discountAmount = parseFloat(inv.discountAmount) || 0;
     const taxAmount = parseFloat(inv.taxAmount) || 0;
-    const total = parseFloat(inv.total) || (subtotal + additionalChargesTotal + taxAmount - discountAmount);
+    const total = Math.max(0, subtotal + additionalChargesTotal + taxAmount - discountAmount);
     const amountPaid = parseFloat(current.amount_paid) || 0;
     const balanceDue = Math.max(0, total - amountPaid);
     const status = inv.status || current.status;

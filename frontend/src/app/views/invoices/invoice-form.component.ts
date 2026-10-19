@@ -410,6 +410,7 @@ interface CurrencyOption {
                           type="number"
                           step="any"
                           [(ngModel)]="item.quantity"
+                          (ngModelChange)="updateItemAmount(item)"
                           (input)="updateItemAmount(item)"
                           min="0"
                           class="w-full text-center rounded-lg border border-[#E2E8F0] bg-white py-1.5 px-2 text-xs font-mono font-bold text-slate-900 dark:border-[#2E3A47] dark:bg-[#1C2434] dark:text-white"
@@ -422,6 +423,7 @@ interface CurrencyOption {
                           type="number"
                           step="any"
                           [(ngModel)]="item.rate"
+                          (ngModelChange)="updateItemAmount(item)"
                           (input)="updateItemAmount(item)"
                           min="0"
                           class="w-full text-right rounded-lg border border-[#E2E8F0] bg-white py-1.5 px-2 text-xs font-mono font-bold text-slate-900 dark:border-[#2E3A47] dark:bg-[#1C2434] dark:text-white"
@@ -1013,11 +1015,11 @@ export class InvoiceFormComponent implements OnInit {
   // Line items
   items: InvoiceItem[] = [
     {
-      description: 'Cloud Architecture & Enterprise Engineering',
+      description: 'Consulting Services',
       category: 'consulting',
       quantity: 1,
-      rate: 4500,
-      amount: 4500
+      rate: 1000,
+      amount: 1000
     }
   ];
 
@@ -1046,42 +1048,48 @@ export class InvoiceFormComponent implements OnInit {
   notes = 'Thank you for your business. Remittances are payable via ACH or direct wire transfer.';
   agreementComplianceNote = 'Submitted in accordance with Consulting Services Agreement.';
 
-  // Currency symbol computed
-  currencySymbol = computed(() => {
+  // Currency symbol
+  currencySymbol(): string {
     const found = this.currencies.find(c => c.code === this.selectedCurrency);
     return found ? found.symbol : '$';
-  });
+  }
 
-  // Financial Computations
-  subtotal = computed(() => {
-    return this.items.reduce((acc, it) => acc + (Number(it.amount) || 0), 0);
-  });
+  // Financial Computations (dynamic methods ensuring live reactivity on any item/rate/tax edit)
+  subtotal(): number {
+    return this.items.reduce((acc, it) => {
+      const qty = Number(it.quantity) || 0;
+      const rate = Number(it.rate) || 0;
+      const amt = Math.round(qty * rate * 100) / 100;
+      it.amount = amt;
+      return acc + amt;
+    }, 0);
+  }
 
-  additionalChargesTotal = computed(() => {
+  additionalChargesTotal(): number {
     return this.additionalCharges.reduce((acc, chg) => acc + (Number(chg.amount) || 0), 0);
-  });
+  }
 
-  calculatedDiscount = computed(() => {
+  calculatedDiscount(): number {
     const base = this.subtotal() + this.additionalChargesTotal();
     if (this.discountType === 'percent') {
-      return (base * (Number(this.discountValue) || 0)) / 100;
+      return Math.round(((base * (Number(this.discountValue) || 0)) / 100) * 100) / 100;
     }
     return Number(this.discountValue) || 0;
-  });
+  }
 
-  calculatedTax = computed(() => {
+  calculatedTax(): number {
     const base = Math.max(0, this.subtotal() + this.additionalChargesTotal() - this.calculatedDiscount());
-    return (base * (Number(this.taxRate) || 0)) / 100;
-  });
+    return Math.round(((base * (Number(this.taxRate) || 0)) / 100) * 100) / 100;
+  }
 
-  calculatedTotal = computed(() => {
+  calculatedTotal(): number {
     const total = this.subtotal() + this.additionalChargesTotal() - this.calculatedDiscount() + this.calculatedTax();
-    return Math.max(0, total);
-  });
+    return Math.max(0, Math.round(total * 100) / 100);
+  }
 
-  calculatedBalanceDue = computed(() => {
-    return Math.max(0, this.calculatedTotal() - this.amountPaid);
-  });
+  calculatedBalanceDue(): number {
+    return Math.max(0, Math.round((this.calculatedTotal() - Number(this.amountPaid || 0)) * 100) / 100);
+  }
 
   ngOnInit(): void {
     // Fill default issuer from active organization
@@ -1135,13 +1143,17 @@ export class InvoiceFormComponent implements OnInit {
 
     // Line items
     if (inv.items && inv.items.length > 0) {
-      this.items = inv.items.map(it => ({
-        description: it.description,
-        category: it.category || 'consulting',
-        quantity: Number(it.quantity) || 1,
-        rate: Number(it.rate !== undefined ? it.rate : it.unitPrice) || 0,
-        amount: Number(it.amount) || 0
-      }));
+      this.items = inv.items.map(it => {
+        const qty = Number(it.quantity) || 1;
+        const rate = Number(it.rate !== undefined ? it.rate : it.unitPrice) || 0;
+        return {
+          description: it.description || '',
+          category: it.category || 'consulting',
+          quantity: qty,
+          rate: rate,
+          amount: Math.round(qty * rate * 100) / 100
+        };
+      });
     }
 
     // Additional Charges
