@@ -23,18 +23,8 @@ import { ThemeService } from '../../core/services/theme.service';
 
           <!-- Brand Header -->
           <div class="relative z-10">
-            <div class="flex items-center gap-3">
-              <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#3C50E0] text-white shadow-lg shadow-[#3C50E0]/30">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-                </svg>
-              </div>
-              <div>
-                <span class="text-2xl font-black tracking-tight text-white leading-none">QuikLedgr</span>
-                <span class="ml-2 inline-block rounded bg-[#3C50E0]/80 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
-                  v2.0 ANGULAR
-                </span>
-              </div>
+            <div class="inline-flex items-center rounded-2xl bg-white p-3.5 shadow-xl shadow-black/20">
+              <img src="/logo.png" alt="QuickLedger" class="h-10 w-auto object-contain" />
             </div>
             
             <p class="mt-4 text-sm text-[#8A99AD] leading-relaxed max-w-sm">
@@ -156,10 +146,18 @@ import { ThemeService } from '../../core/services/theme.service';
               </button>
             </div>
 
+            <!-- Mobile Brand Logo -->
+            <div class="lg:hidden flex items-center justify-center mb-6">
+              <img src="/logo.png" alt="QuickLedger" class="h-9 w-auto object-contain dark:hidden" />
+              <div class="hidden dark:flex items-center rounded-xl bg-white/95 px-3 py-1.5 shadow-sm">
+                <img src="/logo.png" alt="QuickLedger" class="h-8 w-auto object-contain" />
+              </div>
+            </div>
+
             <!-- Header Titles -->
             <div class="mt-6">
               <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {{ isSignUp() ? 'Create your QuikLedgr workspace' : 'Welcome back to QuikLedgr' }}
+                {{ isSignUp() ? 'Create your QuickLedger workspace' : 'Welcome back to QuickLedger' }}
               </h2>
               <p class="text-xs text-[#64748B] dark:text-[#8A99AD] mt-1">
                 {{ isSignUp() ? 'Start managing multi-tenant double-entry accounting in seconds.' : 'Enter your enterprise credentials to access your financial ledger.' }}

@@ -17,7 +17,7 @@ import { Invoice } from '../../core/models/invoice.model';
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-[#E2E8F0] pb-5 dark:border-[#2E3A47]">
         <div>
           <div class="flex items-center gap-1.5 text-xs font-semibold text-[#64748B] dark:text-[#8A99AD] mb-1">
-            <a routerLink="/dashboard" class="hover:text-[#3C50E0]">QuikLedgr</a>
+            <a routerLink="/dashboard" class="hover:text-[#3C50E0]">QuickLedger</a>
             <span class="text-slate-400">/</span>
             <span class="text-[#3C50E0]">Organization Settings</span>
           </div>

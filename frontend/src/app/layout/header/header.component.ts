@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { InvoiceService } from '../../core/services/invoice.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <header class="sticky top-0 z-30 flex h-16 shrink-0 w-full items-center bg-white dark:bg-[#1C2434] border-b border-[#E2E8F0] dark:border-[#2E3A47] shadow-xs">
       <div class="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -24,6 +24,11 @@ import { Router } from '@angular/router';
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
             </svg>
           </button>
+
+          <!-- Mobile Brand Logo (Visible only on mobile when sidebar is hidden) -->
+          <a routerLink="/dashboard" class="flex lg:hidden items-center shrink-0">
+            <img src="/logo-icon.png" alt="QuickLedger" class="h-7 w-auto object-contain" />
+          </a>
 
           <!-- Search Box -->
           <div class="hidden sm:block relative flex-1 max-w-md">

@@ -15,7 +15,7 @@ import { Invoice } from '../../core/models/invoice.model';
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div class="flex items-center gap-1.5 text-xs font-semibold text-[#64748B] dark:text-[#8A99AD] mb-1">
-            <span>QuikLedgr</span>
+            <span>QuickLedger</span>
             <span class="text-slate-400">/</span>
             <span class="text-[#3C50E0]">Dashboard</span>
           </div>

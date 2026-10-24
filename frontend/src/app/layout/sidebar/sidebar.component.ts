@@ -41,23 +41,21 @@ export interface MenuGroup {
         <a 
           routerLink="/dashboard"
           (click)="onLinkClick()"
-          class="flex items-center gap-3 cursor-pointer select-none"
+          class="flex items-center cursor-pointer select-none py-1"
         >
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#3C50E0] text-white shadow-md">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">QuikLedgr</span>
-              <span class="rounded bg-[#3C50E0]/80 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
-                ANGULAR 19
-              </span>
-            </div>
-            <p class="text-[10px] text-[#64748B] dark:text-[#8A99AD] font-medium tracking-wide mt-1">
-              Enterprise Ledger & AR
-            </p>
+          <!-- Light Mode Logo (Default) -->
+          <img 
+            src="/logo.png" 
+            alt="QuickLedger" 
+            class="h-9 w-auto max-w-[200px] object-contain dark:hidden" 
+          />
+          <!-- Dark Mode Logo with subtle soft white backdrop for optimal contrast -->
+          <div class="hidden dark:flex items-center rounded-lg bg-white/95 px-2.5 py-1 shadow-xs">
+            <img 
+              src="/logo.png" 
+              alt="QuickLedger" 
+              class="h-7 w-auto max-w-[190px] object-contain" 
+            />
           </div>
         </a>
 

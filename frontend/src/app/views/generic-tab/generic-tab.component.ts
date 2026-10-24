@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div class="flex items-center gap-1.5 text-xs font-semibold text-[#64748B] dark:text-[#8A99AD] mb-1">
-            <span>QuikLedgr</span>
+            <span>QuickLedger</span>
             <span class="text-slate-400">/</span>
             <span class="text-[#3C50E0] capitalize">{{ tabName() }}</span>
           </div>
@@ -46,7 +46,7 @@ import { RouterLink } from '@angular/router';
           {{ tabName() }} Ledger & Controls Active
         </h3>
         <p class="mt-2 text-xs text-[#64748B] dark:text-[#8A99AD] max-w-md mx-auto">
-          Connected to QuikLedgr Multi-Tenant Accounting Engine. Real-time synchronization is enabled for this workspace.
+          Connected to QuickLedger Multi-Tenant Accounting Engine. Real-time synchronization is enabled for this workspace.
         </p>
 
         <div class="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">

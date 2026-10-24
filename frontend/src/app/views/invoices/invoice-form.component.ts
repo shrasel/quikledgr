@@ -22,7 +22,7 @@ interface CurrencyOption {
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sticky top-16 z-20 bg-[#F1F5F9]/90 dark:bg-[#1A222C]/90 backdrop-blur-md py-3 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
         <div>
           <div class="flex items-center gap-1.5 text-xs font-semibold text-[#64748B] dark:text-[#8A99AD] mb-1">
-            <a routerLink="/dashboard" class="hover:text-[#3C50E0] transition-colors">QuikLedgr</a>
+            <a routerLink="/dashboard" class="hover:text-[#3C50E0] transition-colors">QuickLedger</a>
             <span class="text-slate-400">/</span>
             <a routerLink="/invoices" class="hover:text-[#3C50E0] transition-colors">Invoices</a>
             <span class="text-slate-400">/</span>
