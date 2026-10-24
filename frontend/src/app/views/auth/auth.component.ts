@@ -23,8 +23,8 @@ import { ThemeService } from '../../core/services/theme.service';
 
           <!-- Brand Header -->
           <div class="relative z-10">
-            <div class="inline-flex items-center rounded-2xl bg-white p-3.5 shadow-xl shadow-black/20">
-              <img src="/logo.png" alt="QuickLedger" class="h-10 w-auto object-contain" />
+            <div class="inline-flex items-center py-1">
+              <img src="/ql-logo-dark.png" alt="QuickLedger" class="h-11 w-auto object-contain" />
             </div>
             
             <p class="mt-4 text-sm text-[#8A99AD] leading-relaxed max-w-sm">
@@ -148,10 +148,8 @@ import { ThemeService } from '../../core/services/theme.service';
 
             <!-- Mobile Brand Logo -->
             <div class="lg:hidden flex items-center justify-center mb-6">
-              <img src="/logo.png" alt="QuickLedger" class="h-9 w-auto object-contain dark:hidden" />
-              <div class="hidden dark:flex items-center rounded-xl bg-white/95 px-3 py-1.5 shadow-sm">
-                <img src="/logo.png" alt="QuickLedger" class="h-8 w-auto object-contain" />
-              </div>
+              <img src="/ql-logo-light.png" alt="QuickLedger" class="h-9 w-auto object-contain dark:hidden" />
+              <img src="/ql-logo-dark.png" alt="QuickLedger" class="h-9 w-auto object-contain hidden dark:block" />
             </div>
 
             <!-- Header Titles -->

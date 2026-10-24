@@ -27,7 +27,7 @@ export type SetupStep = 'welcome' | 'business_details' | 'bank_connect' | 'payme
         <header class="flex items-center justify-between px-6 sm:px-12 py-4 border-b border-slate-100">
           <!-- Logo -->
           <div class="flex items-center gap-2.5">
-            <img src="/logo.png" alt="QuickLedger" class="h-8 sm:h-9 w-auto object-contain" />
+            <img src="/ql-logo-light.png" alt="QuickLedger" class="h-8 sm:h-9 w-auto object-contain" />
           </div>
 
           <!-- Center step indicator / Title -->

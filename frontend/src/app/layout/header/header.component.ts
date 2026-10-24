@@ -27,7 +27,8 @@ import { Router, RouterLink } from '@angular/router';
 
           <!-- Mobile Brand Logo (Visible only on mobile when sidebar is hidden) -->
           <a routerLink="/dashboard" class="flex lg:hidden items-center shrink-0">
-            <img src="/logo-icon.png" alt="QuickLedger" class="h-7 w-auto object-contain" />
+            <img src="/ql-icon-light.png" alt="QuickLedger" class="h-7.5 w-7.5 object-contain dark:hidden" />
+            <img src="/ql-icon-dark.png" alt="QuickLedger" class="h-7.5 w-7.5 object-contain hidden dark:block" />
           </a>
 
           <!-- Search Box -->

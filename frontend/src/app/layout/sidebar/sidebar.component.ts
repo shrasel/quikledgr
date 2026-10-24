@@ -45,18 +45,16 @@ export interface MenuGroup {
         >
           <!-- Light Mode Logo (Default) -->
           <img 
-            src="/logo.png" 
+            src="/ql-logo-light.png" 
             alt="QuickLedger" 
-            class="h-9 w-auto max-w-[200px] object-contain dark:hidden" 
+            class="h-8.5 w-auto max-w-[200px] object-contain dark:hidden" 
           />
-          <!-- Dark Mode Logo with subtle soft white backdrop for optimal contrast -->
-          <div class="hidden dark:flex items-center rounded-lg bg-white/95 px-2.5 py-1 shadow-xs">
-            <img 
-              src="/logo.png" 
-              alt="QuickLedger" 
-              class="h-7 w-auto max-w-[190px] object-contain" 
-            />
-          </div>
+          <!-- Dark Mode Logo (Tailored for dark navy backgrounds) -->
+          <img 
+            src="/ql-logo-dark.png" 
+            alt="QuickLedger" 
+            class="h-8.5 w-auto max-w-[200px] object-contain hidden dark:block" 
+          />
         </a>
 
         <button
