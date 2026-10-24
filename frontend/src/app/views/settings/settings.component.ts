@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -312,8 +312,14 @@ import { Invoice } from '../../core/models/invoice.model';
       <!-- MODAL: LIVE SAMPLE INVOICE TEMPLATE PREVIEW -->
       <!-- ========================================================================= -->
       @if (previewModalOpen()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div class="w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-[#F8FAFC] dark:bg-[#1A222C] shadow-2xl border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col">
+        <div 
+          (click)="previewModalOpen.set(false)"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer"
+        >
+          <div 
+            (click)="$event.stopPropagation()"
+            class="w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-[#F8FAFC] dark:bg-[#1A222C] shadow-2xl border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col cursor-default"
+          >
             <!-- Modal Header -->
             <div class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white dark:bg-[#1C2434] border-b border-[#E2E8F0] dark:border-[#2E3A47]">
               <div>
@@ -496,5 +502,10 @@ export class SettingsComponent {
     } finally {
       this.isSaving.set(false);
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.previewModalOpen.set(false);
   }
 }

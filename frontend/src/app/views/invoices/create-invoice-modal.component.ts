@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, output, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InvoiceService } from '../../core/services/invoice.service';
@@ -10,8 +10,14 @@ import { Invoice, InvoiceItem } from '../../core/models/invoice.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col">
+    <div 
+      (click)="onClose.emit()"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs cursor-pointer"
+    >
+      <div 
+        (click)="$event.stopPropagation()"
+        class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col cursor-default"
+      >
         
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
@@ -272,5 +278,10 @@ export class CreateInvoiceModalComponent {
     } finally {
       this.isSubmitting.set(false);
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.onClose.emit();
   }
 }

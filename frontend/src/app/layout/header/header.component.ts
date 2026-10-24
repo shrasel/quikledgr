@@ -1,4 +1,4 @@
-import { Component, input, output, inject, signal } from '@angular/core';
+import { Component, input, output, inject, signal, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
@@ -52,10 +52,10 @@ import { Router, RouterLink } from '@angular/router';
         <div class="flex items-center gap-2 sm:gap-3">
           <!-- Workspace / Entity Selector Dropdown -->
           @if (auth.activeOrganization(); as org) {
-            <div class="relative">
+            <div class="relative" #orgDropdownContainer>
               <button
                 type="button"
-                (click)="toggleOrgDropdown()"
+                (click)="toggleOrgDropdown($event)"
                 class="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] py-1.5 px-3 text-left hover:bg-[#F1F5F9] dark:border-[#2E3A47] dark:bg-[#1A222C] dark:hover:bg-[#24303F] transition-all shadow-xs cursor-pointer"
               >
                 <div class="flex h-6 w-6 items-center justify-center rounded-md bg-[#3C50E0]/15 text-[#3C50E0] dark:bg-[#3C50E0]/25 shrink-0">
@@ -142,10 +142,10 @@ import { Router, RouterLink } from '@angular/router';
           </button>
 
           <!-- Notifications Button -->
-          <div class="relative">
+          <div class="relative" #notifyDropdownContainer>
             <button
               type="button"
-              (click)="toggleNotifyDropdown()"
+              (click)="toggleNotifyDropdown($event)"
               class="relative flex h-9 w-9 items-center justify-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-slate-700 hover:text-[#3C50E0] dark:border-[#2E3A47] dark:bg-[#1A222C] dark:text-[#8A99AD] dark:hover:text-white transition-all shadow-xs cursor-pointer"
             >
               <span class="absolute 1.5 -top-0.5 -right-0.5 z-1 h-2 w-2 rounded-full bg-[#10B981]">
@@ -188,10 +188,10 @@ import { Router, RouterLink } from '@angular/router';
           </div>
 
           <!-- User Profile Dropdown -->
-          <div class="relative pl-2 sm:pl-3 border-l border-[#E2E8F0] dark:border-[#2E3A47]">
+          <div class="relative pl-2 sm:pl-3 border-l border-[#E2E8F0] dark:border-[#2E3A47]" #userDropdownContainer>
             <button
               type="button"
-              (click)="toggleUserDropdown()"
+              (click)="toggleUserDropdown($event)"
               class="flex items-center gap-2.5 text-left p-1 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#1A222C] transition-colors cursor-pointer"
             >
               <div class="h-8 w-8 rounded-full bg-[#3C50E0] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs shrink-0">
@@ -268,31 +268,64 @@ export class HeaderComponent {
   onNewInvoice = output<void>();
   onTabSelected = output<string>();
 
+  @ViewChild('orgDropdownContainer') orgDropdownContainer?: ElementRef;
+  @ViewChild('notifyDropdownContainer') notifyDropdownContainer?: ElementRef;
+  @ViewChild('userDropdownContainer') userDropdownContainer?: ElementRef;
+
   searchQuery = '';
   isOrgDropdownOpen = signal(false);
   isNotifyDropdownOpen = signal(false);
   isUserDropdownOpen = signal(false);
 
   toggleSidebar(): void {
+    this.closeAllDropdowns();
     this.sidebarOpenChange.emit(!this.sidebarOpen());
   }
 
-  toggleOrgDropdown(): void {
+  toggleOrgDropdown(event?: Event): void {
+    event?.stopPropagation();
     this.isOrgDropdownOpen.update(v => !v);
     this.isNotifyDropdownOpen.set(false);
     this.isUserDropdownOpen.set(false);
   }
 
-  toggleNotifyDropdown(): void {
+  toggleNotifyDropdown(event?: Event): void {
+    event?.stopPropagation();
     this.isNotifyDropdownOpen.update(v => !v);
     this.isOrgDropdownOpen.set(false);
     this.isUserDropdownOpen.set(false);
   }
 
-  toggleUserDropdown(): void {
+  toggleUserDropdown(event?: Event): void {
+    event?.stopPropagation();
     this.isUserDropdownOpen.update(v => !v);
     this.isOrgDropdownOpen.set(false);
     this.isNotifyDropdownOpen.set(false);
+  }
+
+  closeAllDropdowns(): void {
+    this.isOrgDropdownOpen.set(false);
+    this.isNotifyDropdownOpen.set(false);
+    this.isUserDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+    if (this.isOrgDropdownOpen() && this.orgDropdownContainer && !this.orgDropdownContainer.nativeElement.contains(target)) {
+      this.isOrgDropdownOpen.set(false);
+    }
+    if (this.isNotifyDropdownOpen() && this.notifyDropdownContainer && !this.notifyDropdownContainer.nativeElement.contains(target)) {
+      this.isNotifyDropdownOpen.set(false);
+    }
+    if (this.isUserDropdownOpen() && this.userDropdownContainer && !this.userDropdownContainer.nativeElement.contains(target)) {
+      this.isUserDropdownOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeAllDropdowns();
   }
 
   selectOrg(orgId: string): void {
@@ -301,6 +334,7 @@ export class HeaderComponent {
   }
 
   onNewInvoiceClick(): void {
+    this.closeAllDropdowns();
     this.router.navigate(['/invoices/create']);
     this.onNewInvoice.emit();
   }

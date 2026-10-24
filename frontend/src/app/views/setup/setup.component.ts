@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -574,8 +574,14 @@ export type SetupStep = 'welcome' | 'business_details' | 'bank_connect' | 'payme
 
       <!-- MOCK BANK CONNECT MODAL -->
       @if (showBankModal()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-5">
+        <div 
+          (click)="showBankModal.set(false)"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs cursor-pointer"
+        >
+          <div 
+            (click)="$event.stopPropagation()"
+            class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-5 cursor-default"
+          >
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h4 class="text-base font-bold text-slate-900">Select your bank</h4>
@@ -770,5 +776,10 @@ export class SetupComponent implements OnInit {
       localStorage.setItem(`quikledgr_setup_completed_${activeOrg.id}`, 'true');
     }
     await this.router.navigate(['/dashboard']);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.showBankModal.set(false);
   }
 }

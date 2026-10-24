@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -504,8 +504,14 @@ import { Invoice } from '../../core/models/invoice.model';
 
     <!-- 4. DELETE CONFIRMATION MODAL -->
     @if (invoiceToDelete()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] space-y-4">
+      <div 
+        (click)="invoiceToDelete.set(null)"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer"
+      >
+        <div 
+          (click)="$event.stopPropagation()"
+          class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] space-y-4 cursor-default"
+        >
           <div class="flex items-center gap-3 text-rose-600">
             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/10">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -550,8 +556,14 @@ import { Invoice } from '../../core/models/invoice.model';
 
     <!-- 5. PREVIEW / PRINT MODAL (Supports World's 3 Best Templates) -->
     @if (previewingInvoice()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-        <div class="w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-2xl bg-[#F8FAFC] dark:bg-[#1A222C] shadow-2xl border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col">
+      <div 
+        (click)="previewingInvoice.set(null)"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer"
+      >
+        <div 
+          (click)="$event.stopPropagation()"
+          class="w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-2xl bg-[#F8FAFC] dark:bg-[#1A222C] shadow-2xl border border-[#E2E8F0] dark:border-[#2E3A47] flex flex-col cursor-default"
+        >
           
           <!-- Modal Top Toolbar -->
           <div class="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 px-6 py-3.5 bg-white dark:bg-[#1C2434] border-b border-[#E2E8F0] dark:border-[#2E3A47]">
@@ -810,5 +822,11 @@ export class InvoicesComponent {
       this.toastMessage.set(err?.message || 'Failed to delete invoice.');
       this.toastType.set('error');
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.invoiceToDelete.set(null);
+    this.previewingInvoice.set(null);
   }
 }

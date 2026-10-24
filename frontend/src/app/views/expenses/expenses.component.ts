@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../core/services/expense.service';
@@ -485,8 +485,14 @@ import { Vendor } from '../../core/models/vendor.model';
 
       <!-- MODAL 1: RECORD EXPENSE & RECEIPT OCR -->
       @if (showRecordExpenseModal()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div class="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47]">
+        <div 
+          (click)="showRecordExpenseModal.set(false)"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs cursor-pointer"
+        >
+          <div 
+            (click)="$event.stopPropagation()"
+            class="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] cursor-default"
+          >
             <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
               <div>
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Record Expense & Receipt OCR</h3>
@@ -662,8 +668,14 @@ import { Vendor } from '../../core/models/vendor.model';
 
       <!-- MODAL 2: ADD VENDOR BILL (AP) -->
       @if (showCreateBillModal()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47]">
+        <div 
+          (click)="showCreateBillModal.set(false)"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs cursor-pointer"
+        >
+          <div 
+            (click)="$event.stopPropagation()"
+            class="w-full max-w-lg rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] cursor-default"
+          >
             <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
               <div>
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Record Vendor Bill (Accounts Payable)</h3>
@@ -785,8 +797,14 @@ import { Vendor } from '../../core/models/vendor.model';
 
       <!-- MODAL 3: PAY VENDOR BILL -->
       @if (showPayBillModal() && selectedBillToPay(); as bill) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47]">
+        <div 
+          (click)="showPayBillModal.set(false)"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs cursor-pointer"
+        >
+          <div 
+            (click)="$event.stopPropagation()"
+            class="w-full max-w-md rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] cursor-default"
+          >
             <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
               <div>
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Pay Vendor Bill</h3>
@@ -861,8 +879,14 @@ import { Vendor } from '../../core/models/vendor.model';
 
       <!-- MODAL 4: NEW VENDOR -->
       @if (showAddVendorModal()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47]">
+        <div 
+          (click)="showAddVendorModal.set(false)"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs cursor-pointer"
+        >
+          <div 
+            (click)="$event.stopPropagation()"
+            class="w-full max-w-md rounded-2xl bg-white shadow-2xl dark:bg-[#1C2434] border border-[#E2E8F0] dark:border-[#2E3A47] cursor-default"
+          >
             <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#2E3A47]">
               <div>
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Add Supplier / Contractor</h3>
@@ -1158,5 +1182,13 @@ export class ExpensesComponent {
     if (confirm('Delete this expense record?')) {
       await this.expenseService.deleteExpense(id);
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.showRecordExpenseModal.set(false);
+    this.showCreateBillModal.set(false);
+    this.showPayBillModal.set(false);
+    this.showAddVendorModal.set(false);
   }
 }
